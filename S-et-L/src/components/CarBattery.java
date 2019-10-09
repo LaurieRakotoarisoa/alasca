@@ -24,10 +24,15 @@ public class CarBattery extends AbstractComponent{
 	 */
 	protected BatteryMode state = BatteryMode.InCharge;
 
+	/**
+	 * @param URI Component uri
+	 * @param inboundURI uri for the inbound port 
+	 * @throws Exception
+	 */
 	protected CarBattery(String URI,String inboundURI) throws Exception {
 		super(URI,1, 0);
 		
-		//Create and publish port
+		//Create and publish port for remote control
 		PortI BatteryInboundPort = new CarBatteryInboundPort(inboundURI,this);
 		BatteryInboundPort.publishPort();
 		this.executionLog.setDirectory(System.getProperty("user.home")) ;
@@ -52,6 +57,10 @@ public class CarBattery extends AbstractComponent{
 		return state;
 	}
 	
+	
+	/**
+	 * @see fr.sorbonne_u.components.AbstractComponent#start()
+	 */
 	@Override
 	public void			start() throws ComponentStartException
 	{
