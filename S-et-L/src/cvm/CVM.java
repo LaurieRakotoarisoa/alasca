@@ -1,27 +1,22 @@
 package cvm;
 
 import components.CarBattery;
-import components.CarBatteryEnergyController;
+import components.EnergyController;
+import components.Fridge;
 import components.TV;
-import components.TVEnergyController;
 import connectors.CarBatteryConnector;
+import connectors.FridgeConnector;
 import connectors.TVConnector;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.cvm.AbstractCVM;
+import utils.URI;
 
 public class CVM extends AbstractCVM{
 	
-	/** URI of the provider component (convenience).						*/
-	protected static final String	CONTROLLER_COMPONENT_URI = "my-URI-controller" ;
-	/** URI of the consumer component (convenience).						*/
-	protected static final String	BATTERY_COMPONENT_URI = "my-URI-battery" ;
-	/** URI of the provider outbound port (simplifies the connection).	*/
-	protected static final String	BatteryOutboundPortURI = "oport" ;
-	/** URI of the consumer inbound port (simplifies the connection).		*/
-	protected static final String	BatteryInboundPortURI = "iport" ;
-	
 	protected String controllerURI;
 	protected String carBatteryURI;
+	protected String fridgeURI;
+	protected String tvURI;
 
 	public CVM() throws Exception {
 		super();
@@ -49,21 +44,47 @@ public class CVM extends AbstractCVM{
 		// create the battery component
 		this.carBatteryURI =
 			AbstractComponent.createComponent(
-					TV.class.getCanonicalName(),
-					new Object[]{BATTERY_COMPONENT_URI,
-							BatteryInboundPortURI}) ;
+					CarBattery.class.getCanonicalName(),
+					new Object[]{URI.BATTERY_COMPONENT_URI,
+							URI.BatteryInboundPortURI}) ;
 		assert	this.isDeployedComponent(this.carBatteryURI) ;
 		// make it trace its operations; comment and uncomment the line to see
 		// the difference
 		this.toggleTracing(this.carBatteryURI) ;
 		this.toggleLogging(this.carBatteryURI) ;
+		
+		
+		// create the Fridge component
+		this.fridgeURI =
+				AbstractComponent.createComponent(
+						Fridge.class.getCanonicalName(),
+						new Object[]{URI.Fridge_COMPONENT_URI,
+								URI.FridgeInboundPortURI}) ;
+		assert	this.isDeployedComponent(this.fridgeURI) ;
+		// make it trace its operations; comment and uncomment the line to see
+		// the difference
+		this.toggleTracing(this.fridgeURI) ;
+		this.toggleLogging(this.fridgeURI) ;
+		
+		// create the TV component
+		this.tvURI =
+				AbstractComponent.createComponent(
+						TV.class.getCanonicalName(),
+						new Object[]{URI.TV_COMPONENT_URI,
+								URI.TVInboundPortURI}) ;
+		assert	this.isDeployedComponent(this.tvURI) ;
+		// make it trace its operations; comment and uncomment the line to see
+		// the difference
+		this.toggleTracing(this.tvURI) ;
+		this.toggleLogging(this.tvURI) ;
 
+		
 		// create the controller component
 		this.controllerURI =
 			AbstractComponent.createComponent(
-					TVEnergyController.class.getCanonicalName(),
-					new Object[]{CONTROLLER_COMPONENT_URI,
-							BatteryOutboundPortURI}) ;
+					EnergyController.class.getCanonicalName(),
+					new Object[]{URI.CONTROLLER_COMPONENT_URI,
+							URI.BatteryOutboundPortURI}) ;
 		assert	this.isDeployedComponent(this.controllerURI) ;
 		// make it trace its operations; comment and uncomment the line to see
 		// the difference
@@ -77,8 +98,18 @@ public class CVM extends AbstractCVM{
 		// do the connection
 		this.doPortConnection(
 				this.controllerURI,
-				BatteryOutboundPortURI,
-				BatteryInboundPortURI,
+				URI.BatteryOutboundPortURI,
+				URI.BatteryInboundPortURI,
+				CarBatteryConnector.class.getCanonicalName()) ;
+		this.doPortConnection(
+				this.controllerURI,
+				URI.FridgeOutboundPortURI,
+				URI.FridgeInboundPortURI,
+				FridgeConnector.class.getCanonicalName()) ;
+		this.doPortConnection(
+				this.controllerURI,
+				URI.TVOutboundPortURI,
+				URI.TVInboundPortURI,
 				TVConnector.class.getCanonicalName()) ;
 		// Nota: the above use of the reference to the object representing
 		// the URI consumer component is allowed only in the deployment

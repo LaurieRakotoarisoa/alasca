@@ -1,4 +1,4 @@
-package ports;
+package ports.carBattery;
 
 import components.CarBattery;
 import fr.sorbonne_u.components.ComponentI;

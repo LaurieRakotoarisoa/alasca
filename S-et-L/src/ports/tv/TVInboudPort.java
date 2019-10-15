@@ -1,4 +1,4 @@
-package ports;
+package ports.tv;
 
 import components.TV;
 import fr.sorbonne_u.components.ComponentI;

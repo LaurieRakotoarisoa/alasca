@@ -1,6 +1,6 @@
-package ports;
+package ports.tv;
 
-import components.TVEnergyController;
+import components.EnergyController;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractOutboundPort;
 import interfaces.TVI;
@@ -12,7 +12,7 @@ implements TVI{
 	public TVOutboundPort(String uri,ComponentI owner) throws Exception {
 		super(uri,TVI.class, owner);
 		
-		assert owner instanceof TVEnergyController;
+		assert owner instanceof EnergyController;
 	}
 
 	/**

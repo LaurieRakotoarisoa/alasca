@@ -1,6 +1,6 @@
-package ports;
+package ports.carBattery;
 
-import components.CarBatteryEnergyController;
+import components.EnergyController;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractOutboundPort;
 import interfaces.CarBatteryI;
@@ -12,7 +12,7 @@ implements CarBatteryI{
 	public CarBatteryOutboundPort(String uri,ComponentI owner) throws Exception {
 		super(uri,CarBatteryI.class, owner);
 		
-		assert owner instanceof CarBatteryEnergyController;
+		assert owner instanceof EnergyController;
 	}
 
 	/**

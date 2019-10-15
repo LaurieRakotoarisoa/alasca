@@ -5,20 +5,30 @@ import java.util.concurrent.TimeUnit;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.RequiredInterfaces;
 import interfaces.CarBatteryI;
-import ports.CarBatteryOutboundPort;
+import ports.carBattery.CarBatteryOutboundPort;
+import ports.fridge.FridgeOutboundPort;
+import ports.tv.TVOutboundPort;
 import utils.BatteryMode;
+import utils.FridgeMode;
+import utils.TVMode;
 
 
 @RequiredInterfaces (required = CarBatteryI.class)
-public class CarBatteryEnergyController extends AbstractComponent{
+public class EnergyController extends AbstractComponent{
 	
 	protected CarBatteryOutboundPort batteryOutbound;
+	protected FridgeOutboundPort fridgeOutbound;
+	protected TVOutboundPort tvOutbound;
 	
-	protected CarBatteryEnergyController(String URI,String outboundURI) throws Exception {
-		super(URI,1, 1);
+	protected EnergyController(String URI,String outboundURI) throws Exception {
+		super(URI,3,3 );
 		
 		batteryOutbound = new CarBatteryOutboundPort(outboundURI,this);
 		batteryOutbound.localPublishPort();
+		fridgeOutbound = new FridgeOutboundPort(outboundURI,this);
+		fridgeOutbound.localPublishPort();
+		tvOutbound = new TVOutboundPort(outboundURI,this);
+		tvOutbound.localPublishPort();
 		this.executionLog.setDirectory(System.getProperty("user.home")) ;
 		this.tracer.setTitle("energy controller") ;
 	}
@@ -26,6 +36,18 @@ public class CarBatteryEnergyController extends AbstractComponent{
 	public void getCarBatteryMode() throws Exception{
 		BatteryMode m = batteryOutbound.getState();
 		this.logMessage("Etat de la batterie : "+m);
+		
+	}
+	
+	public void getTVMode() throws Exception{
+		TVMode m = tvOutbound.getState();
+		this.logMessage("Etat de la télé : "+m);
+		
+	}
+	
+	public void getFridgeMode() throws Exception{
+		FridgeMode m = fridgeOutbound.getState();
+		this.logMessage("Etat de la réfrigérateur : "+m);
 		
 	}
 	
@@ -45,7 +67,9 @@ public class CarBatteryEnergyController extends AbstractComponent{
 				@Override
 				public void run() {
 					try {
-						((CarBatteryEnergyController)this.getTaskOwner()).getCarBatteryMode() ;
+						((EnergyController)this.getTaskOwner()).getCarBatteryMode();
+						((EnergyController)this.getTaskOwner()).getFridgeMode();
+						((EnergyController)this.getTaskOwner()).getTVMode();
 					} catch (Exception e) {
 						throw new RuntimeException(e) ;
 					}
@@ -67,6 +91,10 @@ public class CarBatteryEnergyController extends AbstractComponent{
 		// virtual machine.
 		this.batteryOutbound.doDisconnection();
 		this.batteryOutbound.unpublishPort() ;
+		this.fridgeOutbound.doDisconnection();
+		this.fridgeOutbound.unpublishPort() ;
+		this.tvOutbound.doDisconnection();
+		this.tvOutbound.unpublishPort() ;
 
 		// This called at the end to make the component internal
 		// state move to the finalised state.

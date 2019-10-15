@@ -5,44 +5,44 @@ import fr.sorbonne_u.components.annotations.OfferedInterfaces;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.components.ports.PortI;
-import interfaces.TVI;
-import ports.tv.TVInboudPort;
-import utils.TVMode;
+import interfaces.FridgeI;
+import ports.fridge.FridgeInboudPort;
+import utils.FridgeMode;
 
 /**
- * The class <code>TV</code> implements a component that models a TV's behaviour
+ * The class <code>Fridge</code> implements a component that models a Fridge's behaviour
  * @author Saad CHIADMI
  *
  */
-@OfferedInterfaces (offered = TVI.class)
-public class TV extends AbstractComponent{
+@OfferedInterfaces (offered = FridgeI.class)
+public class Fridge extends AbstractComponent{
 	
 	/**
-	 * Current state of the TV
+	 * Current state of the Fridge
 	 */
-	protected TVMode state = TVMode.Off;
+	protected FridgeMode state = FridgeMode.On_Close;
 	
 	/**
 	 * @param URI Component uri
 	 * @param inboundURI uri for the inbound port 
 	 * @throws Exception
 	 */
-	protected TV(String URI,String inboundURI) throws Exception {
+	protected Fridge(String URI,String inboundURI) throws Exception {
 		super(URI,1, 0);
 		
 		//Create and publish port for remote control
-		PortI TVInboundPort = new TVInboudPort(inboundURI,this);
-		TVInboundPort.publishPort();
+		PortI FridgeInboundPort = new FridgeInboudPort(inboundURI,this);
+		FridgeInboundPort.publishPort();
 		this.executionLog.setDirectory(System.getProperty("user.home"));
-		this.tracer.setTitle("TV");
+		this.tracer.setTitle("Fridge");
 	}
 	
 	/**
-	 * <p>Give information about the current state of the TV</p>
-	 * (On, off)
-	 * @return {@link TVMode}
+	 * <p>Give information about the current state of the Fridge</p>
+	 * (On, off, In charge)
+	 * @return {@link FridgeMode}
 	 */
-	public TVMode getModeService() {
+	public FridgeMode getModeService() {
 		return state;
 	}
 	
@@ -53,14 +53,14 @@ public class TV extends AbstractComponent{
 	public void			start() throws ComponentStartException
 	{
 		super.start() ;
-		this.logMessage("starting TV component.") ;
+		this.logMessage("starting Fridge component.") ;
 	}
 	
 	@Override
 	public void			finalise() throws Exception
 	{
-		this.logMessage("stopping TV component.") ;
-		this.printExecutionLogOnFile("TV") ;
+		this.logMessage("stopping Fridge component.") ;
+		this.printExecutionLogOnFile("Fridge") ;
 		super.finalise();
 	}
 	
@@ -68,7 +68,7 @@ public class TV extends AbstractComponent{
 	public void			shutdown() throws ComponentShutdownException
 	{
 		try {
-			PortI[] p = this.findPortsFromInterface(TVI.class) ;
+			PortI[] p = this.findPortsFromInterface(FridgeI.class) ;
 			p[0].unpublishPort() ;
 		} catch (Exception e) {
 			throw new ComponentShutdownException(e);
@@ -77,3 +77,4 @@ public class TV extends AbstractComponent{
 	}
 
 }
+

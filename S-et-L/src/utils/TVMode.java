@@ -8,11 +8,11 @@ package utils;
 public enum TVMode {
 
 	/**
-	 * Battery providing power
+	 * TV providing power
 	 */
 	On, 
 	/**
-	 * Battery off
+	 * TV off
 	 */
 	Off;
 }

@@ -6,7 +6,7 @@ import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.components.ports.PortI;
 import interfaces.CarBatteryI;
-import ports.CarBatteryInboundPort;
+import ports.carBattery.CarBatteryInboundPort;
 import utils.BatteryMode;
 
 /**
