@@ -19,9 +19,6 @@ import utils.BatteryMode;
 public class CarBatteryInboundPort  extends AbstractInboundPort
 implements CarBatteryI{
 
-
-	
-
 	public CarBatteryInboundPort(String uri,ComponentI owner) throws Exception {
 		super(uri, CarBatteryI.class, owner);
 		assert owner instanceof CarBattery;

@@ -1,8 +1,11 @@
 package cvm;
 
 import components.CarBattery;
-import components.EnergyController;
+import components.CarBatteryEnergyController;
+import components.TV;
+import components.TVEnergyController;
 import connectors.CarBatteryConnector;
+import connectors.TVConnector;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.cvm.AbstractCVM;
 
@@ -46,7 +49,7 @@ public class CVM extends AbstractCVM{
 		// create the battery component
 		this.carBatteryURI =
 			AbstractComponent.createComponent(
-					CarBattery.class.getCanonicalName(),
+					TV.class.getCanonicalName(),
 					new Object[]{BATTERY_COMPONENT_URI,
 							BatteryInboundPortURI}) ;
 		assert	this.isDeployedComponent(this.carBatteryURI) ;
@@ -58,7 +61,7 @@ public class CVM extends AbstractCVM{
 		// create the controller component
 		this.controllerURI =
 			AbstractComponent.createComponent(
-					EnergyController.class.getCanonicalName(),
+					TVEnergyController.class.getCanonicalName(),
 					new Object[]{CONTROLLER_COMPONENT_URI,
 							BatteryOutboundPortURI}) ;
 		assert	this.isDeployedComponent(this.controllerURI) ;
@@ -76,7 +79,7 @@ public class CVM extends AbstractCVM{
 				this.controllerURI,
 				BatteryOutboundPortURI,
 				BatteryInboundPortURI,
-				CarBatteryConnector.class.getCanonicalName()) ;
+				TVConnector.class.getCanonicalName()) ;
 		// Nota: the above use of the reference to the object representing
 		// the URI consumer component is allowed only in the deployment
 		// phase of the component virtual machine (to perform the static
