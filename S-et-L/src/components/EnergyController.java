@@ -5,6 +5,8 @@ import java.util.concurrent.TimeUnit;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.RequiredInterfaces;
 import interfaces.CarBatteryI;
+import interfaces.FridgeI;
+import interfaces.TVI;
 import ports.carBattery.CarBatteryOutboundPort;
 import ports.fridge.FridgeOutboundPort;
 import ports.tv.TVOutboundPort;
@@ -13,24 +15,42 @@ import utils.FridgeMode;
 import utils.TVMode;
 
 
-@RequiredInterfaces (required = CarBatteryI.class)
+@RequiredInterfaces (required = {CarBatteryI.class, TVI.class, FridgeI.class})
 public class EnergyController extends AbstractComponent{
 	
 	protected CarBatteryOutboundPort batteryOutbound;
 	protected FridgeOutboundPort fridgeOutbound;
 	protected TVOutboundPort tvOutbound;
 	
-	protected EnergyController(String URI,String outboundURI) throws Exception {
-		super(URI,3,3 );
+	protected EnergyController(String URI,String CarBatteryoutboundURI, String TVoutboundURI, String FridgeoutboundURI) throws Exception {
+		super(URI,1,1 );
 		
-		batteryOutbound = new CarBatteryOutboundPort(outboundURI,this);
+		batteryOutbound = new CarBatteryOutboundPort(CarBatteryoutboundURI,this);
 		batteryOutbound.localPublishPort();
-		fridgeOutbound = new FridgeOutboundPort(outboundURI,this);
-		fridgeOutbound.localPublishPort();
-		tvOutbound = new TVOutboundPort(outboundURI,this);
+		tvOutbound = new TVOutboundPort(TVoutboundURI,this);
 		tvOutbound.localPublishPort();
+		fridgeOutbound = new FridgeOutboundPort(FridgeoutboundURI,this);
+		fridgeOutbound.localPublishPort();
 		this.executionLog.setDirectory(System.getProperty("user.home")) ;
 		this.tracer.setTitle("energy controller") ;
+	}
+	
+	public void turnOff() throws Exception{
+		tvOutbound.turnOff();
+		this.logMessage("Etat de la télé : Off");
+		
+	}
+	
+	public void turnOn() throws Exception{
+		tvOutbound.turnOn();
+		this.logMessage("Etat de la télé : ON");
+		
+	}
+	
+	public void setBacklight(int backlight) throws Exception{
+		tvOutbound.setBacklight(backlight);
+		this.logMessage("retro-éclairage de la télé :"+backlight);
+		
 	}
 	
 	public void getCarBatteryMode() throws Exception{
@@ -76,6 +96,19 @@ public class EnergyController extends AbstractComponent{
 				}
 			},
 			1000, TimeUnit.MILLISECONDS);
+		
+		this.scheduleTask(
+			new AbstractComponent.AbstractTask() {
+				@Override
+				public void run() {
+					try {
+						((EnergyController)this.getTaskOwner()).get;
+					} catch (Exception e) {
+						throw new RuntimeException(e) ;
+					}
+				}
+			},
+			5000, TimeUnit.MILLISECONDS);
 	}
 	
 	@Override

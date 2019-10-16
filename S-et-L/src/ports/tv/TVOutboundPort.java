@@ -26,4 +26,25 @@ implements TVI{
 		return ((TVI)this.connector).getState();
 	}
 
+
+	@Override
+	public void turnOff() throws Exception {
+		((TVI)this.connector).turnOff();
+		
+	}
+
+
+	@Override
+	public void turnOn() throws Exception {
+		((TVI)this.connector).turnOn();
+		
+	}
+
+
+	@Override
+	public void setBacklight(int backlight) throws Exception {
+		((TVI)this.connector).setBacklight(backlight);
+		
+	}
+
 }

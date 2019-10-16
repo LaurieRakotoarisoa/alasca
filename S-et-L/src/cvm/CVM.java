@@ -84,7 +84,9 @@ public class CVM extends AbstractCVM{
 			AbstractComponent.createComponent(
 					EnergyController.class.getCanonicalName(),
 					new Object[]{URI.CONTROLLER_COMPONENT_URI,
-							URI.BatteryOutboundPortURI}) ;
+							URI.BatteryOutboundPortURI,
+							URI.TVOutboundPortURI,
+							URI.FridgeOutboundPortURI}) ;
 		assert	this.isDeployedComponent(this.controllerURI) ;
 		// make it trace its operations; comment and uncomment the line to see
 		// the difference

@@ -21,6 +21,8 @@ public class TV extends AbstractComponent{
 	 * Current state of the TV
 	 */
 	protected TVMode state = TVMode.Off;
+	protected int cons = 0;
+	protected int backlight = 50;
 	
 	/**
 	 * @param URI Component uri
@@ -43,6 +45,28 @@ public class TV extends AbstractComponent{
 	 * @return {@link TVMode}
 	 */
 	public TVMode getModeService() {
+		return state;
+	}
+	
+	/**
+	 * <p>set the current state of the TV</p>
+	 * (On, off)
+	 */
+	public int setBacklight(int backlight) {
+		this.logMessage("Modification rétroeclairage à "+ backlight);
+		this.cons = backlight/10;
+		this.backlight = backlight;
+		return backlight;
+	}
+	
+	/**
+	 * <p>set the current state of the TV</p>
+	 * (On, off)
+	 */
+	public TVMode setModeService(TVMode state) {
+		if (state == TVMode.Off) this.cons = 0;
+		else this.cons = backlight/10;
+		this.state = state;
 		return state;
 	}
 	

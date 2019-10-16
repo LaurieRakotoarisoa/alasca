@@ -35,4 +35,27 @@ implements TVI{
 		return this.getOwner().handleRequestSync(owner -> ((TV)owner).getModeService());
 	}
 
+	/**
+	 * @see interfaces.TVI#turnOff()
+	 */
+	@Override
+	public void turnOff() throws Exception {
+		this.getOwner().handleRequestSync(owner -> ((TV) owner).setModeService(TVMode.Off));
+		
+	}
+
+	/**
+	 * @see interfaces.TVI#turnOn()
+	 */
+	@Override
+	public void turnOn() throws Exception {
+		this.getOwner().handleRequestSync(owner -> ((TV) owner).setModeService(TVMode.On));
+	}
+
+	@Override
+	public void setBacklight(int backlight) throws Exception {
+		this.getOwner().handleRequestSync(owner -> ((TV) owner).setBacklight(backlight));
+		
+	}
+
 }

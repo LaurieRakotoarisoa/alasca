@@ -20,4 +20,24 @@ public interface TVI extends OfferedI, RequiredI{
 	 */
 	public TVMode getState() throws Exception;
 	
+	/**
+	 * Turn off the TV 
+	 * @throws Exception
+	 */
+	public void turnOff( ) throws Exception;
+	
+	/**
+	 * Turn on the TV 
+	 * @throws Exception
+	 */
+	public void turnOn( ) throws Exception;
+	
+	/**
+	 * set the backlight of the TV 
+	 * @throws Exception
+	 */
+	public void setBacklight(int backlight) throws Exception;
+	
+	
+	
 }

@@ -9,12 +9,12 @@ public class URI {
 	public static final String	TV_COMPONENT_URI = "my-URI-tv" ;
 	public static final String	Fridge_COMPONENT_URI = "my-URI-fridge" ;
 	/** URI of the provider outbound port (simplifies the connection).	*/
-	public static final String	BatteryOutboundPortURI = "oport" ;
-	public static final String	TVOutboundPortURI = "oport" ;
-	public static final String	FridgeOutboundPortURI = "oport" ;
+	public static final String	BatteryOutboundPortURI = "Boport" ;
+	public static final String	TVOutboundPortURI = "Toport" ;
+	public static final String	FridgeOutboundPortURI = "Foport" ;
 	/** URI of the consumer inbound port (simplifies the connection).		*/
-	public static final String	BatteryInboundPortURI = "iport" ;
-	public static final String	TVInboundPortURI = "iport" ;
-	public static final String	FridgeInboundPortURI = "iport" ;
+	public static final String	BatteryInboundPortURI = "Biport" ;
+	public static final String	TVInboundPortURI = "Tiport" ;
+	public static final String	FridgeInboundPortURI = "Fiport" ;
 
 }
