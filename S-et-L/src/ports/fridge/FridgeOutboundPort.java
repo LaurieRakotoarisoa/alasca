@@ -26,4 +26,25 @@ implements FridgeI{
 		return ((FridgeI)this.connector).getState();
 	}
 
+
+	@Override
+	public void turnOff() throws Exception {
+		((FridgeI)this.connector).turnOff();
+		
+	}
+
+
+	@Override
+	public void turnOn() throws Exception {
+		((FridgeI)this.connector).turnOn();
+		
+	}
+
+
+	@Override
+	public void setTemperatur(int temperature) throws Exception {
+		((FridgeI)this.connector).setTemperatur(temperature);
+		
+	}
+
 }

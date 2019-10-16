@@ -53,9 +53,9 @@ public class TV extends AbstractComponent{
 	 * (On, off)
 	 */
 	public int setBacklight(int backlight) {
-		this.logMessage("Modification rétroeclairage à "+ backlight);
 		this.cons = backlight/10;
 		this.backlight = backlight;
+		this.logMessage("Modification rétroeclairage à "+ backlight);
 		return backlight;
 	}
 	
@@ -67,6 +67,7 @@ public class TV extends AbstractComponent{
 		if (state == TVMode.Off) this.cons = 0;
 		else this.cons = backlight/10;
 		this.state = state;
+		this.logMessage("Modification state à "+ state);
 		return state;
 	}
 	

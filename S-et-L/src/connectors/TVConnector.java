@@ -13,4 +13,22 @@ implements TVI{
 		return ((TVI)this.offering).getState();
 	}
 
+	@Override
+	public void turnOff() throws Exception {
+		((TVI)this.offering).turnOff();
+		
+	}
+
+	@Override
+	public void turnOn() throws Exception {
+		((TVI)this.offering).turnOn();
+		
+	}
+
+	@Override
+	public void setBacklight(int backlight) throws Exception {
+		((TVI)this.offering).setBacklight(backlight);
+		
+	}
+
 }

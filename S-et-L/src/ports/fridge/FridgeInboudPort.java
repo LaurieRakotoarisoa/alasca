@@ -35,4 +35,22 @@ implements FridgeI{
 		return this.getOwner().handleRequestSync(owner -> ((Fridge)owner).getModeService());
 	}
 
+	@Override
+	public void turnOff() throws Exception {
+		this.getOwner().handleRequestSync(owner -> ((Fridge)owner).setModeService(FridgeMode.Off_Close));
+		
+	}
+
+	@Override
+	public void turnOn() throws Exception {
+		this.getOwner().handleRequestSync(owner -> ((Fridge)owner).setModeService(FridgeMode.On_Close));
+		
+	}
+
+	@Override
+	public void setTemperatur(int temperature) throws Exception {
+		this.getOwner().handleRequestSync(owner -> ((Fridge)owner).setTemperatur(temperature));
+		
+	}
+
 }

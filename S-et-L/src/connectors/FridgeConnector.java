@@ -13,4 +13,21 @@ implements FridgeI{
 		return ((FridgeI)this.offering).getState();
 	}
 
+	@Override
+	public void turnOff() throws Exception {
+		((FridgeI)this.offering).turnOff();
+	}
+
+	@Override
+	public void turnOn() throws Exception {
+		((FridgeI)this.offering).turnOn();
+		
+	}
+
+	@Override
+	public void setTemperatur(int temperature) throws Exception {
+		((FridgeI)this.offering).setTemperatur(temperature);
+		
+	}
+
 }

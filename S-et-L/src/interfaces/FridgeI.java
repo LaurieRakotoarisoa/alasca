@@ -20,22 +20,22 @@ public interface FridgeI extends OfferedI, RequiredI{
 	 */
 	public FridgeMode getState() throws Exception;
 	
-//	/**
-//	 * Turn off the Fridge
-//	 * @throws Exception
-//	 */
-//	public void turnOff( ) throws Exception;
-//	
-//	/**
-//	 * Turn on the TV 
-//	 * @throws Exception
-//	 */
-//	public void turnOn( ) throws Exception;
-//	
-//	/**
-//	 * Turn on the TV 
-//	 * @throws Exception
-//	 */
-//	public void pause( ) throws Exception;
+	/**
+	 * Turn off the Fridge
+	 * @throws Exception
+	 */
+	public void turnOff( ) throws Exception;
+	
+	/**
+	 * Turn on the Fridge
+	 * @throws Exception
+	 */
+	public void turnOn( ) throws Exception;
+	
+	/**
+	 * set the temperature of the Fridge
+	 * @throws Exception
+	 */
+	public void setTemperatur(int temperature) throws Exception; 
 	
 }

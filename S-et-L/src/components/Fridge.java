@@ -21,6 +21,12 @@ public class Fridge extends AbstractComponent{
 	 * Current state of the Fridge
 	 */
 	protected FridgeMode state = FridgeMode.On_Close;
+	protected int cons = 0;
+	/**
+	 * the temperature of the fridge
+	 * between 0 and 5
+	 */
+	protected int temperature = 3;
 	
 	/**
 	 * @param URI Component uri
@@ -43,6 +49,32 @@ public class Fridge extends AbstractComponent{
 	 * @return {@link FridgeMode}
 	 */
 	public FridgeMode getModeService() {
+		return state;
+	}
+	
+	/**
+	 * <p>set the current state of the TV</p>
+	 * (On, off)
+	 */
+	public int setTemperatur(int temperature) {
+		if (this.state == FridgeMode.On_Open) this.cons = temperature*4;
+		else if(this.state == FridgeMode.On_Close) this.cons = temperature*2;
+		this.temperature = temperature;
+		this.logMessage("Modification temperature à "+ temperature);
+		return temperature;
+	}
+	
+	/**
+	 * <p>set the current state of the TV</p>
+	 * (On, off)
+	 */
+	public FridgeMode setModeService(FridgeMode state) {
+		if (state == FridgeMode.Off_Close) this.cons = 0;
+		else if (state == FridgeMode.Off_Open) this.cons = 0;
+		else if (state == FridgeMode.On_Open)this.cons = temperature*4;
+		else this.cons = temperature*2;
+		this.state = state;
+		this.logMessage("Modification state à "+ state);
 		return state;
 	}
 	

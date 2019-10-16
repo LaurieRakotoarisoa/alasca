@@ -35,22 +35,39 @@ public class EnergyController extends AbstractComponent{
 		this.tracer.setTitle("energy controller") ;
 	}
 	
-	public void turnOff() throws Exception{
+	public void tvTurnOff() throws Exception{
 		tvOutbound.turnOff();
 		this.logMessage("Etat de la télé : Off");
 		
 	}
 	
-	public void turnOn() throws Exception{
+	public void tvTurnOn() throws Exception{
 		tvOutbound.turnOn();
 		this.logMessage("Etat de la télé : ON");
 		
 	}
 	
-	public void setBacklight(int backlight) throws Exception{
+	public void tvSetBacklight(int backlight) throws Exception{
 		tvOutbound.setBacklight(backlight);
-		this.logMessage("retro-éclairage de la télé :"+backlight);
+		this.logMessage("Modification du retro-éclairage de la télé :"+backlight);
 		
+	}
+	
+	public void fridgeTurnOff() throws Exception{
+		fridgeOutbound.turnOff();
+		this.logMessage("Etat du réfrigérateur : Off");
+		
+	}
+	
+	public void fridgeTurnOn() throws Exception{
+		fridgeOutbound.turnOn();
+		this.logMessage("Etat du réfrigérateur : ON");
+		
+	}
+	
+	public void fridgeSetTemperature(int temperature) throws Exception{
+		fridgeOutbound.setTemperatur(temperature);
+		this.logMessage("Modification de la température du réfrigérateur:"+temperature);
 	}
 	
 	public void getCarBatteryMode() throws Exception{
@@ -67,7 +84,7 @@ public class EnergyController extends AbstractComponent{
 	
 	public void getFridgeMode() throws Exception{
 		FridgeMode m = fridgeOutbound.getState();
-		this.logMessage("Etat de la réfrigérateur : "+m);
+		this.logMessage("Etat du réfrigérateur : "+m);
 		
 	}
 	
@@ -102,13 +119,16 @@ public class EnergyController extends AbstractComponent{
 				@Override
 				public void run() {
 					try {
-						((EnergyController)this.getTaskOwner()).get;
+						((EnergyController)this.getTaskOwner()).tvTurnOn();
+						((EnergyController)this.getTaskOwner()).tvSetBacklight(60);
+						((EnergyController)this.getTaskOwner()).fridgeTurnOn();
+						((EnergyController)this.getTaskOwner()).fridgeSetTemperature(4);
 					} catch (Exception e) {
 						throw new RuntimeException(e) ;
 					}
 				}
 			},
-			5000, TimeUnit.MILLISECONDS);
+			10000, TimeUnit.MILLISECONDS);
 	}
 	
 	@Override
