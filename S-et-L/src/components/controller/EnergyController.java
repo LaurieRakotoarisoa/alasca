@@ -1,4 +1,4 @@
-package components;
+package components.controller;
 
 import java.util.concurrent.TimeUnit;
 
@@ -10,9 +10,7 @@ import interfaces.TVI;
 import ports.carBattery.CarBatteryOutboundPort;
 import ports.fridge.FridgeOutboundPort;
 import ports.tv.TVOutboundPort;
-import utils.BatteryMode;
-import utils.FridgeMode;
-import utils.TVMode;
+import components.controller.utilController.*;
 
 
 @RequiredInterfaces (required = {CarBatteryI.class, TVI.class, FridgeI.class})
@@ -35,63 +33,21 @@ public class EnergyController extends AbstractComponent{
 		this.tracer.setTitle("energy controller") ;
 	}
 	
-	public void tvTurnOff() throws Exception{
-		tvOutbound.turnOff();
-		this.logMessage("Etat de la télé : Off");
-		
-	}
+	//TV methode's
+	public void tvTurnOff() throws Exception {TV.TurnOff(tvOutbound, this);}
+	public void tvTurnOn() throws Exception {TV.TurnOn(tvOutbound, this);}
+	public void tvSetBacklight(int backlight) throws Exception {TV.SetBacklight(tvOutbound, this, backlight);}
+	public void tvGetMode() throws Exception {TV.getMode(tvOutbound, this);}
 	
-	public void tvTurnOn() throws Exception{
-		tvOutbound.turnOn();
-		this.logMessage("Etat de la télé : ON");
-		
-	}
+	//Fridge methode's
+	public void fridgeTurnOff() throws Exception {Fridge.TurnOff(fridgeOutbound, this);}
+	public void fridgeTurnOn() throws Exception {Fridge.TurnOn(fridgeOutbound, this);}
+	public void fridgeSetTemperature(int temperature) throws Exception {Fridge.SetTemperature(fridgeOutbound, this, temperature);}
+	public void fridgeGetMode() throws Exception {Fridge.getMode(fridgeOutbound, this);}
 	
-	public void tvSetBacklight(int backlight) throws Exception{
-		tvOutbound.setBacklight(backlight);
-		this.logMessage("Modification du retro-éclairage de la télé :"+backlight);
-		
-	}
-	
-	public void fridgeTurnOff() throws Exception{
-		fridgeOutbound.turnOff();
-		this.logMessage("Etat du réfrigérateur : Off");
-		
-	}
-	
-	public void fridgeTurnOn() throws Exception{
-		fridgeOutbound.turnOn();
-		this.logMessage("Etat du réfrigérateur : ON");
-		
-	}
-	
-	public void fridgeSetTemperature(int temperature) throws Exception{
-		fridgeOutbound.setTemperatur(temperature);
-		this.logMessage("Modification de la température du réfrigérateur:"+temperature);
-	}
-	
-	public void getCarBatteryMode() throws Exception{
-		BatteryMode m = batteryOutbound.getState();
-		this.logMessage("Etat de la batterie : "+m);
-		
-	}
-	
-	public void getTVMode() throws Exception{
-		TVMode m = tvOutbound.getState();
-		this.logMessage("Etat de la télé : "+m);
-		
-	}
-	
-	public void getFridgeMode() throws Exception{
-		FridgeMode m = fridgeOutbound.getState();
-		this.logMessage("Etat du réfrigérateur : "+m);
-		
-	}
-	
-	public void getLevelCarBattery() throws Exception{
-		int lvl = batteryOutbound.getLevelEnergy();
-		this.logMessage("Niveau de charge de la batterie de voiture : "+lvl);
-	}
+	//Car Battery methode's
+	public void carBatteryTurnOff() throws Exception {CarBattery.getMode(batteryOutbound, this);}
+	public void carBatteryGetMode() throws Exception {CarBattery.getBattery(batteryOutbound, this);}
 	
 	@Override
 	public void			execute() throws Exception
@@ -104,9 +60,9 @@ public class EnergyController extends AbstractComponent{
 				@Override
 				public void run() {
 					try {
-						((EnergyController)this.getTaskOwner()).getCarBatteryMode();
-						((EnergyController)this.getTaskOwner()).getFridgeMode();
-						((EnergyController)this.getTaskOwner()).getTVMode();
+						((EnergyController)this.getTaskOwner()).carBatteryGetMode();
+						((EnergyController)this.getTaskOwner()).fridgeGetMode();
+						((EnergyController)this.getTaskOwner()).tvGetMode();
 					} catch (Exception e) {
 						throw new RuntimeException(e) ;
 					}

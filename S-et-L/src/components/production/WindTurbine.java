@@ -1,4 +1,4 @@
-package components;
+package components.production;
 
 import fr.sorbonne_u.components.AbstractComponent;
 import ports.TurbineInboundPort;

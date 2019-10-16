@@ -1,6 +1,6 @@
 package ports.carBattery;
 
-import components.CarBattery;
+import components.device.CarBattery;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractInboundPort;
 import interfaces.CarBatteryI;

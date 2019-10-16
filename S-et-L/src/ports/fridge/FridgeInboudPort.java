@@ -1,6 +1,6 @@
 package ports.fridge;
 
-import components.Fridge;
+import components.device.Fridge;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractInboundPort;
 import interfaces.FridgeI;

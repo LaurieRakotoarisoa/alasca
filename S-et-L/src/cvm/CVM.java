@@ -1,9 +1,9 @@
 package cvm;
 
-import components.CarBattery;
-import components.EnergyController;
-import components.Fridge;
-import components.TV;
+import components.controller.EnergyController;
+import components.device.CarBattery;
+import components.device.Fridge;
+import components.device.TV;
 import connectors.CarBatteryConnector;
 import connectors.FridgeConnector;
 import connectors.TVConnector;

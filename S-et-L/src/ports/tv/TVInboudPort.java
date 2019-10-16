@@ -1,6 +1,6 @@
 package ports.tv;
 
-import components.TV;
+import components.device.TV;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractInboundPort;
 import interfaces.TVI;
