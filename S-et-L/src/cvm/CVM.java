@@ -1,10 +1,10 @@
 package cvm;
 
 import components.controller.EnergyController;
-import components.device.CarBattery;
+import components.device.Oven;
 import components.device.Fridge;
 import components.device.TV;
-import connectors.CarBatteryConnector;
+import connectors.OvenConnector;
 import connectors.FridgeConnector;
 import connectors.TVConnector;
 import fr.sorbonne_u.components.AbstractComponent;
@@ -44,7 +44,7 @@ public class CVM extends AbstractCVM{
 		// create the battery component
 		this.carBatteryURI =
 			AbstractComponent.createComponent(
-					CarBattery.class.getCanonicalName(),
+					Oven.class.getCanonicalName(),
 					new Object[]{URI.BATTERY_COMPONENT_URI,
 							URI.BatteryInboundPortURI}) ;
 		assert	this.isDeployedComponent(this.carBatteryURI) ;
@@ -102,7 +102,7 @@ public class CVM extends AbstractCVM{
 				this.controllerURI,
 				URI.BatteryOutboundPortURI,
 				URI.BatteryInboundPortURI,
-				CarBatteryConnector.class.getCanonicalName()) ;
+				OvenConnector.class.getCanonicalName()) ;
 		this.doPortConnection(
 				this.controllerURI,
 				URI.FridgeOutboundPortURI,

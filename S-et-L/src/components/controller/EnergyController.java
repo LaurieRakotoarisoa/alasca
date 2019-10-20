@@ -1,53 +1,58 @@
 package components.controller;
 
+import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.RequiredInterfaces;
-import interfaces.CarBatteryI;
+import interfaces.OvenI;
 import interfaces.FridgeI;
 import interfaces.TVI;
-import ports.carBattery.CarBatteryOutboundPort;
 import ports.fridge.FridgeOutboundPort;
+import ports.oven.OvenOutboundPort;
 import ports.tv.TVOutboundPort;
 import components.controller.utilController.*;
 
 
-@RequiredInterfaces (required = {CarBatteryI.class, TVI.class, FridgeI.class})
+@RequiredInterfaces (required = {OvenI.class, TVI.class, FridgeI.class})
 public class EnergyController extends AbstractComponent{
 	
-	protected CarBatteryOutboundPort batteryOutbound;
+	protected OvenOutboundPort ovenOutbound;
 	protected FridgeOutboundPort fridgeOutbound;
 	protected TVOutboundPort tvOutbound;
 	
-	protected EnergyController(String URI,String CarBatteryoutboundURI, String TVoutboundURI, String FridgeoutboundURI) throws Exception {
+	protected EnergyController(String URI,String ovenOutboundURI, String TVOutboundURI, String FridgeOutboundURI) throws Exception {
 		super(URI,1,1 );
 		
-		batteryOutbound = new CarBatteryOutboundPort(CarBatteryoutboundURI,this);
-		batteryOutbound.localPublishPort();
-		tvOutbound = new TVOutboundPort(TVoutboundURI,this);
+		ovenOutbound = new OvenOutboundPort(ovenOutboundURI,this);
+		ovenOutbound.localPublishPort();
+		tvOutbound = new TVOutboundPort(TVOutboundURI,this);
 		tvOutbound.localPublishPort();
-		fridgeOutbound = new FridgeOutboundPort(FridgeoutboundURI,this);
+		fridgeOutbound = new FridgeOutboundPort(FridgeOutboundURI,this);
 		fridgeOutbound.localPublishPort();
 		this.executionLog.setDirectory(System.getProperty("user.home")) ;
 		this.tracer.setTitle("energy controller") ;
 	}
 	
 	//TV methode's
-	public void tvTurnOff() throws Exception {TV.TurnOff(tvOutbound, this);}
-	public void tvTurnOn() throws Exception {TV.TurnOn(tvOutbound, this);}
-	public void tvSetBacklight(int backlight) throws Exception {TV.SetBacklight(tvOutbound, this, backlight);}
+	public void tvTurnOff() throws Exception {TV.turnOff(tvOutbound, this);}
+	public void tvTurnOn() throws Exception {TV.turnOn(tvOutbound, this);}
+	public void tvSetBacklight(int backlight) throws Exception {TV.setBacklight(tvOutbound, this, backlight);}
 	public void tvGetMode() throws Exception {TV.getMode(tvOutbound, this);}
 	
 	//Fridge methode's
-	public void fridgeTurnOff() throws Exception {Fridge.TurnOff(fridgeOutbound, this);}
-	public void fridgeTurnOn() throws Exception {Fridge.TurnOn(fridgeOutbound, this);}
-	public void fridgeSetTemperature(int temperature) throws Exception {Fridge.SetTemperature(fridgeOutbound, this, temperature);}
+	public void fridgeTurnOff() throws Exception {Fridge.turnOff(fridgeOutbound, this);}
+	public void fridgeTurnOn() throws Exception {Fridge.turnOn(fridgeOutbound, this);}
+	public void fridgeSetTemperature(int temperature) throws Exception {Fridge.setTemperature(fridgeOutbound, this, temperature);}
 	public void fridgeGetMode() throws Exception {Fridge.getMode(fridgeOutbound, this);}
 	
-	//Car Battery methode's
-	public void carBatteryTurnOff() throws Exception {CarBattery.getMode(batteryOutbound, this);}
-	public void carBatteryGetMode() throws Exception {CarBattery.getBattery(batteryOutbound, this);}
+	//Oven methode's
+	public void ovenGetMode() throws Exception {Oven.getMode(ovenOutbound, this);}
+	public void ovenTurnOff() throws Exception {Oven.turnOff(ovenOutbound, this);}
+	public void ovenTurnOn() throws Exception {Oven.turnOn(ovenOutbound, this);}
+	public void ovenSetTemperature(int temperature) throws Exception {Oven.setTemperature(ovenOutbound, this, temperature);}
+	public void ovenTurnOnInDate(LocalDateTime date, int temperature) throws Exception {Oven.displayDate(ovenOutbound, this, date, temperature);}
+	public void ovenTurnOnSetTemperatur(int temperature) throws Exception {Oven.turnOnIn(ovenOutbound, this, temperature);}
 	
 	@Override
 	public void			execute() throws Exception
@@ -60,7 +65,7 @@ public class EnergyController extends AbstractComponent{
 				@Override
 				public void run() {
 					try {
-						((EnergyController)this.getTaskOwner()).carBatteryGetMode();
+						((EnergyController)this.getTaskOwner()).ovenGetMode();
 						((EnergyController)this.getTaskOwner()).fridgeGetMode();
 						((EnergyController)this.getTaskOwner()).tvGetMode();
 					} catch (Exception e) {
@@ -84,7 +89,52 @@ public class EnergyController extends AbstractComponent{
 					}
 				}
 			},
-			10000, TimeUnit.MILLISECONDS);
+			5000, TimeUnit.MILLISECONDS);
+		
+		this.scheduleTask(
+				new AbstractComponent.AbstractTask() {
+					@Override
+					public void run() {
+						try {
+							((EnergyController)this.getTaskOwner()).ovenTurnOn();
+							((EnergyController)this.getTaskOwner()).ovenSetTemperature(170);
+							((EnergyController)this.getTaskOwner()).ovenTurnOff();
+						} catch (Exception e) {
+							throw new RuntimeException(e) ;
+						}
+					}
+				},
+				10000, TimeUnit.MILLISECONDS);
+		
+		this.scheduleTask(
+				new AbstractComponent.AbstractTask() {
+					@Override
+					public void run() {
+						try {
+							((EnergyController)this.getTaskOwner()).ovenTurnOnInDate(LocalDateTime.now().plusSeconds(30), 190);
+						} catch (Exception e) {
+							throw new RuntimeException(e) ;
+						}
+					}
+				},
+				15000, TimeUnit.MILLISECONDS);
+		
+		while(true) {
+			if(Oven.dateToOn==LocalDateTime.now()) {
+				this.scheduleTask(
+						new AbstractComponent.AbstractTask() {
+							@Override
+							public void run() {
+								try {
+									((EnergyController)this.getTaskOwner()).ovenTurnOnSetTemperatur(Oven.temperatureToOn);
+								} catch (Exception e) {
+									throw new RuntimeException(e) ;
+								}
+							}
+						},
+						0, TimeUnit.MILLISECONDS);
+			}
+		}
 	}
 	
 	@Override
@@ -98,8 +148,8 @@ public class EnergyController extends AbstractComponent{
 		// In static architectures like in this example, ports can also
 		// be disconnected by the finalise method of the component
 		// virtual machine.
-		this.batteryOutbound.doDisconnection();
-		this.batteryOutbound.unpublishPort() ;
+		this.ovenOutbound.doDisconnection();
+		this.ovenOutbound.unpublishPort() ;
 		this.fridgeOutbound.doDisconnection();
 		this.fridgeOutbound.unpublishPort() ;
 		this.tvOutbound.doDisconnection();

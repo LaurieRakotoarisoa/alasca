@@ -6,21 +6,21 @@ import utils.TVMode;
 
 public class TV {
 	
-	public static void TurnOff(TVOutboundPort tvOutbound, 
+	public static void turnOff(TVOutboundPort tvOutbound, 
 						EnergyController controller) throws Exception{
 		tvOutbound.turnOff();
 		controller.logMessage("Etat de la télé : Off");
 		
 	}
 	
-	public static void TurnOn(TVOutboundPort tvOutbound, 
+	public static void turnOn(TVOutboundPort tvOutbound, 
 						EnergyController controller) throws Exception{
 		tvOutbound.turnOn();
 		controller.logMessage("Etat de la télé : ON");
 		
 	}
 	
-	public static void SetBacklight(TVOutboundPort tvOutbound, 
+	public static void setBacklight(TVOutboundPort tvOutbound, 
 						EnergyController controller, 
 						int backlight) throws Exception{
 		tvOutbound.setBacklight(backlight);

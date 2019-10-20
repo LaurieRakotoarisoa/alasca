@@ -6,21 +6,21 @@ import utils.FridgeMode;
 
 public class Fridge {
 	
-	public static void TurnOff(FridgeOutboundPort fridgeOutbound, 
+	public static void turnOff(FridgeOutboundPort fridgeOutbound, 
 						EnergyController controller) throws Exception{
 		fridgeOutbound.turnOff();
 		controller.logMessage("Etat du réfrigérateur : Off");
 		
 	}
 	
-	public static void TurnOn(FridgeOutboundPort fridgeOutbound, 
+	public static void turnOn(FridgeOutboundPort fridgeOutbound, 
 						EnergyController controller) throws Exception{
 		fridgeOutbound.turnOn();
 		controller.logMessage("Etat du réfrigérateur : ON");
 		
 	}
 	
-	public static void SetTemperature(FridgeOutboundPort fridgeOutbound, 
+	public static void setTemperature(FridgeOutboundPort fridgeOutbound, 
 						EnergyController controller, 
 						int temperature) throws Exception{
 		fridgeOutbound.setTemperatur(temperature);
