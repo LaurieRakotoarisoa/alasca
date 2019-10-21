@@ -14,7 +14,7 @@ import utils.URI;
 public class CVM extends AbstractCVM{
 	
 	protected String controllerURI;
-	protected String carBatteryURI;
+	protected String ovenURI;
 	protected String fridgeURI;
 	protected String tvURI;
 
@@ -42,16 +42,16 @@ public class CVM extends AbstractCVM{
 		// --------------------------------------------------------------------
 
 		// create the battery component
-		this.carBatteryURI =
+		this.ovenURI =
 			AbstractComponent.createComponent(
 					Oven.class.getCanonicalName(),
-					new Object[]{URI.BATTERY_COMPONENT_URI,
-							URI.BatteryInboundPortURI}) ;
-		assert	this.isDeployedComponent(this.carBatteryURI) ;
+					new Object[]{URI.OVEN_COMPONENT_URI,
+							URI.OvenInboundPortURI}) ;
+		assert	this.isDeployedComponent(this.ovenURI) ;
 		// make it trace its operations; comment and uncomment the line to see
 		// the difference
-		this.toggleTracing(this.carBatteryURI) ;
-		this.toggleLogging(this.carBatteryURI) ;
+		this.toggleTracing(this.ovenURI) ;
+		this.toggleLogging(this.ovenURI) ;
 		
 		
 		// create the Fridge component
@@ -84,7 +84,7 @@ public class CVM extends AbstractCVM{
 			AbstractComponent.createComponent(
 					EnergyController.class.getCanonicalName(),
 					new Object[]{URI.CONTROLLER_COMPONENT_URI,
-							URI.BatteryOutboundPortURI,
+							URI.OvenOutboundPortURI,
 							URI.TVOutboundPortURI,
 							URI.FridgeOutboundPortURI}) ;
 		assert	this.isDeployedComponent(this.controllerURI) ;
@@ -100,8 +100,8 @@ public class CVM extends AbstractCVM{
 		// do the connection
 		this.doPortConnection(
 				this.controllerURI,
-				URI.BatteryOutboundPortURI,
-				URI.BatteryInboundPortURI,
+				URI.OvenOutboundPortURI,
+				URI.OvenInboundPortURI,
 				OvenConnector.class.getCanonicalName()) ;
 		this.doPortConnection(
 				this.controllerURI,

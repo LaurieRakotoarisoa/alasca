@@ -6,7 +6,7 @@ import utils.TVMode;
 
 /**
  * The interface <code>TVI</code> defines the services 
- * to access car TV state and its operations
+ * to access TV state and its operations
  * 
  * @author Saad CHIADMI
  */
