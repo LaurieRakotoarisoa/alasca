@@ -31,7 +31,7 @@ public class Fridge {
 	public static void setTemperature(FridgeOutboundPort fridgeOutbound, 
 						EnergyController controller, 
 						int temperature) throws Exception{
-		fridgeOutbound.setTemperatur(temperature);
+		fridgeOutbound.setTemperature(temperature);
 		controller.logMessage("Modification de la température du réfrigérateur:"+temperature);
 	}
 	

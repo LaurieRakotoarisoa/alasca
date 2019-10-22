@@ -43,6 +43,6 @@ public interface FridgeI extends OfferedI, RequiredI{
 	 * set the temperature of the Fridge
 	 * @throws Exception
 	 */
-	public void setTemperatur(int temperature) throws Exception; 
+	public void setTemperature(int temperature) throws Exception; 
 	
 }

@@ -42,8 +42,8 @@ implements FridgeI{
 
 
 	@Override
-	public void setTemperatur(int temperature) throws Exception {
-		((FridgeI)this.connector).setTemperatur(temperature);
+	public void setTemperature(int temperature) throws Exception {
+		((FridgeI)this.connector).setTemperature(temperature);
 		
 	}
 

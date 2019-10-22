@@ -15,5 +15,9 @@ public class WindTurbine extends AbstractComponent{
 		tb = new TurbineInboundPort(inboundURI, this);
 		tb.publishPort();
 	}
+	
+	public TurbineMode getState() throws Exception{
+		return state;
+	}
 
 }

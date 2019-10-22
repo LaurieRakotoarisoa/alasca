@@ -6,7 +6,7 @@ import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.components.ports.PortI;
 import interfaces.FridgeI;
-import ports.fridge.FridgeInboudPort;
+import ports.fridge.FridgeInboundPort;
 import utils.FridgeMode;
 
 /**
@@ -21,6 +21,9 @@ public class Fridge extends AbstractComponent{
 	 * Current state of the Fridge
 	 */
 	protected FridgeMode state = FridgeMode.On_Close;
+	/**
+	 * Current consommation
+	 */
 	protected int cons = 0;
 	/**
 	 * the temperature of the fridge
@@ -37,7 +40,7 @@ public class Fridge extends AbstractComponent{
 		super(URI,1, 0);
 		
 		//Create and publish port for remote control
-		PortI FridgeInboundPort = new FridgeInboudPort(inboundURI,this);
+		PortI FridgeInboundPort = new FridgeInboundPort(inboundURI,this);
 		FridgeInboundPort.publishPort();
 		this.executionLog.setDirectory(System.getProperty("user.home"));
 		this.tracer.setTitle("Fridge");
@@ -65,7 +68,7 @@ public class Fridge extends AbstractComponent{
 	 * <p>set the current state of the TV</p>
 	 * (On, off)
 	 */
-	public int setTemperatur(int temperature) {
+	public int setTemperature(int temperature) {
 		if (this.state == FridgeMode.On_Open) this.cons = temperature*4;
 		else if(this.state == FridgeMode.On_Close) this.cons = temperature*2;
 		this.temperature = temperature;

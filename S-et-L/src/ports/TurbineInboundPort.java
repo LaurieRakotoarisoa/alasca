@@ -6,6 +6,10 @@ import fr.sorbonne_u.components.ports.AbstractInboundPort;
 import interfaces.WindTurbineI;
 import utils.TurbineMode;
 
+/**
+ * @author Laurie Rakotoarisoa
+ *
+ */
 public class TurbineInboundPort extends AbstractInboundPort
 implements WindTurbineI{
 
@@ -22,8 +26,7 @@ implements WindTurbineI{
 
 	@Override
 	public TurbineMode getState() throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		return this.getOwner().handleRequestSync(owner -> ((WindTurbine)owner).getState());
 	}
 
 	@Override
@@ -33,13 +36,19 @@ implements WindTurbineI{
 	}
 
 	@Override
-	public int getSpeed() throws Exception {
+	public int getProduction() throws Exception {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
 	public void stop() throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void activate() throws Exception {
 		// TODO Auto-generated method stub
 		
 	}

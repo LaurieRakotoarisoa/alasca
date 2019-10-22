@@ -14,10 +14,10 @@ import utils.FridgeMode;
  * @author Saad CHIADMI
  *
  */
-public class FridgeInboudPort extends AbstractInboundPort
+public class FridgeInboundPort extends AbstractInboundPort
 implements FridgeI{
 	
-	public FridgeInboudPort(String uri,ComponentI owner) throws Exception {
+	public FridgeInboundPort(String uri,ComponentI owner) throws Exception {
 		super(uri, FridgeI.class, owner);
 		assert owner instanceof Fridge;
 	}
@@ -48,8 +48,8 @@ implements FridgeI{
 	}
 
 	@Override
-	public void setTemperatur(int temperature) throws Exception {
-		this.getOwner().handleRequestSync(owner -> ((Fridge)owner).setTemperatur(temperature));
+	public void setTemperature(int temperature) throws Exception {
+		this.getOwner().handleRequestSync(owner -> ((Fridge)owner).setTemperature(temperature));
 		
 	}
 

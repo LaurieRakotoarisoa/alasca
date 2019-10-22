@@ -28,16 +28,22 @@ public interface WindTurbineI extends OfferedI{
 	
 	
 	/**
-	 * @return the current speed of the wind turbine considered as an integer
+	 * @return the current production of energy provided by the wind turbine considered as an integer
 	 * @throws Exception
 	 */
-	public int getSpeed() throws Exception;
+	public int getProduction() throws Exception;
 	
 	/**
 	 * Operation to stop the wind turbine when needed (security for example)
 	 * @throws Exception
 	 */
 	public void stop() throws Exception;
+	
+	/**
+	 * Operation to start the wind turbine after being suspended
+	 * @throws Exception
+	 */
+	public void activate() throws Exception;
 	
 
 }
