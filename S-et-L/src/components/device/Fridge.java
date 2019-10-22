@@ -53,6 +53,15 @@ public class Fridge extends AbstractComponent{
 	}
 	
 	/**
+	 * <p>Give information about the current cons of the Fridge</p>
+	 * (On, off, In charge)
+	 * @return {@link Integer}
+	 */
+	public int getCons() {
+		return cons;
+	}
+	
+	/**
 	 * <p>set the current state of the TV</p>
 	 * (On, off)
 	 */

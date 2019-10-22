@@ -30,4 +30,9 @@ implements FridgeI{
 		
 	}
 
+	@Override
+	public int getCons() throws Exception {
+		return ((FridgeI)this.offering).getCons();
+	}
+
 }

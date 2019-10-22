@@ -34,13 +34,5 @@ public class CompteurInboudPort extends AbstractInboundPort
 	public int getConsumptionOfAllDevices() throws Exception {
 		return this.getOwner().handleRequestSync(owner -> ((Compteur)owner).getCons());
 	}
-
-	/**
-	 * @see interfaces.CompteurI#setConsumptionOfAllDevices(int)
-	 */
-	@Override
-	public void setConsumptionOfAllDevices(int cons) throws Exception {
-		this.getOwner().handleRequestSync(owner -> ((Compteur)owner).setCons(cons));
-	}
 	
 }

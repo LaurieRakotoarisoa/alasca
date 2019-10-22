@@ -21,6 +21,13 @@ public interface TVI extends OfferedI, RequiredI{
 	public TVMode getState() throws Exception;
 	
 	/**
+	 * Give information about the current state of the TV
+	 * @return  a state from {@link TVMode} enum
+	 * @throws Exception
+	 */
+	public int getCons() throws Exception;
+	
+	/**
 	 * Turn off the TV 
 	 * @throws Exception
 	 */

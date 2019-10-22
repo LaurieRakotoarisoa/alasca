@@ -23,6 +23,13 @@ public interface OvenI extends OfferedI, RequiredI{
 	public OvenMode getState() throws Exception;
 	
 	/**
+	 * Give information about the current cons of the oven
+	 * @return  a state from {@link Integer} enum
+	 * @throws Exception
+	 */
+	public int getCons() throws Exception;
+	
+	/**
 	 * Turn off the oven
 	 * @throws Exception
 	 */

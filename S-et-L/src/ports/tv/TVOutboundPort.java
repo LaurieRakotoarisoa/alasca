@@ -47,4 +47,10 @@ implements TVI{
 		
 	}
 
+
+	@Override
+	public int getCons() throws Exception {
+		return ((TVI)this.connector).getCons();
+	}
+
 }

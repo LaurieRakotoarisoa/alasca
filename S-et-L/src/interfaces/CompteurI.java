@@ -17,7 +17,5 @@ public interface CompteurI extends OfferedI, RequiredI{
 	 * @throws Exception
 	 */
 	public int getConsumptionOfAllDevices() throws Exception;
-	
-	public void setConsumptionOfAllDevices(int cons) throws Exception;
 
 }

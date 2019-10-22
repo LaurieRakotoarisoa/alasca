@@ -53,4 +53,9 @@ implements FridgeI{
 		
 	}
 
+	@Override
+	public int getCons() throws Exception {
+		return this.getOwner().handleRequestSync(owner -> ((Fridge)owner).getCons());
+	}
+
 }

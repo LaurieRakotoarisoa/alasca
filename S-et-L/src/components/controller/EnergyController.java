@@ -6,22 +6,25 @@ import java.util.concurrent.TimeUnit;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.RequiredInterfaces;
 import interfaces.OvenI;
+import interfaces.CompteurI;
 import interfaces.FridgeI;
 import interfaces.TVI;
+import ports.compteur.CompteurOutboundPort;
 import ports.fridge.FridgeOutboundPort;
 import ports.oven.OvenOutboundPort;
 import ports.tv.TVOutboundPort;
 import components.controller.utilController.*;
 
 
-@RequiredInterfaces (required = {OvenI.class, TVI.class, FridgeI.class})
+@RequiredInterfaces (required = {OvenI.class, TVI.class, FridgeI.class, CompteurI.class})
 public class EnergyController extends AbstractComponent{
 	
 	protected OvenOutboundPort ovenOutbound;
 	protected FridgeOutboundPort fridgeOutbound;
 	protected TVOutboundPort tvOutbound;
+	protected CompteurOutboundPort counterOutbound;
 	
-	protected EnergyController(String URI,String ovenOutboundURI, String TVOutboundURI, String FridgeOutboundURI) throws Exception {
+	protected EnergyController(String URI, String counterOutboundURI, String ovenOutboundURI, String TVOutboundURI, String FridgeOutboundURI) throws Exception {
 		super(URI,1,1 );
 		
 		ovenOutbound = new OvenOutboundPort(ovenOutboundURI,this);
@@ -30,6 +33,8 @@ public class EnergyController extends AbstractComponent{
 		tvOutbound.localPublishPort();
 		fridgeOutbound = new FridgeOutboundPort(FridgeOutboundURI,this);
 		fridgeOutbound.localPublishPort();
+		counterOutbound = new CompteurOutboundPort(counterOutboundURI,this);
+		counterOutbound.localPublishPort();
 		this.executionLog.setDirectory(System.getProperty("user.home")) ;
 		this.tracer.setTitle("energy controller") ;
 	}
@@ -54,6 +59,12 @@ public class EnergyController extends AbstractComponent{
 	public void ovenTurnOnInDate(LocalDateTime date, int temperature) throws Exception {Oven.displayDate(ovenOutbound, this, date, temperature);}
 	public void ovenTurnOnSetTemperatur(int temperature) throws Exception {Oven.turnOnIn(ovenOutbound, this, temperature);}
 	
+	//Counter
+	public void getAllCons() throws Exception{
+		int cons = Oven.getCons(ovenOutbound, this)+Fridge.getCons(fridgeOutbound, this)+TV.getCons(tvOutbound, this);
+		this.logMessage("La consomation d'énergie acctuel est "+cons+" Watt");
+	}
+	
 	@Override
 	public void			execute() throws Exception
 	{
@@ -68,6 +79,7 @@ public class EnergyController extends AbstractComponent{
 						((EnergyController)this.getTaskOwner()).ovenGetMode();
 						((EnergyController)this.getTaskOwner()).fridgeGetMode();
 						((EnergyController)this.getTaskOwner()).tvGetMode();
+						((EnergyController)this.getTaskOwner()).getAllCons();
 					} catch (Exception e) {
 						throw new RuntimeException(e) ;
 					}
@@ -84,6 +96,7 @@ public class EnergyController extends AbstractComponent{
 						((EnergyController)this.getTaskOwner()).tvSetBacklight(60);
 						((EnergyController)this.getTaskOwner()).fridgeTurnOn();
 						((EnergyController)this.getTaskOwner()).fridgeSetTemperature(4);
+						((EnergyController)this.getTaskOwner()).getAllCons();
 					} catch (Exception e) {
 						throw new RuntimeException(e) ;
 					}
@@ -98,7 +111,7 @@ public class EnergyController extends AbstractComponent{
 						try {
 							((EnergyController)this.getTaskOwner()).ovenTurnOn();
 							((EnergyController)this.getTaskOwner()).ovenSetTemperature(170);
-							((EnergyController)this.getTaskOwner()).ovenTurnOff();
+							((EnergyController)this.getTaskOwner()).getAllCons();
 						} catch (Exception e) {
 							throw new RuntimeException(e) ;
 						}
@@ -111,30 +124,22 @@ public class EnergyController extends AbstractComponent{
 					@Override
 					public void run() {
 						try {
+							((EnergyController)this.getTaskOwner()).ovenTurnOff();
+							((EnergyController)this.getTaskOwner()).tvTurnOff();
+							((EnergyController)this.getTaskOwner()).fridgeTurnOff();
+							((EnergyController)this.getTaskOwner()).getAllCons();
 							((EnergyController)this.getTaskOwner()).ovenTurnOnInDate(LocalDateTime.now().plusSeconds(30), 190);
+//							while(true) {
+//								if(Oven.dateToOn==LocalDateTime.now()) {
+//									((EnergyController)this.getTaskOwner()).ovenTurnOnSetTemperatur(Oven.temperatureToOn);
+//								}
+//							}
 						} catch (Exception e) {
 							throw new RuntimeException(e) ;
 						}
 					}
 				},
 				15000, TimeUnit.MILLISECONDS);
-		
-		while(true) {
-			if(Oven.dateToOn==LocalDateTime.now()) {
-				this.scheduleTask(
-						new AbstractComponent.AbstractTask() {
-							@Override
-							public void run() {
-								try {
-									((EnergyController)this.getTaskOwner()).ovenTurnOnSetTemperatur(Oven.temperatureToOn);
-								} catch (Exception e) {
-									throw new RuntimeException(e) ;
-								}
-							}
-						},
-						0, TimeUnit.MILLISECONDS);
-			}
-		}
 	}
 	
 	@Override
@@ -154,6 +159,8 @@ public class EnergyController extends AbstractComponent{
 		this.fridgeOutbound.unpublishPort() ;
 		this.tvOutbound.doDisconnection();
 		this.tvOutbound.unpublishPort() ;
+//		this.counterOutbound.doDisconnection();
+//		this.counterOutbound.unpublishPort() ;
 
 		// This called at the end to make the component internal
 		// state move to the finalised state.

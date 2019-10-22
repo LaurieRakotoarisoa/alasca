@@ -35,4 +35,9 @@ implements OvenI{
 		((OvenI)this.offering).setTemperature(temperature);
 	}
 
+	@Override
+	public int getCons() throws Exception {
+		return ((OvenI)this.offering).getCons();
+	}
+
 }

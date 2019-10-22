@@ -51,4 +51,10 @@ implements OvenI{
 		((OvenI)this.connector).setTemperature(temperature);
 	}
 
+
+	@Override
+	public int getCons() throws Exception {
+		return ((OvenI)this.connector).getCons();
+	}
+
 }

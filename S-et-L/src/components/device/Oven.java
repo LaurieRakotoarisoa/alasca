@@ -47,12 +47,21 @@ public class Oven extends AbstractComponent{
 	
 	
 	/**
-	 * <p>Give information about the current state of the battery</p>
-	 * (On, off, In charge)
+	 * <p>Give information about the current state of the Oven</p>
+	 * (On, off)
 	 * @return {@link OvenMode}
 	 */
 	public OvenMode getModeService() {
 		return state;
+	}
+	
+	/**
+	 * <p>Give information about the current state of the oven</p>
+	 * (On, off, In charge)
+	 * @return {@link Integer}
+	 */
+	public int getCon() {
+		return cons;
 	}
 	
 	/**

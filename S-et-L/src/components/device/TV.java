@@ -49,6 +49,15 @@ public class TV extends AbstractComponent{
 	}
 	
 	/**
+	 * <p>Give information about the current cons of the TV</p>
+	 * (On, off)
+	 * @return {@link Integer}
+	 */
+	public int getCons() {
+		return cons;
+	}
+	
+	/**
 	 * <p>set the current state of the TV</p>
 	 * (On, off)
 	 */

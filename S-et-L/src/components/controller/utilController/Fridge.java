@@ -1,10 +1,18 @@
 package components.controller.utilController;
 
+import components.compteur.Compteur;
 import components.controller.EnergyController;
 import ports.fridge.FridgeOutboundPort;
 import utils.FridgeMode;
 
 public class Fridge {
+	
+	public static int getCons(FridgeOutboundPort fridgeOutbound, 
+			EnergyController counter) throws Exception{
+		int cons = fridgeOutbound.getCons();
+		counter.logMessage("Consomation du réfrigérateur : "+cons);
+		return cons;
+	}
 	
 	public static void turnOff(FridgeOutboundPort fridgeOutbound, 
 						EnergyController controller) throws Exception{

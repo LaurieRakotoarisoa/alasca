@@ -3,6 +3,7 @@ package components.controller.utilController;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import components.compteur.Compteur;
 import components.controller.EnergyController;
 import ports.oven.OvenOutboundPort;
 import utils.OvenMode;
@@ -18,6 +19,13 @@ public class Oven {
 		OvenMode m = ovenOutbound.getState();
 		controller.logMessage("Etat du four : "+m);
 		
+	}
+	
+	public static int getCons(OvenOutboundPort ovenOutbound, 
+			EnergyController counter) throws Exception{
+		int cons = ovenOutbound.getCons();
+		counter.logMessage("Consomation du four : "+cons);
+		return cons;
 	}
 	
 	

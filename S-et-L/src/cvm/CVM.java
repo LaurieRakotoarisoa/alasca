@@ -1,10 +1,12 @@
 package cvm;
 
+import components.compteur.Compteur;
 import components.controller.EnergyController;
 import components.device.Oven;
 import components.device.Fridge;
 import components.device.TV;
 import connectors.OvenConnector;
+import connectors.CompteurConnector;
 import connectors.FridgeConnector;
 import connectors.TVConnector;
 import fr.sorbonne_u.components.AbstractComponent;
@@ -17,6 +19,7 @@ public class CVM extends AbstractCVM{
 	protected String ovenURI;
 	protected String fridgeURI;
 	protected String tvURI;
+	protected String counterURI;
 
 	public CVM() throws Exception {
 		super();
@@ -41,7 +44,7 @@ public class CVM extends AbstractCVM{
 		// Creation phase
 		// --------------------------------------------------------------------
 
-		// create the battery component
+		// create the oven component
 		this.ovenURI =
 			AbstractComponent.createComponent(
 					Oven.class.getCanonicalName(),
@@ -77,6 +80,18 @@ public class CVM extends AbstractCVM{
 		// the difference
 		this.toggleTracing(this.tvURI) ;
 		this.toggleLogging(this.tvURI) ;
+		
+		// create the counter component
+//		this.counterURI =
+//			AbstractComponent.createComponent(
+//					Compteur.class.getCanonicalName(),
+//					new Object[]{URI.COUNTER_COMPONENT_URI,
+//							URI.CounterInboundPortURI}) ;
+//		assert	this.isDeployedComponent(this.counterURI) ;
+//		// make it trace its operations; comment and uncomment the line to see
+//		// the difference
+//		this.toggleTracing(this.counterURI) ;
+//		this.toggleLogging(this.counterURI) ;
 
 		
 		// create the controller component
@@ -84,6 +99,7 @@ public class CVM extends AbstractCVM{
 			AbstractComponent.createComponent(
 					EnergyController.class.getCanonicalName(),
 					new Object[]{URI.CONTROLLER_COMPONENT_URI,
+							URI.CounterOutboundPortURI,
 							URI.OvenOutboundPortURI,
 							URI.TVOutboundPortURI,
 							URI.FridgeOutboundPortURI}) ;
@@ -113,6 +129,11 @@ public class CVM extends AbstractCVM{
 				URI.TVOutboundPortURI,
 				URI.TVInboundPortURI,
 				TVConnector.class.getCanonicalName()) ;
+//		this.doPortConnection(
+//				this.controllerURI,
+//				URI.CounterInboundPortURI,
+//				URI.CounterInboundPortURI,
+//				CompteurConnector.class.getCanonicalName()) ;
 		// Nota: the above use of the reference to the object representing
 		// the URI consumer component is allowed only in the deployment
 		// phase of the component virtual machine (to perform the static

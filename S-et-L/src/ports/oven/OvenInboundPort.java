@@ -64,4 +64,10 @@ implements OvenI{
 		this.setTemperature(temperature);
 	}
 
+
+	@Override
+	public int getCons() throws Exception {
+		return this.getOwner().handleRequestSync(owner -> ((Oven)owner).getCon());
+	}
+
 }

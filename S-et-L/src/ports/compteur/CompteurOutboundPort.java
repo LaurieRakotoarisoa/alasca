@@ -24,9 +24,4 @@ implements CompteurI{
 		return ((CompteurI)this.connector).getConsumptionOfAllDevices();
 	}
 
-	@Override
-	public void setConsumptionOfAllDevices(int cons) throws Exception {
-		((CompteurI)this.connector).setConsumptionOfAllDevices(cons);
-	}
-
 }

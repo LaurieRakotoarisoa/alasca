@@ -11,9 +11,4 @@ implements CompteurI{
 		return ((CompteurI)this.offering).getConsumptionOfAllDevices();
 	}
 
-	@Override
-	public void setConsumptionOfAllDevices(int cons) throws Exception {
-		((CompteurI)this.offering).setConsumptionOfAllDevices(cons);
-	}
-
 }
