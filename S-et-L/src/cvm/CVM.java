@@ -86,7 +86,9 @@ public class CVM extends AbstractCVM{
 //			AbstractComponent.createComponent(
 //					Compteur.class.getCanonicalName(),
 //					new Object[]{URI.COUNTER_COMPONENT_URI,
-//							URI.CounterInboundPortURI}) ;
+//							URI.OvenOutboundPortURI,
+//							URI.TVOutboundPortURI,
+//							URI.FridgeOutboundPortURI}) ;
 //		assert	this.isDeployedComponent(this.counterURI) ;
 //		// make it trace its operations; comment and uncomment the line to see
 //		// the difference
@@ -113,7 +115,7 @@ public class CVM extends AbstractCVM{
 		// Connection phase
 		// --------------------------------------------------------------------
 
-		// do the connection
+		// do the connection controller
 		this.doPortConnection(
 				this.controllerURI,
 				URI.OvenOutboundPortURI,
@@ -129,11 +131,23 @@ public class CVM extends AbstractCVM{
 				URI.TVOutboundPortURI,
 				URI.TVInboundPortURI,
 				TVConnector.class.getCanonicalName()) ;
+		
+		// do the connection counter
 //		this.doPortConnection(
-//				this.controllerURI,
-//				URI.CounterInboundPortURI,
-//				URI.CounterInboundPortURI,
-//				CompteurConnector.class.getCanonicalName()) ;
+//				this.counterURI,
+//				URI.OvenOutboundPortURI,
+//				URI.OvenInboundPortURI,
+//				OvenConnector.class.getCanonicalName()) ;
+//		this.doPortConnection(
+//				this.counterURI,
+//				URI.FridgeOutboundPortURI,
+//				URI.FridgeInboundPortURI,
+//				FridgeConnector.class.getCanonicalName()) ;
+//		this.doPortConnection(
+//				this.counterURI,
+//				URI.TVOutboundPortURI,
+//				URI.TVInboundPortURI,
+//				TVConnector.class.getCanonicalName()) ;
 		// Nota: the above use of the reference to the object representing
 		// the URI consumer component is allowed only in the deployment
 		// phase of the component virtual machine (to perform the static
@@ -173,7 +187,7 @@ public class CVM extends AbstractCVM{
 			// Create an instance of the defined component virtual machine.
 			CVM a = new CVM() ;
 			// Execute the application.
-			a.startStandardLifeCycle(20000L) ;
+			a.startStandardLifeCycle(200000000000L) ;
 			// Give some time to see the traces (convenience).
 			Thread.sleep(5000L) ;
 			// Simplifies the termination (termination has yet to be treated

@@ -1,6 +1,7 @@
 package ports.oven;
 
 
+import components.compteur.Compteur;
 import components.controller.EnergyController;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractOutboundPort;
@@ -13,7 +14,7 @@ implements OvenI{
 	public OvenOutboundPort(String uri,ComponentI owner) throws Exception {
 		super(uri,OvenI.class, owner);
 		
-		assert owner instanceof EnergyController;
+		assert owner instanceof EnergyController | owner instanceof Compteur;
 	}
 
 	/**

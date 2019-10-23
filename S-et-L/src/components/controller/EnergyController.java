@@ -128,12 +128,14 @@ public class EnergyController extends AbstractComponent{
 							((EnergyController)this.getTaskOwner()).tvTurnOff();
 							((EnergyController)this.getTaskOwner()).fridgeTurnOff();
 							((EnergyController)this.getTaskOwner()).getAllCons();
-							((EnergyController)this.getTaskOwner()).ovenTurnOnInDate(LocalDateTime.now().plusSeconds(30), 190);
-//							while(true) {
-//								if(Oven.dateToOn==LocalDateTime.now()) {
-//									((EnergyController)this.getTaskOwner()).ovenTurnOnSetTemperatur(Oven.temperatureToOn);
-//								}
-//							}
+							((EnergyController)this.getTaskOwner()).ovenTurnOnInDate(LocalDateTime.now().plusSeconds(10), 190);
+							while(true) {
+								if(Oven.dateToOn.isEqual(LocalDateTime.now().minusNanos(LocalDateTime.now().getNano()))) {
+									((EnergyController)this.getTaskOwner()).ovenTurnOnSetTemperatur(Oven.temperatureToOn);
+									((EnergyController)this.getTaskOwner()).getAllCons();
+									break;
+								}
+							}
 						} catch (Exception e) {
 							throw new RuntimeException(e) ;
 						}

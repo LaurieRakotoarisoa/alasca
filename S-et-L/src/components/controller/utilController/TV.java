@@ -14,6 +14,13 @@ public class TV {
 		return cons;
 	}
 	
+	public static int getCons(TVOutboundPort tvOutbound,
+			Compteur counter) throws Exception{
+		int cons = tvOutbound.getCons();
+		counter.logMessage("Consomation de la télé : "+cons);
+		return cons;
+	}
+	
 	public static void turnOff(TVOutboundPort tvOutbound, 
 						EnergyController controller) throws Exception{
 		tvOutbound.turnOff();

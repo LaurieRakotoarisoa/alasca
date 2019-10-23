@@ -6,9 +6,16 @@ import ports.fridge.FridgeOutboundPort;
 import utils.FridgeMode;
 
 public class Fridge {
-	
+	//controller
 	public static int getCons(FridgeOutboundPort fridgeOutbound, 
 			EnergyController counter) throws Exception{
+		int cons = fridgeOutbound.getCons();
+		counter.logMessage("Consomation du réfrigérateur : "+cons);
+		return cons;
+	}
+	//counter
+	public static int getCons(FridgeOutboundPort fridgeOutbound, 
+			Compteur counter) throws Exception{
 		int cons = fridgeOutbound.getCons();
 		counter.logMessage("Consomation du réfrigérateur : "+cons);
 		return cons;

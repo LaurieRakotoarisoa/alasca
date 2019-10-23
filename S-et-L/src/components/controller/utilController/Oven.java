@@ -20,9 +20,17 @@ public class Oven {
 		controller.logMessage("Etat du four : "+m);
 		
 	}
-	
+	//controller
 	public static int getCons(OvenOutboundPort ovenOutbound, 
 			EnergyController counter) throws Exception{
+		int cons = ovenOutbound.getCons();
+		counter.logMessage("Consomation du four : "+cons);
+		return cons;
+	}
+	
+	//counter
+	public static int getCons(OvenOutboundPort ovenOutbound, 
+			Compteur counter) throws Exception{
 		int cons = ovenOutbound.getCons();
 		counter.logMessage("Consomation du four : "+cons);
 		return cons;
@@ -47,10 +55,9 @@ public class Oven {
 			EnergyController controller,
 			int temperature) throws Exception{
 		ovenOutbound.turnOn(temperature);
+		controller.logMessage("Allumer le four en "+temperature+"°");
 		dateToOn = null;
 		temperature = 0;
-		controller.logMessage("Allumer le four en "+temperature+"°");
-	
 	}
 	
 	public static void setTemperature(OvenOutboundPort ovenOutbound, 
@@ -65,7 +72,7 @@ public class Oven {
 			EnergyController controller, 
 			LocalDateTime date, 
 			int temperature) throws Exception{
-		dateToOn = date;
+		dateToOn = date.minusNanos(date.getNano());
 		temperatureToOn = temperature;
 		DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
 	    String formattedDate = date.format(myFormatObj);
