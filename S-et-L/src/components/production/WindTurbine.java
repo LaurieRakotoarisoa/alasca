@@ -1,23 +1,29 @@
 package components.production;
 
 import fr.sorbonne_u.components.AbstractComponent;
-import ports.TurbineInboundPort;
+import turbine.TurbineInboundPort;
 import utils.TurbineMode;
 
 public class WindTurbine extends AbstractComponent{
 	
 	protected TurbineMode state = TurbineMode.OFF;
-	protected TurbineInboundPort tb;
+	protected int production =0;
+
 
 	protected WindTurbine(String uri, String inboundURI) throws Exception {
 		super(uri,1, 0);
-		
-		tb = new TurbineInboundPort(inboundURI, this);
-		tb.publishPort();
 	}
 	
 	public TurbineMode getState() throws Exception{
 		return state;
+	}
+	
+	public int maxPower() {
+		return 500;
+	}
+	
+	public int getProduction() {
+		return production;
 	}
 
 }

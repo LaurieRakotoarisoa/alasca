@@ -14,10 +14,10 @@ import utils.TVMode;
  * @author Saad CHIADMI
  *
  */
-public class TVInboudPort extends AbstractInboundPort
+public class TVInboundPort extends AbstractInboundPort
 implements TVI{
 	
-	public TVInboudPort(String uri,ComponentI owner) throws Exception {
+	public TVInboundPort(String uri,ComponentI owner) throws Exception {
 		super(uri, TVI.class, owner);
 		assert owner instanceof TV;
 	}

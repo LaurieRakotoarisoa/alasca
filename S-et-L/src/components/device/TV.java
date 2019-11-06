@@ -6,7 +6,7 @@ import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.components.ports.PortI;
 import interfaces.TVI;
-import ports.tv.TVInboudPort;
+import ports.tv.TVInboundPort;
 import utils.TVMode;
 
 /**
@@ -33,7 +33,7 @@ public class TV extends AbstractComponent{
 		super(URI,1, 0);
 		
 		//Create and publish port for remote control
-		PortI TVInboundPort = new TVInboudPort(inboundURI,this);
+		PortI TVInboundPort = new TVInboundPort(inboundURI,this);
 		TVInboundPort.publishPort();
 		this.executionLog.setDirectory(System.getProperty("user.home"));
 		this.tracer.setTitle("TV");

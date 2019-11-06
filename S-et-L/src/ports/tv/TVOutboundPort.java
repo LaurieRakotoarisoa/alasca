@@ -13,7 +13,7 @@ implements TVI{
 	public TVOutboundPort(String uri,ComponentI owner) throws Exception {
 		super(uri,TVI.class, owner);
 		
-		assert owner instanceof EnergyController | owner instanceof Compteur;
+		assert owner instanceof EnergyController;
 	}
 
 	/**
