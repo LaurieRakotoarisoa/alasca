@@ -11,7 +11,7 @@ import utils.TurbineMode;
 public interface WindTurbineI extends OfferedI{
 	
 	/**
-	 * State of the wind turbine according to the environment (wind speed)
+	 * State of the wind turbine according to the environment (suspended or not)
 	 * @return the state of the turbine 
 	 *
 	 * @throws Exception
