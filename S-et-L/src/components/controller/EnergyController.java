@@ -6,25 +6,28 @@ import java.util.concurrent.TimeUnit;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.RequiredInterfaces;
 import interfaces.OvenI;
+import interfaces.ProductionI;
 import interfaces.CompteurI;
 import interfaces.FridgeI;
 import interfaces.TVI;
 import ports.compteur.CompteurOutboundPort;
 import ports.fridge.FridgeOutboundPort;
 import ports.oven.OvenOutboundPort;
+import ports.production.ProductionOutboundPort;
 import ports.tv.TVOutboundPort;
 import components.controller.utilController.*;
 
 
-@RequiredInterfaces (required = {OvenI.class, TVI.class, FridgeI.class, CompteurI.class})
+@RequiredInterfaces (required = {OvenI.class, TVI.class, FridgeI.class, CompteurI.class, ProductionI.class})
 public class EnergyController extends AbstractComponent{
 	
 	protected OvenOutboundPort ovenOutbound;
 	protected FridgeOutboundPort fridgeOutbound;
 	protected TVOutboundPort tvOutbound;
 	protected CompteurOutboundPort counterOutbound;
+	protected ProductionOutboundPort productionOutbound;
 	
-	protected EnergyController(String URI, String counterOutboundURI, String ovenOutboundURI, String TVOutboundURI, String FridgeOutboundURI) throws Exception {
+	protected EnergyController(String URI, String productionOutboundURI, String counterOutboundURI, String ovenOutboundURI, String TVOutboundURI, String FridgeOutboundURI) throws Exception {
 		super(URI,1,1 );
 		
 		ovenOutbound = new OvenOutboundPort(ovenOutboundURI,this);
@@ -35,6 +38,8 @@ public class EnergyController extends AbstractComponent{
 		fridgeOutbound.localPublishPort();
 		counterOutbound = new CompteurOutboundPort(counterOutboundURI,this);
 		counterOutbound.localPublishPort();
+		productionOutbound = new ProductionOutboundPort(productionOutboundURI,this);
+		productionOutbound.localPublishPort();
 		this.executionLog.setDirectory(System.getProperty("user.home")) ;
 		this.tracer.setTitle("energy controller") ;
 	}
@@ -60,9 +65,19 @@ public class EnergyController extends AbstractComponent{
 	public void ovenTurnOnSetTemperatur(int temperature) throws Exception {Oven.turnOnIn(ovenOutbound, this, temperature);}
 	
 	//Counter
-	public void getAllCons() throws Exception{
+	public int getAllCons() throws Exception{
 		int cons = Oven.getCons(ovenOutbound, this)+Fridge.getCons(fridgeOutbound, this)+TV.getCons(tvOutbound, this);
 		this.logMessage("La consomation d'énergie acctuel est "+cons+" Watt");
+		return cons;
+	}
+	
+	//Production
+	public void getProduction() throws Exception{
+		Production.getProduction(productionOutbound, this);
+	}
+	
+	public void setProduction(int cons) throws Exception{
+		Production.setProduction(cons, productionOutbound, this);
 	}
 	
 	@Override
@@ -71,6 +86,23 @@ public class EnergyController extends AbstractComponent{
 		super.execute() ;
 		this.logMessage("executing controller component.") ;
 		// Schedule the first service method invocation in one second.
+		
+//		this.scheduleTask(
+//				new AbstractComponent.AbstractTask() {
+//					@Override
+//					public void run() {
+//						try {
+//							while(true) {
+//								Thread.sleep(2000);
+//								((EnergyController)this.getTaskOwner()).getAllCons();
+//							}
+//						} catch (Exception e) {
+//							throw new RuntimeException(e) ;
+//						}
+//					}
+//				},
+//				1000, TimeUnit.MILLISECONDS);
+		
 		this.scheduleTask(
 			new AbstractComponent.AbstractTask() {
 				@Override
@@ -80,6 +112,7 @@ public class EnergyController extends AbstractComponent{
 						((EnergyController)this.getTaskOwner()).fridgeGetMode();
 						((EnergyController)this.getTaskOwner()).tvGetMode();
 						((EnergyController)this.getTaskOwner()).getAllCons();
+						((EnergyController)this.getTaskOwner()).setProduction(getAllCons());
 					} catch (Exception e) {
 						throw new RuntimeException(e) ;
 					}
@@ -97,12 +130,13 @@ public class EnergyController extends AbstractComponent{
 						((EnergyController)this.getTaskOwner()).fridgeTurnOn();
 						((EnergyController)this.getTaskOwner()).fridgeSetTemperature(4);
 						((EnergyController)this.getTaskOwner()).getAllCons();
+						((EnergyController)this.getTaskOwner()).setProduction(getAllCons());
 					} catch (Exception e) {
 						throw new RuntimeException(e) ;
 					}
 				}
 			},
-			5000, TimeUnit.MILLISECONDS);
+			10000, TimeUnit.MILLISECONDS);
 		
 		this.scheduleTask(
 				new AbstractComponent.AbstractTask() {
@@ -112,12 +146,13 @@ public class EnergyController extends AbstractComponent{
 							((EnergyController)this.getTaskOwner()).ovenTurnOn();
 							((EnergyController)this.getTaskOwner()).ovenSetTemperature(170);
 							((EnergyController)this.getTaskOwner()).getAllCons();
+							((EnergyController)this.getTaskOwner()).setProduction(getAllCons());
 						} catch (Exception e) {
 							throw new RuntimeException(e) ;
 						}
 					}
 				},
-				10000, TimeUnit.MILLISECONDS);
+				20000, TimeUnit.MILLISECONDS);
 		
 		this.scheduleTask(
 				new AbstractComponent.AbstractTask() {
@@ -133,6 +168,7 @@ public class EnergyController extends AbstractComponent{
 								if(Oven.dateToOn.isEqual(LocalDateTime.now().minusNanos(LocalDateTime.now().getNano()))) {
 									((EnergyController)this.getTaskOwner()).ovenTurnOnSetTemperatur(Oven.temperatureToOn);
 									((EnergyController)this.getTaskOwner()).getAllCons();
+									((EnergyController)this.getTaskOwner()).setProduction(getAllCons());
 									break;
 								}
 							}
@@ -141,7 +177,7 @@ public class EnergyController extends AbstractComponent{
 						}
 					}
 				},
-				15000, TimeUnit.MILLISECONDS);
+				25000, TimeUnit.MILLISECONDS);
 	}
 	
 	@Override
@@ -161,6 +197,8 @@ public class EnergyController extends AbstractComponent{
 		this.fridgeOutbound.unpublishPort() ;
 		this.tvOutbound.doDisconnection();
 		this.tvOutbound.unpublishPort() ;
+		this.productionOutbound.doDisconnection();
+		this.productionOutbound.unpublishPort() ;
 //		this.counterOutbound.doDisconnection();
 //		this.counterOutbound.unpublishPort() ;
 

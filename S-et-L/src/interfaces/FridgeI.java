@@ -5,8 +5,8 @@ import fr.sorbonne_u.components.interfaces.RequiredI;
 import utils.FridgeMode;
 
 /**
- * The interface <code>TVI</code> defines the services 
- * to access car TV state and its operations
+ * The interface <code>FridgeI</code> defines the services 
+ * to access Fridge state and its operations
  * 
  * @author Saad CHIADMI
  */

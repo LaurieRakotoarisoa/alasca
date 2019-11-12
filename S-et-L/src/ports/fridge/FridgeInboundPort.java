@@ -8,8 +8,8 @@ import utils.FridgeMode;
 
 /**
  *	The class <code>FridgeInboudPort</code> defines the inbound port
- * exposing the interface <code>TVI</code> for components of
- * type <code>TV</code>.
+ * exposing the interface <code>FridgeI</code> for components of
+ * type <code>Fridge</code>.
  * 
  * @author Saad CHIADMI
  *

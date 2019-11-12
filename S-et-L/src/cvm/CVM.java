@@ -5,7 +5,9 @@ import components.controller.EnergyController;
 import components.device.Oven;
 import components.device.Fridge;
 import components.device.TV;
+import components.production.Production;
 import connectors.OvenConnector;
+import connectors.ProductionConnector;
 import connectors.CompteurConnector;
 import connectors.FridgeConnector;
 import connectors.TVConnector;
@@ -20,6 +22,7 @@ public class CVM extends AbstractCVM{
 	protected String fridgeURI;
 	protected String tvURI;
 	protected String counterURI;
+	protected String productionURI;
 
 	public CVM() throws Exception {
 		super();
@@ -81,6 +84,18 @@ public class CVM extends AbstractCVM{
 		this.toggleTracing(this.tvURI) ;
 		this.toggleLogging(this.tvURI) ;
 		
+		// create the Production component
+		this.productionURI =
+				AbstractComponent.createComponent(
+						Production.class.getCanonicalName(),
+						new Object[]{URI.PRODUCTION_COMPONENT_URI,
+								URI.ProductionInboundPortURI}) ;
+		assert	this.isDeployedComponent(this.productionURI) ;
+		// make it trace its operations; comment and uncomment the line to see
+		// the difference
+		this.toggleTracing(this.productionURI) ;
+		this.toggleLogging(this.productionURI) ;
+		
 		// create the counter component
 //		this.counterURI =
 //			AbstractComponent.createComponent(
@@ -101,6 +116,7 @@ public class CVM extends AbstractCVM{
 			AbstractComponent.createComponent(
 					EnergyController.class.getCanonicalName(),
 					new Object[]{URI.CONTROLLER_COMPONENT_URI,
+							URI.ProductionOutboundPortURI,
 							URI.CounterOutboundPortURI,
 							URI.OvenOutboundPortURI,
 							URI.TVOutboundPortURI,
@@ -131,6 +147,11 @@ public class CVM extends AbstractCVM{
 				URI.TVOutboundPortURI,
 				URI.TVInboundPortURI,
 				TVConnector.class.getCanonicalName()) ;
+		this.doPortConnection(
+				this.controllerURI,
+				URI.ProductionOutboundPortURI,
+				URI.ProductionInboundPortURI,
+				ProductionConnector.class.getCanonicalName()) ;
 		
 		// do the connection counter
 //		this.doPortConnection(

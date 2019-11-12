@@ -76,7 +76,7 @@ public class Oven {
 		temperatureToOn = temperature;
 		DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
 	    String formattedDate = date.format(myFormatObj);
-		controller.logMessage("Allumer le à "+formattedDate+" en "+temperature+"°");
+		controller.logMessage("Allumer le four à "+formattedDate+" en "+temperature+"°");
 	}
 
 }
