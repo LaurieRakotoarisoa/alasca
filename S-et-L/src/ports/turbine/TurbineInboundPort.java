@@ -1,4 +1,4 @@
-package turbine;
+package ports.turbine;
 
 import components.production.WindTurbine;
 import fr.sorbonne_u.components.ComponentI;
@@ -30,25 +30,21 @@ implements WindTurbineI{
 	}
 
 	@Override
-	public int maxPower() throws Exception {
-		return this.getOwner().handleRequestSync(owner -> ((WindTurbine)owner).maxPower());
-	}
-
-	@Override
 	public int getProduction() throws Exception {
 		return this.getOwner().handleRequestSync(owner -> ((WindTurbine)owner).getProduction());
 	}
 
 	@Override
-	public void stop() throws Exception {
-		// TODO Auto-generated method stub
-		
+	public void turnOff() throws Exception {
+		this.getOwner().handleRequestSync(owner -> ((WindTurbine)owner).setMode(TurbineMode.OFF));
 	}
 
 	@Override
-	public void activate() throws Exception {
-		// TODO Auto-generated method stub
-		
+	public void turnOn() throws Exception {
+		this.getOwner().handleRequestSync(owner -> ((WindTurbine)owner).setMode(TurbineMode.ON));
 	}
+
+
+	
 
 }

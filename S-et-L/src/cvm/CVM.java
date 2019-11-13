@@ -6,11 +6,13 @@ import components.device.Oven;
 import components.device.Fridge;
 import components.device.TV;
 import components.production.Production;
+import components.production.WindTurbine;
 import connectors.OvenConnector;
 import connectors.ProductionConnector;
 import connectors.CompteurConnector;
 import connectors.FridgeConnector;
 import connectors.TVConnector;
+import connectors.TurbineConnector;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.cvm.AbstractCVM;
 import utils.URI;
@@ -23,6 +25,7 @@ public class CVM extends AbstractCVM{
 	protected String tvURI;
 	protected String counterURI;
 	protected String productionURI;
+	protected String windURI;
 
 	public CVM() throws Exception {
 		super();
@@ -96,6 +99,18 @@ public class CVM extends AbstractCVM{
 		this.toggleTracing(this.productionURI) ;
 		this.toggleLogging(this.productionURI) ;
 		
+		// create the Wind Turbine component
+		this.windURI =
+				AbstractComponent.createComponent(
+						WindTurbine.class.getCanonicalName(),
+						new Object[]{URI.WIND_COMPONENT_URI,
+								URI.WindInboundPortURI}) ;
+		assert	this.isDeployedComponent(this.windURI) ;
+		// make it trace its operations; comment and uncomment the line to see
+		// the difference
+		this.toggleTracing(this.windURI) ;
+		this.toggleLogging(this.windURI) ;
+		
 		// create the counter component
 //		this.counterURI =
 //			AbstractComponent.createComponent(
@@ -117,6 +132,7 @@ public class CVM extends AbstractCVM{
 					EnergyController.class.getCanonicalName(),
 					new Object[]{URI.CONTROLLER_COMPONENT_URI,
 							URI.ProductionOutboundPortURI,
+							URI.WindOutboundPortURI,
 							URI.CounterOutboundPortURI,
 							URI.OvenOutboundPortURI,
 							URI.TVOutboundPortURI,
@@ -152,6 +168,11 @@ public class CVM extends AbstractCVM{
 				URI.ProductionOutboundPortURI,
 				URI.ProductionInboundPortURI,
 				ProductionConnector.class.getCanonicalName()) ;
+		this.doPortConnection(
+				this.controllerURI,
+				URI.WindOutboundPortURI,
+				URI.WindInboundPortURI,
+				TurbineConnector.class.getCanonicalName()) ;
 		
 		// do the connection counter
 //		this.doPortConnection(

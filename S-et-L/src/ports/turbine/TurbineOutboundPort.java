@@ -1,5 +1,6 @@
-package turbine;
+package ports.turbine;
 
+import components.controller.EnergyController;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractOutboundPort;
 import interfaces.WindTurbineI;
@@ -10,7 +11,7 @@ implements WindTurbineI{
 
 	public TurbineOutboundPort(String uri, ComponentI owner) throws Exception {
 		super(uri,WindTurbineI.class, owner);
-		
+		assert owner instanceof EnergyController;
 	}
 
 	/**
@@ -24,26 +25,19 @@ implements WindTurbineI{
 	}
 
 	@Override
-	public int maxPower() throws Exception {
-		return ((WindTurbineI)this.connector).maxPower();
-	}
-
-	@Override
 	public int getProduction() throws Exception {
 		// TODO Auto-generated method stub
 		return ((WindTurbineI)this.connector).getProduction();
 	}
 
 	@Override
-	public void stop() throws Exception {
-		((WindTurbineI)this.connector).stop();
-		
+	public void turnOff() throws Exception {
+		((WindTurbineI)this.connector).turnOff();
 	}
 
 	@Override
-	public void activate() throws Exception {
-		((WindTurbineI)this.connector).activate();
-		
+	public void turnOn() throws Exception {
+		((WindTurbineI)this.connector).turnOn();
 	}
 
 }

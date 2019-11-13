@@ -10,15 +10,17 @@ import interfaces.ProductionI;
 import interfaces.CompteurI;
 import interfaces.FridgeI;
 import interfaces.TVI;
+import interfaces.WindTurbineI;
 import ports.compteur.CompteurOutboundPort;
 import ports.fridge.FridgeOutboundPort;
 import ports.oven.OvenOutboundPort;
 import ports.production.ProductionOutboundPort;
+import ports.turbine.TurbineOutboundPort;
 import ports.tv.TVOutboundPort;
 import components.controller.utilController.*;
 
 
-@RequiredInterfaces (required = {OvenI.class, TVI.class, FridgeI.class, CompteurI.class, ProductionI.class})
+@RequiredInterfaces (required = {OvenI.class, TVI.class, FridgeI.class, CompteurI.class, ProductionI.class, WindTurbineI.class})
 public class EnergyController extends AbstractComponent{
 	
 	protected OvenOutboundPort ovenOutbound;
@@ -26,8 +28,9 @@ public class EnergyController extends AbstractComponent{
 	protected TVOutboundPort tvOutbound;
 	protected CompteurOutboundPort counterOutbound;
 	protected ProductionOutboundPort productionOutbound;
+	protected TurbineOutboundPort windOutbound;
 	
-	protected EnergyController(String URI, String productionOutboundURI, String counterOutboundURI, String ovenOutboundURI, String TVOutboundURI, String FridgeOutboundURI) throws Exception {
+	protected EnergyController(String URI, String productionOutboundURI, String windOutboundURI, String counterOutboundURI, String ovenOutboundURI, String TVOutboundURI, String FridgeOutboundURI) throws Exception {
 		super(URI,1,1 );
 		
 		ovenOutbound = new OvenOutboundPort(ovenOutboundURI,this);
@@ -40,6 +43,8 @@ public class EnergyController extends AbstractComponent{
 		counterOutbound.localPublishPort();
 		productionOutbound = new ProductionOutboundPort(productionOutboundURI,this);
 		productionOutbound.localPublishPort();
+		windOutbound = new TurbineOutboundPort(windOutboundURI,this);
+		windOutbound.localPublishPort();
 		this.executionLog.setDirectory(System.getProperty("user.home")) ;
 		this.tracer.setTitle("energy controller") ;
 	}
@@ -72,13 +77,13 @@ public class EnergyController extends AbstractComponent{
 	}
 	
 	//Production
-	public void getProduction() throws Exception{
-		Production.getProduction(productionOutbound, this);
-	}
+	public void getProduction() throws Exception{Production.getProduction(productionOutbound, this);}
+	public void setProduction(int cons) throws Exception{Production.setProduction(cons, productionOutbound, this);}
 	
-	public void setProduction(int cons) throws Exception{
-		Production.setProduction(cons, productionOutbound, this);
-	}
+	
+	//Wind turbine methode's
+	public void windGetMode() throws Exception {Wind.getMode(windOutbound, this);}
+	public void windTurnOn() throws Exception {Wind.turnOn(windOutbound, this);}
 	
 	@Override
 	public void			execute() throws Exception
@@ -108,6 +113,7 @@ public class EnergyController extends AbstractComponent{
 				@Override
 				public void run() {
 					try {
+						((EnergyController)this.getTaskOwner()).windTurnOn();
 						((EnergyController)this.getTaskOwner()).ovenGetMode();
 						((EnergyController)this.getTaskOwner()).fridgeGetMode();
 						((EnergyController)this.getTaskOwner()).tvGetMode();
@@ -199,6 +205,8 @@ public class EnergyController extends AbstractComponent{
 		this.tvOutbound.unpublishPort() ;
 		this.productionOutbound.doDisconnection();
 		this.productionOutbound.unpublishPort() ;
+		this.windOutbound.doDisconnection();
+		this.windOutbound.unpublishPort() ;
 //		this.counterOutbound.doDisconnection();
 //		this.counterOutbound.unpublishPort() ;
 
