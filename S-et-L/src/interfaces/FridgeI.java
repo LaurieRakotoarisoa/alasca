@@ -3,6 +3,7 @@ package interfaces;
 import fr.sorbonne_u.components.interfaces.OfferedI;
 import fr.sorbonne_u.components.interfaces.RequiredI;
 import utils.FridgeMode;
+import utils.TVMode;
 
 /**
  * The interface <code>FridgeI</code> defines the services 

@@ -33,11 +33,11 @@ public class Compteur extends AbstractComponent{
 	
 	/**
 	 * <p>Give information about the current consumption of all devices</p>
-	 * @return {@link integer}
+	 * @return Comsumption of all devices as an integer
 	 * @throws Exception 
 	 */
 	public int getCons() throws Exception {
-		//Consommation totale en attendant la modélisation EVS
+		//Consommation totale arbitraire en attendant la modélisation DEVS
 		return 12;
 	}
 	
