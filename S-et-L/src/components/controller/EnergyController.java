@@ -45,7 +45,7 @@ public class EnergyController extends AbstractComponent{
 		productionOutbound.localPublishPort();
 		windOutbound = new TurbineOutboundPort(windOutboundURI,this);
 		windOutbound.localPublishPort();
-		this.executionLog.setDirectory(System.getProperty("user.home")) ;
+		//this.executionLog.setDirectory(System.getProperty("user.home")) ;
 		this.tracer.setTitle("energy controller") ;
 	}
 	
@@ -71,9 +71,11 @@ public class EnergyController extends AbstractComponent{
 	
 	//Counter
 	public int getAllCons() throws Exception{
-		int cons = Oven.getCons(ovenOutbound, this)+Fridge.getCons(fridgeOutbound, this)+TV.getCons(tvOutbound, this);
+//		int cons = Oven.getCons(ovenOutbound, this)+Fridge.getCons(fridgeOutbound, this)+TV.getCons(tvOutbound, this);
+		int cons = Compteur.getComsumption(counterOutbound, this);
 		this.logMessage("La consomation d'énergie acctuel est "+cons+" Watt");
 		return cons;
+		
 	}
 	
 	//Production

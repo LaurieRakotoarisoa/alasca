@@ -17,7 +17,7 @@ public class Production extends AbstractComponent{
 		//Create and publish port for remote control
 		PortI ProductInboundPort = new ProductionInboundPort(inboundURI,this);
 		ProductInboundPort.publishPort();
-		this.executionLog.setDirectory(System.getProperty("user.home"));
+		//this.executionLog.setDirectory(System.getProperty("user.home"));
 		this.tracer.setTitle("Production");
 	}
 	

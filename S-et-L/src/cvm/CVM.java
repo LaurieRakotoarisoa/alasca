@@ -112,18 +112,16 @@ public class CVM extends AbstractCVM{
 		this.toggleLogging(this.windURI) ;
 		
 		// create the counter component
-//		this.counterURI =
-//			AbstractComponent.createComponent(
-//					Compteur.class.getCanonicalName(),
-//					new Object[]{URI.COUNTER_COMPONENT_URI,
-//							URI.OvenOutboundPortURI,
-//							URI.TVOutboundPortURI,
-//							URI.FridgeOutboundPortURI}) ;
-//		assert	this.isDeployedComponent(this.counterURI) ;
-//		// make it trace its operations; comment and uncomment the line to see
-//		// the difference
-//		this.toggleTracing(this.counterURI) ;
-//		this.toggleLogging(this.counterURI) ;
+		this.counterURI =
+			AbstractComponent.createComponent(
+					Compteur.class.getCanonicalName(),
+					new Object[]{URI.COUNTER_COMPONENT_URI,
+							URI.CounterInboundPortURI}) ;
+		assert	this.isDeployedComponent(this.counterURI) ;
+		// make it trace its operations; comment and uncomment the line to see
+		// the difference
+		this.toggleTracing(this.counterURI) ;
+		this.toggleLogging(this.counterURI) ;
 
 		
 		// create the controller component
@@ -175,11 +173,11 @@ public class CVM extends AbstractCVM{
 				TurbineConnector.class.getCanonicalName()) ;
 		
 		// do the connection counter
-//		this.doPortConnection(
-//				this.counterURI,
-//				URI.OvenOutboundPortURI,
-//				URI.OvenInboundPortURI,
-//				OvenConnector.class.getCanonicalName()) ;
+		this.doPortConnection(
+				this.controllerURI,
+				URI.CounterOutboundPortURI,
+				URI.CounterInboundPortURI,
+				CompteurConnector.class.getCanonicalName()) ;
 //		this.doPortConnection(
 //				this.counterURI,
 //				URI.FridgeOutboundPortURI,

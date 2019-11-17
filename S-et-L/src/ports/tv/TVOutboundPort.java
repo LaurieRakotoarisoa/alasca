@@ -1,6 +1,5 @@
 package ports.tv;
 
-import components.compteur.Compteur;
 import components.controller.EnergyController;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractOutboundPort;

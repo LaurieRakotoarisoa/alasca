@@ -41,7 +41,7 @@ public class Oven extends AbstractComponent{
 		//Create and publish port for remote control
 		PortI ovenInboundPort = new OvenInboundPort(inboundURI,this);
 		ovenInboundPort.publishPort();
-		this.executionLog.setDirectory(System.getProperty("user.home")) ;
+		//this.executionLog.setDirectory(System.getProperty("user.home")) ;
 		this.tracer.setTitle("Oven") ;
 	}
 	

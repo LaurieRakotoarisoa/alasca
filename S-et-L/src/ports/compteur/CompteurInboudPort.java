@@ -1,7 +1,6 @@
 package ports.compteur;
 
 import components.compteur.Compteur;
-import components.device.TV;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractInboundPort;
 import interfaces.CompteurI;
@@ -19,7 +18,7 @@ public class CompteurInboudPort extends AbstractInboundPort
 	
 	public CompteurInboudPort(String uri,ComponentI owner) throws Exception {
 		super(uri, CompteurI.class, owner);
-		assert owner instanceof TV;
+		assert owner instanceof Compteur;
 	}
 	
 	/**

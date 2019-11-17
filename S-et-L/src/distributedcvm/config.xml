@@ -1,0 +1,39 @@
+<deployment>
+   <hosts>
+    <host name="localhost"
+          dir="./"/>
+  </hosts>
+  <cyclicBarrier   hostname="localhost" port="55253"/>
+  <globalRegistry  hostname="localhost" port="55252"/>
+  <rmiRegistryPort no="55999"/>
+  <jvms2hostnames>
+    <jvm2hostname jvmuri="my-URI-controller"
+        rmiRegistryCreator="true"
+        hostname="localhost"
+        mainclass="distributedcvm.DistributedCVM"/>
+    <jvm2hostname jvmuri="my-URI-oven"
+        rmiRegistryCreator="false"
+        	hostname="localhost"
+        mainclass="DistributedCVM"/>
+<jvm2hostname jvmuri="my-URI-production"
+        rmiRegistryCreator="false"
+        	hostname="localhost"
+        mainclass="distributedcvm.DistributedCVM"/>
+<jvm2hostname jvmuri="my-URI-wind"
+        rmiRegistryCreator="false"
+        	hostname="localhost"
+        mainclass="distributedcvm.DistributedCVM"/>
+<jvm2hostname jvmuri="my-URI-counter"
+        rmiRegistryCreator="false"
+        	hostname="localhost"
+        mainclass="distributedcvm.DistributedCVM"/>
+<jvm2hostname jvmuri="my-URI-fridge"
+        rmiRegistryCreator="false"
+        	hostname="localhost"
+        mainclass="distributedcvm.DistributedCVM"/>
+<jvm2hostname jvmuri="my-URI-tv"
+        rmiRegistryCreator="false"
+        	hostname="localhost"
+        mainclass="distributedcvm.DistributedCVM"/>
+  </jvms2hostnames>
+</deployment>

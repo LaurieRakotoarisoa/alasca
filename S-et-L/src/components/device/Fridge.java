@@ -42,7 +42,7 @@ public class Fridge extends AbstractComponent{
 		//Create and publish port for remote control
 		PortI FridgeInboundPort = new FridgeInboundPort(inboundURI,this);
 		FridgeInboundPort.publishPort();
-		this.executionLog.setDirectory(System.getProperty("user.home"));
+		//this.executionLog.setDirectory(System.getProperty("user.home"));
 		this.tracer.setTitle("Fridge");
 	}
 	

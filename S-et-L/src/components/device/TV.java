@@ -35,7 +35,7 @@ public class TV extends AbstractComponent{
 		//Create and publish port for remote control
 		PortI TVInboundPort = new TVInboundPort(inboundURI,this);
 		TVInboundPort.publishPort();
-		this.executionLog.setDirectory(System.getProperty("user.home"));
+		//this.executionLog.setDirectory(System.getProperty("user.home"));
 		this.tracer.setTitle("TV");
 	}
 	
