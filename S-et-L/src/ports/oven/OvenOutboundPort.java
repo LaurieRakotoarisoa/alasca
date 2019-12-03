@@ -6,7 +6,8 @@ import components.controller.EnergyController;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractOutboundPort;
 import interfaces.OvenI;
-import utils.OvenMode;
+import utils.oven.OvenLightMode;
+import utils.oven.OvenMode;
 
 public class OvenOutboundPort extends AbstractOutboundPort
 implements OvenI{
@@ -56,6 +57,27 @@ implements OvenI{
 	@Override
 	public int getCons() throws Exception {
 		return ((OvenI)this.connector).getCons();
+	}
+
+
+	@Override
+	public void setModeLight(OvenLightMode mode) throws Exception {
+		((OvenI)this.connector).setModeLight(mode);
+		
+	}
+
+
+	@Override
+	public void forbidPyrolysis() throws Exception {
+		((OvenI)this.connector).forbidPyrolysis();
+		
+	}
+
+
+	@Override
+	public void allowPyrolysis() throws Exception {
+		((OvenI)this.connector).allowPyrolysis();
+		
 	}
 
 }

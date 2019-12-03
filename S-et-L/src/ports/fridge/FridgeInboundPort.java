@@ -4,7 +4,7 @@ import components.device.Fridge;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractInboundPort;
 import interfaces.FridgeI;
-import utils.FridgeMode;
+import utils.fridge.FridgeMode;
 
 /**
  *	The class <code>FridgeInboudPort</code> defines the inbound port

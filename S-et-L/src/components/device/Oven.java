@@ -7,7 +7,8 @@ import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.components.ports.PortI;
 import interfaces.OvenI;
 import ports.oven.OvenInboundPort;
-import utils.OvenMode;
+import utils.oven.OvenLightMode;
+import utils.oven.OvenMode;
 
 /**
  * The class <code>Oven</code> implements a component that models a oven's behaviour
@@ -29,6 +30,17 @@ public class Oven extends AbstractComponent{
 	 * between 0 and 250
 	 */
 	protected int temperature = 0;
+	
+	
+	/**
+	 * default light mode of the oven 
+	 */
+	protected OvenLightMode lightMode = OvenLightMode.ON;
+	
+	/**
+	 * initially allow pyrolysis
+	 */
+	protected boolean allow_pyrolysis = true;
 
 	/**
 	 * @param URI Component uri
@@ -65,7 +77,7 @@ public class Oven extends AbstractComponent{
 	}
 	
 	/**
-	 * <p>set the current state of the TV</p>
+	 * <p>set the current state of the oven</p>
 	 * (On, off)
 	 */
 	public int setTemperatur(int temperature) {
@@ -76,7 +88,7 @@ public class Oven extends AbstractComponent{
 	}
 	
 	/**
-	 * <p>set the current state of the TV</p>
+	 * <p>set the current state of the oven</p>
 	 * (On, off)
 	 */
 	public OvenMode setModeService(OvenMode state) {
@@ -85,6 +97,12 @@ public class Oven extends AbstractComponent{
 		this.state = state;
 		this.logMessage("Modification state à "+ state);
 		return state;
+	}
+	
+	public OvenLightMode setModeLight(OvenLightMode mode) {
+		this.lightMode = mode;
+		this.logMessage("Light mode is now : "+lightMode);
+		return mode;
 	}
 	
 	

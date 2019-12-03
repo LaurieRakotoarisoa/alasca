@@ -7,7 +7,7 @@ import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.components.ports.PortI;
 import interfaces.FridgeI;
 import ports.fridge.FridgeInboundPort;
-import utils.FridgeMode;
+import utils.fridge.FridgeMode;
 
 /**
  * The class <code>Fridge</code> implements a component that models a Fridge's behaviour

@@ -3,7 +3,8 @@ package connectors;
 
 import fr.sorbonne_u.components.connectors.AbstractConnector;
 import interfaces.OvenI;
-import utils.OvenMode;
+import utils.oven.OvenLightMode;
+import utils.oven.OvenMode;
 
 public class OvenConnector extends AbstractConnector
 implements OvenI{
@@ -38,6 +39,24 @@ implements OvenI{
 	@Override
 	public int getCons() throws Exception {
 		return ((OvenI)this.offering).getCons();
+	}
+
+	@Override
+	public void setModeLight(OvenLightMode mode) throws Exception {
+		((OvenI)this.offering).setModeLight(mode);
+		
+	}
+
+	@Override
+	public void forbidPyrolysis() throws Exception {
+		((OvenI)this.offering).forbidPyrolysis();
+		
+	}
+
+	@Override
+	public void allowPyrolysis() throws Exception {
+		((OvenI)this.offering).allowPyrolysis();
+		
 	}
 
 }

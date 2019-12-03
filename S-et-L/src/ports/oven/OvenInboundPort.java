@@ -2,10 +2,12 @@ package ports.oven;
 
 
 import components.device.Oven;
+import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractInboundPort;
 import interfaces.OvenI;
-import utils.OvenMode;
+import utils.oven.OvenLightMode;
+import utils.oven.OvenMode;
 
 
 
@@ -68,6 +70,27 @@ implements OvenI{
 	@Override
 	public int getCons() throws Exception {
 		return this.getOwner().handleRequestSync(owner -> ((Oven)owner).getCon());
+	}
+
+
+	@Override
+	public void setModeLight(OvenLightMode mode) throws Exception {
+		this.getOwner().handleRequestSync(owner -> ((Oven)owner).setModeLight(mode));
+		
+	}
+
+
+	@Override
+	public void forbidPyrolysis() throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void allowPyrolysis() throws Exception {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

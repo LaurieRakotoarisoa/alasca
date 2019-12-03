@@ -5,7 +5,7 @@ import components.controller.EnergyController;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractOutboundPort;
 import interfaces.FridgeI;
-import utils.FridgeMode;
+import utils.fridge.FridgeMode;
 
 public class FridgeOutboundPort extends AbstractOutboundPort
 implements FridgeI{

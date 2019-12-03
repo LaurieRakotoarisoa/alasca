@@ -3,7 +3,7 @@ package components.controller.utilController;
 import components.compteur.Compteur;
 import components.controller.EnergyController;
 import ports.fridge.FridgeOutboundPort;
-import utils.FridgeMode;
+import utils.fridge.FridgeMode;
 
 public class Fridge {
 	//controller
