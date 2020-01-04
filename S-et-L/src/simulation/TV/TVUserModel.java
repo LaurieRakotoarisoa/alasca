@@ -4,7 +4,6 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
-import fr.sorbonne_u.devs_simulation.examples.molene.wbsm.WiFiBandwidthReading;
 import fr.sorbonne_u.devs_simulation.interfaces.SimulationReportI;
 import fr.sorbonne_u.devs_simulation.models.AtomicModel;
 import fr.sorbonne_u.devs_simulation.models.annotations.ModelExternalEvents;
@@ -104,6 +103,7 @@ extends AtomicModel{
 	/**
 	 * @see fr.sorbonne_u.devs_simulation.models.Model#setSimulationRunParameters(java.util.Map)
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public void			setSimulationRunParameters(
 		Map<String, Object> simParams
