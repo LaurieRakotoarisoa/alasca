@@ -45,14 +45,7 @@ public class TestTV {
 				new HashMap<>() ;
 		try {
 			
-//			atomicModelDescriptors.put(TicModel.URI,
-//					AtomicModelDescriptor.create(TicModel.class,
-//							TicModel.URI,
-//							TimeUnit.SECONDS,null,SimulationEngineCreationMode.ATOMIC_ENGINE));
-//			atomicModelDescriptors.put(TVConsumption.URI,
-//					AtomicModelDescriptor.create(TVConsumption.class,
-//							TVConsumption.URI,
-//							TimeUnit.SECONDS,null,SimulationEngineCreationMode.ATOMIC_ENGINE));
+			
 			
 			atomicModelDescriptors.put(TVUserModel.URI,
 					AtomicModelDescriptor.create(TVUserModel.class,
@@ -64,13 +57,20 @@ public class TestTV {
 							TVStateModel.URI,
 							TimeUnit.SECONDS,null,SimulationEngineCreationMode.ATOMIC_ENGINE));
 			
-			
+			atomicModelDescriptors.put(TicModel.URI,
+					AtomicModelDescriptor.create(TicModel.class,
+							TicModel.URI,
+							TimeUnit.SECONDS,null,SimulationEngineCreationMode.ATOMIC_ENGINE));
+			atomicModelDescriptors.put(TVConsumption.URI,
+					AtomicModelDescriptor.create(TVConsumption.class,
+							TVConsumption.URI,
+							TimeUnit.SECONDS,null,SimulationEngineCreationMode.ATOMIC_ENGINE));
 			
 			Set<String> submodels1 = new HashSet<String>() ;
 			submodels1.add(TVUserModel.URI);
 			submodels1.add(TVStateModel.URI);
-//			submodels1.add(TicModel.URI);
-//			submodels1.add(TVConsumption.URI);
+			submodels1.add(TicModel.URI);
+			submodels1.add(TVConsumption.URI);
 			
 			Map<Class<? extends EventI>,EventSink[]> imported1 =
 					new HashMap<Class<? extends EventI>,EventSink[]>() ;
@@ -94,30 +94,30 @@ public class TestTV {
 									  TVSwitch.class)} ;
 			connections1.put(from11, to11) ;
 			
-//			EventSource from12 =
-//					new EventSource(TicModel.URI,
-//									TicEvent.class) ;
-//			EventSink[] to12 =
-//					new EventSink[] {
-//						new EventSink(TVConsumption.URI,
-//									  TicEvent.class)} ;
-//			connections1.put(from12, to12) ;
+			EventSource from12 =
+					new EventSource(TicModel.URI,
+									TicEvent.class) ;
+			EventSink[] to12 =
+					new EventSink[] {
+						new EventSink(TVConsumption.URI,
+									  TicEvent.class)} ;
+			connections1.put(from12, to12) ;
 			
 			Map<VariableSource,VariableSink[]> bindings1 =
 					new HashMap<VariableSource,VariableSink[]>() ;
 					
-//			VariableSource source11 =
-//					new VariableSource("tv_backlight",
-//									   Double.class,
-//									   TVStateModel.URI) ;
-//				VariableSink[] sinks11 =
-//					new VariableSink[] {
-//							new VariableSink("tv_backlight",
-//											 Double.class,
-//											 TVConsumption.URI)} ;
-//					
-//			bindings1.put(source11, sinks11);
-//			
+			VariableSource source11 =
+					new VariableSource("tvBack",
+									   Double.class,
+									   TVStateModel.URI) ;
+				VariableSink[] sinks11 =
+					new VariableSink[] {
+							new VariableSink("tvBack",
+											 Double.class,
+											 TVConsumption.URI)} ;
+					
+			bindings1.put(source11, sinks11);
+			
 			Map<String,CoupledModelDescriptor> coupledModelDescriptors =
 					new HashMap<>() ;
 			

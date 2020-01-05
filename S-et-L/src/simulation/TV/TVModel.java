@@ -48,7 +48,7 @@ extends CoupledModel{
 			)
 		{
 			super(modelURI) ;
-			assert	reports.length == 2 ;
+			assert	reports.length == 4 ;
 
 		}
 

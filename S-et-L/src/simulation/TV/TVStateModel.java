@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 
 import fr.sorbonne_u.devs_simulation.hioa.annotations.ExportedVariable;
 import fr.sorbonne_u.devs_simulation.hioa.models.AtomicHIOA;
+import fr.sorbonne_u.devs_simulation.hioa.models.AtomicHIOAwithEquations;
 import fr.sorbonne_u.devs_simulation.hioa.models.vars.Value;
 import fr.sorbonne_u.devs_simulation.interfaces.SimulationReportI;
 import fr.sorbonne_u.devs_simulation.models.annotations.ModelExternalEvents;
@@ -30,7 +31,7 @@ import utils.TVMode;
 @ModelExternalEvents(imported = {TVSwitch.class},
 					exported = {TvStateEvent.class})
 public class TVStateModel 
-extends AtomicHIOA{
+extends AtomicHIOAwithEquations{
 	
 	// -------------------------------------------------------------------------
 	// Inner classes
@@ -80,10 +81,8 @@ extends AtomicHIOA{
 		this.setLogger(new StandardLogger()) ;
 		this.toggleDebugMode() ;
 		states = new Vector<TvStateEvent>();
-		assert this.tv_backlight != null;
-		tv_backlight.v = 15.0;
-		tv_backlight.time = new Time(0.0, TimeUnit.SECONDS);
-		System.out.println(tv_backlight.time);
+		assert this.tvBack != null;
+		this.staticInitialiseVariables();
 	}
 
 	// -------------------------------------------------------------------------
@@ -126,8 +125,8 @@ extends AtomicHIOA{
 
 	/** TVConsumption in Watt.								*/
 	@ExportedVariable(type = Double.class)
-	protected final Value<Double>		tv_backlight =
-											new Value<Double>(this, 12.0, 1) ;
+	protected final Value<Double>		tvBack =
+											new Value<Double>(this, 12.0, 0) ;
 	
 	
 	/**
@@ -166,22 +165,31 @@ extends AtomicHIOA{
 	{
 		this.currentState = TVMode.Off;
 		this.last_value_backlight = DEFAULT_TV_BACKLIGHT;
-		
 		if (this.statePlotter != null) {
 			this.statePlotter.initialise() ;
 			this.statePlotter.showPlotter() ;
 		}
 		
 		super.initialiseState(initialTime);
-		
 		if (this.statePlotter != null) {
 			this.statePlotter.addData(
 				SERIES1,
-				this.getCurrentStateTime().getSimulatedTime(),
+				initialTime.getSimulatedTime(),
 				state2int(this.currentState)) ;
 		}
 		
 		
+	}
+	
+	/**
+	 * @see fr.sorbonne_u.devs_simulation.hioa.models.AtomicHIOA#initialiseVariables(fr.sorbonne_u.devs_simulation.models.time.Time)
+	 */
+	@Override
+	protected void		initialiseVariables(Time startTime)
+	{
+		super.initialiseVariables(startTime);
+		this.tvBack.v = 0.0;
+		assert	startTime.equals(this.tvBack.time) ;
 	}
 	
 	/**
@@ -193,6 +201,17 @@ extends AtomicHIOA{
 		this.logMessage("at internal transition " +
 							this.getCurrentStateTime().getSimulatedTime() +
 							" " + elapsedTime.getSimulatedDuration()) ;
+		
+		if (elapsedTime.greaterThan(Duration.zero(getSimulatedTimeUnit()))) {
+			super.userDefinedInternalTransition(elapsedTime) ;
+			if (this.currentState == TVMode.On) {
+				// the value of the bandwidth at the next internal transition
+				// is computed in the timeAdvance function when computing
+				// the delay until the next internal transition.
+				this.tvBack.v = 13.0 ;
+			}
+			this.tvBack.time = this.getCurrentStateTime() ;
+		}
 	}
 	
 	/**
@@ -239,7 +258,7 @@ extends AtomicHIOA{
 
 	@Override
 	public Duration timeAdvance() {
-		return new Duration(60.0, TimeUnit.SECONDS);
+		return new Duration(30.0, TimeUnit.SECONDS);
 	}
 	
 	@Override
@@ -251,17 +270,17 @@ extends AtomicHIOA{
 	private void switchState() {
 		if(currentState == TVMode.Off) {
 			currentState = TVMode.On;
-			tv_backlight.v = this.last_value_backlight;
+			tvBack.v = this.last_value_backlight;
 		}
 		else
 		{
 			assert currentState == TVMode.On;
 			currentState = TVMode.Off;
-			last_value_backlight = tv_backlight.v;
-			tv_backlight.v = 0.0;
+			last_value_backlight = tvBack.v;
+			tvBack.v = 0.0;
 			
 		} 
-		tv_backlight.time = this.getCurrentStateTime();
+		tvBack.time = this.getCurrentStateTime();
 	}
 	
 	
