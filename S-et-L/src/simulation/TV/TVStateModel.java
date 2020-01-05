@@ -81,7 +81,7 @@ extends AtomicHIOAwithEquations{
 	public TVStateModel(String uri, TimeUnit simulatedTimeUnit, SimulatorI simulationEngine) throws Exception {
 		super(uri, simulatedTimeUnit, simulationEngine);
 		this.setLogger(new StandardLogger()) ;
-		this.toggleDebugMode() ;
+		this.setDebugLevel(1);
 		states = new Vector<TvStateEvent>();
 		assert this.tvBack != null;
 		this.staticInitialiseVariables();
@@ -270,6 +270,9 @@ extends AtomicHIOAwithEquations{
 		if(tvBack.v > MAX_ECO_BACKLIGHT) {
 			tvBack.v = MAX_ECO_BACKLIGHT;
 			tvBack.time = this.getCurrentStateTime();
+		}
+		else if(this.currentState == TVMode.Off){
+			this.last_value_backlight = MAX_ECO_BACKLIGHT;
 		}
 	}
 	

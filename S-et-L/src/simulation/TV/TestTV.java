@@ -31,6 +31,7 @@ import simulation.Controller.EnergyController;
 import simulation.Controller.TVController;
 import simulation.Controller.events.EconomyEvent;
 import simulation.Controller.events.NoEconomyEvent;
+import simulation.Fridge.FridgeTemperature;
 import simulation.TV.events.TVSwitch;
 public class TestTV {
 
@@ -148,11 +149,20 @@ public class TestTV {
 					TimeUnit.SECONDS,null,SimulationEngineCreationMode.ATOMIC_ENGINE));
 			
 			// ----------------------------------------------------------------
+			// Fridge Model
+			// ----------------------------------------------------------------
+			atomicModelDescriptors.put(FridgeTemperature.URI,
+			AtomicModelDescriptor.create(FridgeTemperature.class,
+					FridgeTemperature.URI,
+					TimeUnit.SECONDS,null,SimulationEngineCreationMode.ATOMIC_ENGINE));
+			
+			// ----------------------------------------------------------------
 			// Full architecture and Global model
 			// ----------------------------------------------------------------
 			Set<String> submodels2 = new HashSet<String>() ;
 			submodels2.add(TVModel.URI);
 			submodels2.add(TVController.URI);
+			submodels2.add(FridgeTemperature.URI);
 			
 			Map<EventSource,EventSink[]> connections2 =
 					new HashMap<EventSource,EventSink[]>() ;
@@ -239,6 +249,20 @@ public class TestTV {
 							"TV Model - Consumption",
 							"Time (sec)",
 							"Consumption",
+							SimulationMain.ORIGIN_X +
+						  		SimulationMain.getPlotterWidth(),
+							SimulationMain.ORIGIN_Y +
+								2 * SimulationMain.getPlotterHeight(),
+							SimulationMain.getPlotterWidth(),
+							SimulationMain.getPlotterHeight()));
+			
+			// Fridge Temperature
+			modelURI = FridgeTemperature.URI;
+			simParams.put(modelURI + ":" + FridgeTemperature.FRIDGE_TEMP_PLOTTING_PARAM_NAME,
+					new PlotterDescription(
+							"Fridge - Temperature",
+							"Time (sec)",
+							"Temperature",
 							SimulationMain.ORIGIN_X +
 						  		SimulationMain.getPlotterWidth(),
 							SimulationMain.ORIGIN_Y +
