@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
+import components.controller.utilController.TV;
 import fr.sorbonne_u.devs_simulation.hioa.annotations.ExportedVariable;
 import fr.sorbonne_u.devs_simulation.hioa.models.AtomicHIOA;
 import fr.sorbonne_u.devs_simulation.hioa.models.AtomicHIOAwithEquations;
@@ -19,6 +20,9 @@ import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
 import fr.sorbonne_u.utils.PlotterDescription;
 import fr.sorbonne_u.utils.XYPlotter;
 import simulation.AtomicModels.events.TvStateEvent;
+import simulation.Controller.events.EconomyEvent;
+import simulation.Controller.events.NoEconomyEvent;
+import simulation.TV.TVUserModel.TVUserModelReport;
 import simulation.TV.events.TVSwitch;
 import utils.TVMode;
 
@@ -28,8 +32,7 @@ import utils.TVMode;
  *
  */
 
-@ModelExternalEvents(imported = {TVSwitch.class},
-					exported = {TvStateEvent.class})
+@ModelExternalEvents(imported = {TVSwitch.class, EconomyEvent.class, NoEconomyEvent.class})
 public class TVStateModel 
 extends AtomicHIOAwithEquations{
 	
@@ -77,7 +80,6 @@ extends AtomicHIOAwithEquations{
 
 	public TVStateModel(String uri, TimeUnit simulatedTimeUnit, SimulatorI simulationEngine) throws Exception {
 		super(uri, simulatedTimeUnit, simulationEngine);
-		receivedEvent = false;
 		this.setLogger(new StandardLogger()) ;
 		this.toggleDebugMode() ;
 		states = new Vector<TvStateEvent>();
@@ -95,8 +97,6 @@ extends AtomicHIOAwithEquations{
 	private static final long serialVersionUID = 1L;
 	
 	public static final String URI = "TV-STATE";
-	
-	protected boolean receivedEvent;
 	
 	/** stored output events for report */
 	protected Vector<TvStateEvent> states;
@@ -119,6 +119,8 @@ extends AtomicHIOAwithEquations{
 	/** Last value of backlight when TV was on	 */
 	private double last_value_backlight;
 	
+	protected boolean modeEco;
+	
 	// -------------------------------------------------------------------------
 	// HIOA model variables
 	// -------------------------------------------------------------------------
@@ -126,7 +128,7 @@ extends AtomicHIOAwithEquations{
 	/** TVConsumption in Watt.								*/
 	@ExportedVariable(type = Double.class)
 	protected final Value<Double>		tvBack =
-											new Value<Double>(this, 12.0, 0) ;
+											new Value<Double>(this, 0.0, 0) ;
 	
 	
 	/**
@@ -164,6 +166,7 @@ extends AtomicHIOAwithEquations{
 	public void			initialiseState(Time initialTime)
 	{
 		this.currentState = TVMode.Off;
+		this.modeEco = false;
 		this.last_value_backlight = DEFAULT_TV_BACKLIGHT;
 		if (this.statePlotter != null) {
 			this.statePlotter.initialise() ;
@@ -193,28 +196,6 @@ extends AtomicHIOAwithEquations{
 	}
 	
 	/**
-	 * @see fr.sorbonne_u.devs_simulation.models.AtomicModel#userDefinedInternalTransition(fr.sorbonne_u.devs_simulation.models.time.Duration)
-	 */
-	@Override
-	public void			userDefinedInternalTransition(Duration elapsedTime)
-	{
-		this.logMessage("at internal transition " +
-							this.getCurrentStateTime().getSimulatedTime() +
-							" " + elapsedTime.getSimulatedDuration()) ;
-		
-		if (elapsedTime.greaterThan(Duration.zero(getSimulatedTimeUnit()))) {
-			super.userDefinedInternalTransition(elapsedTime) ;
-			if (this.currentState == TVMode.On) {
-				// the value of the bandwidth at the next internal transition
-				// is computed in the timeAdvance function when computing
-				// the delay until the next internal transition.
-				this.tvBack.v = 13.0 ;
-			}
-			this.tvBack.time = this.getCurrentStateTime() ;
-		}
-	}
-	
-	/**
 	 * @see fr.sorbonne_u.devs_simulation.models.AtomicModel#userDefinedExternalTransition(fr.sorbonne_u.devs_simulation.models.time.Duration)
 	 */
 	@Override
@@ -223,42 +204,29 @@ extends AtomicHIOAwithEquations{
 		super.userDefinedExternalTransition(elapsedTime) ;
 		Vector<EventI> current = this.getStoredEventAndReset();
 		assert current != null & current.size() == 1;
-		if(current.get(0) instanceof TVSwitch) { 
-			TVMode oldState = this.currentState;
-			switchState();
-			receivedEvent = true;
-			if (this.statePlotter != null && oldState != this.currentState) {
-				this.statePlotter.addData(
-						SERIES1,
-						this.getCurrentStateTime().getSimulatedTime(),
-						state2int(oldState)) ;
-				this.statePlotter.addData(
-						SERIES1,
-						this.getCurrentStateTime().getSimulatedTime(),
-						state2int(this.currentState)) ;
-			}
+		EventI e = current.get(0);
+		if(e instanceof TVSwitch) {
+			switchState(this.getCurrentStateTime().getSimulatedTime());
+			
 		}
-			
-			
+		else if(e instanceof EconomyEvent) {
+			if(!modeEco) activateEnergyEco();
+		}
+		else if(e instanceof NoEconomyEvent) {
+			if(modeEco) deactivateEnergyEco();
+		}			
 		
 	}
 	
 	@Override
 	public Vector<EventI> output() {
-		Vector<EventI> ret = new Vector<EventI>();
-		if(receivedEvent) {
-			Time t = this.getCurrentStateTime().add(getNextTimeAdvance());
-			TvStateEvent e = new TvStateEvent(t,currentState);
-			states.addElement(e);
-			this.logMessage(e.eventAsString());
-			receivedEvent = false;
-		}
-		return ret;
+		return null;
+		
 	}
 
 	@Override
 	public Duration timeAdvance() {
-		return new Duration(30.0, TimeUnit.SECONDS);
+		return Duration.INFINITY;
 	}
 	
 	@Override
@@ -267,20 +235,54 @@ extends AtomicHIOAwithEquations{
 		return new TVStateModelReport(this.getURI(),states);
 	}
 	
-	private void switchState() {
-		if(currentState == TVMode.Off) {
+	private void switchState(double currentTime) {
+		TVMode oldState = this.currentState;
+		if(oldState == TVMode.Off) {
 			currentState = TVMode.On;
 			tvBack.v = this.last_value_backlight;
 		}
 		else
 		{
-			assert currentState == TVMode.On;
+			assert oldState == TVMode.On;
 			currentState = TVMode.Off;
 			last_value_backlight = tvBack.v;
 			tvBack.v = 0.0;
 			
 		} 
+		
 		tvBack.time = this.getCurrentStateTime();
+		
+		if (this.statePlotter != null && oldState != this.currentState) {
+			this.statePlotter.addData(
+					SERIES1,
+					currentTime,
+					state2int(oldState)) ;
+			this.statePlotter.addData(
+					SERIES1,
+					currentTime,
+					state2int(this.currentState)) ;
+		}
+		
+	}
+	
+	private void activateEnergyEco() {
+		this.modeEco = true;
+		if(tvBack.v > MAX_ECO_BACKLIGHT) {
+			tvBack.v = MAX_ECO_BACKLIGHT;
+			tvBack.time = this.getCurrentStateTime();
+		}
+	}
+	
+	private void deactivateEnergyEco() {
+		this.modeEco = false;
+		if(tvBack.v < DEFAULT_TV_BACKLIGHT && this.currentState == TVMode.On) {
+			tvBack.v = DEFAULT_TV_BACKLIGHT;
+			tvBack.time = this.getCurrentStateTime();
+		}
+		else {
+			this.last_value_backlight = DEFAULT_TV_BACKLIGHT;
+		}
+		
 	}
 	
 	

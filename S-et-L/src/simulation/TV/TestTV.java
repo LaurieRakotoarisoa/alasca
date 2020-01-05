@@ -10,9 +10,8 @@ import java.util.concurrent.TimeUnit;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.devs_simulation.architectures.ArchitectureI;
 import fr.sorbonne_u.devs_simulation.architectures.SimulationEngineCreationMode;
+import fr.sorbonne_u.devs_simulation.examples.molene.MoleneModel;
 import fr.sorbonne_u.devs_simulation.examples.molene.SimulationMain;
-import fr.sorbonne_u.devs_simulation.examples.molene.bsm.BatterySensorModel;
-import fr.sorbonne_u.devs_simulation.examples.molene.pcsm.PortableComputerStateModel;
 import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicEvent;
 import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicModel;
 import fr.sorbonne_u.devs_simulation.hioa.architectures.CoupledHIOA_Descriptor;
@@ -25,18 +24,14 @@ import fr.sorbonne_u.devs_simulation.models.events.EventI;
 import fr.sorbonne_u.devs_simulation.models.events.EventSink;
 import fr.sorbonne_u.devs_simulation.models.events.EventSource;
 import fr.sorbonne_u.devs_simulation.models.events.ReexportedEvent;
-import fr.sorbonne_u.devs_simulation.models.time.Duration;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
-import fr.sorbonne_u.devs_simulation.simulators.AtomicEngine;
 import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
 import fr.sorbonne_u.utils.PlotterDescription;
-import simulation.AtomicModels.events.TvStateEvent;
-import simulation.TV.events.TVStateReading;
+import simulation.Controller.EnergyController;
+import simulation.Controller.TVController;
+import simulation.Controller.events.EconomyEvent;
+import simulation.Controller.events.NoEconomyEvent;
 import simulation.TV.events.TVSwitch;
-import simulation.temp.ElectricityEvent;
-import simulation.temp.ElectricityModel;
-import simulation.temp.Electricy_ESModel;
-
 public class TestTV {
 
 	public static void main(String[] args) {
@@ -45,8 +40,10 @@ public class TestTV {
 				new HashMap<>() ;
 		try {
 			
-			
-			
+				
+			// ----------------------------------------------------------------
+			// TV Model 
+			// ----------------------------------------------------------------
 			atomicModelDescriptors.put(TVUserModel.URI,
 					AtomicModelDescriptor.create(TVUserModel.class,
 							TVUserModel.URI,
@@ -75,12 +72,18 @@ public class TestTV {
 			Map<Class<? extends EventI>,EventSink[]> imported1 =
 					new HashMap<Class<? extends EventI>,EventSink[]>() ;
 					
+			imported1.put(EconomyEvent.class,
+					new EventSink[] {
+							new EventSink(TVStateModel.URI,
+									EconomyEvent.class)});
+			
+			imported1.put(NoEconomyEvent.class,
+					new EventSink[] {
+							new EventSink(TVStateModel.URI,
+									NoEconomyEvent.class)});
+					
 			Map<Class<? extends EventI>,ReexportedEvent> reexported1 =
 					new HashMap<Class<? extends EventI>,ReexportedEvent>() ;
-			reexported1.put(
-					TvStateEvent.class,
-					new ReexportedEvent(TVStateModel.URI,
-										TvStateEvent.class)) ;
 			
 			Map<EventSource,EventSink[]> connections1 =
 					new HashMap<EventSource,EventSink[]>() ;
@@ -136,9 +139,63 @@ public class TestTV {
 							null,
 							bindings1)) ;
 			
+			// ----------------------------------------------------------------
+			// TV Controller
+			// ----------------------------------------------------------------
+			atomicModelDescriptors.put(TVController.URI,
+			AtomicModelDescriptor.create(TVController.class,
+					TVController.URI,
+					TimeUnit.SECONDS,null,SimulationEngineCreationMode.ATOMIC_ENGINE));
+			
+			// ----------------------------------------------------------------
+			// Full architecture and Global model
+			// ----------------------------------------------------------------
+			Set<String> submodels2 = new HashSet<String>() ;
+			submodels2.add(TVModel.URI);
+			submodels2.add(TVController.URI);
+			
+			Map<EventSource,EventSink[]> connections2 =
+					new HashMap<EventSource,EventSink[]>() ;
+					
+			EventSource from21 =
+					new EventSource(
+							TVController.URI,
+							EconomyEvent.class) ;
+			EventSink[] to21 =
+					new EventSink[] {
+							new EventSink(
+									TVModel.URI,
+									EconomyEvent.class)} ;
+			connections2.put(from21, to21) ;
+			
+			EventSource from22 =
+					new EventSource(
+							TVController.URI,
+							NoEconomyEvent.class) ;
+			EventSink[] to22 =
+					new EventSink[] {
+							new EventSink(
+									TVModel.URI,
+									NoEconomyEvent.class)} ;
+			connections2.put(from22, to22) ;
+			
+			coupledModelDescriptors.put(
+					EnergyController.URI,
+					new CoupledModelDescriptor(
+							EnergyController.class,
+							MoleneModel.URI,
+							submodels2,
+							null,
+							null,
+							connections2,
+							null,
+							SimulationEngineCreationMode.COORDINATION_ENGINE)) ;
+
+	
+			
 			ArchitectureI architecture =
 					new Architecture(
-							TVModel.URI,
+							EnergyController.URI,
 							atomicModelDescriptors,
 							coupledModelDescriptors,
 							TimeUnit.SECONDS) ;
@@ -155,6 +212,8 @@ public class TestTV {
 			eventsTime.addElement(new Time(90.0, TimeUnit.SECONDS));
 			eventsTime.addElement(new Time(180.0, TimeUnit.SECONDS));
 			eventsTime.addElement(new Time(300.0, TimeUnit.SECONDS));
+			eventsTime.addElement(new Time(1000.0, TimeUnit.SECONDS));
+			eventsTime.addElement(new Time(2000.0, TimeUnit.SECONDS));
 
 			String modelURI = TVUserModel.URI;
 			simParams.put(modelURI + ":" + TVUserModel.USER_EVENTS , eventsTime);
@@ -172,6 +231,21 @@ public class TestTV {
 								2 * SimulationMain.getPlotterHeight(),
 							SimulationMain.getPlotterWidth(),
 							SimulationMain.getPlotterHeight()));
+			
+			//TV Consumption Model
+			modelURI = TVConsumption.URI;
+			simParams.put(modelURI + ":" + TVConsumption.TVCONS_PLOTTING_PARAM_NAME,
+					new PlotterDescription(
+							"TV Model - Consumption",
+							"Time (sec)",
+							"Consumption",
+							SimulationMain.ORIGIN_X +
+						  		SimulationMain.getPlotterWidth(),
+							SimulationMain.ORIGIN_Y +
+								2 * SimulationMain.getPlotterHeight(),
+							SimulationMain.getPlotterWidth(),
+							SimulationMain.getPlotterHeight()));
+			
 
 			se.setSimulationRunParameters(simParams) ;
 			

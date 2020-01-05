@@ -1,5 +1,6 @@
 package simulation.TV;
 
+import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
@@ -17,6 +18,8 @@ import fr.sorbonne_u.devs_simulation.models.time.Duration;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 import fr.sorbonne_u.devs_simulation.utils.AbstractSimulationReport;
+import fr.sorbonne_u.utils.PlotterDescription;
+import fr.sorbonne_u.utils.XYPlotter;
 import simulation.TV.events.TVConsumptionEvent;
 
 @ModelExternalEvents(imported = TicEvent.class,
@@ -71,6 +74,7 @@ extends AtomicHIOA{
 		consumptions = new Vector<TVConsumptionEvent>();
 		this.updateConsumption = false;
 		this.rgConsumption = new RandomDataGenerator();
+		this.lastConsumption = 0.0;
 	}
 	
 	// -------------------------------------------------------------------------
@@ -86,6 +90,10 @@ extends AtomicHIOA{
 	/** true when tv consumption must be updated */
 	protected boolean updateConsumption;
 	
+	protected double lastConsumption;
+	
+	protected double lastTimeEmitCons;
+	
 	/** random generator for consumption depending on rate backlight parameter */
 	protected final RandomDataGenerator rgConsumption;
 	
@@ -95,6 +103,13 @@ extends AtomicHIOA{
 	/** maximum factor to generate consumption depending on backlight */
 	protected final double MAX_RATE_BL = 3.0;
 	
+	public static final String TVCONS_PLOTTING_PARAM_NAME = "tv-cons-plot";
+	
+	private static final String	SERIES1 = "TV consumption" ;
+	
+	/** Frame used to plot the consumption during the simulation.			*/
+	protected XYPlotter			consPlotter ;
+	
 	// -------------------------------------------------------------------------
 	// HIOA Model Variables
 	// -------------------------------------------------------------------------
@@ -102,23 +117,67 @@ extends AtomicHIOA{
 	@ImportedVariable (type = Double.class)
 	protected Value<Double> tvBack;
 	
+	
+	/**
+	 * @see fr.sorbonne_u.devs_simulation.models.Model#setSimulationRunParameters(java.util.Map)
+	 */
+	@Override
+	public void			setSimulationRunParameters(
+		Map<String, Object> simParams
+		) throws Exception
+	{
+		
+		String vname = this.getURI() + ":" +
+				TVCONS_PLOTTING_PARAM_NAME ;
+	PlotterDescription pd = (PlotterDescription) simParams.get(vname) ;
+	this.consPlotter = new XYPlotter(pd) ;
+	this.consPlotter.createSeries(SERIES1) ;
+	
+	}
 
 	@Override
 	public Vector<EventI> output() {
 		Vector<EventI> ret = new Vector<EventI>();
 		if(updateConsumption) {
+			
+			//update current consumption
+			double newConsumption = generateConsumption();
+			
+			// Plotting
+			if (this.consPlotter != null) {
+				this.consPlotter.addData(
+						SERIES1,
+						this.lastTimeEmitCons,
+						newConsumption) ;
+				this.consPlotter.addData(
+						SERIES1,
+						this.getCurrentStateTime().getSimulatedTime(),
+						newConsumption) ;
+			}
+			
+			//Memorise last consumption
+			this.lastConsumption = newConsumption;
+			this.lastTimeEmitCons = this.getCurrentStateTime().getSimulatedTime();
+			
+			
 			Time t = this.getCurrentStateTime().add(this.getNextTimeAdvance()) ;
-			TVConsumptionEvent e = new TVConsumptionEvent(t, generateConsumption());
+			TVConsumptionEvent e = new TVConsumptionEvent(t, newConsumption);
 			ret.add(e);
 			consumptions.add(e);
 			updateConsumption = false;
+			return ret;
 		}
-		return ret;
+		return null;
 	}
 
 	@Override
 	public Duration timeAdvance() {
-		return Duration.one(this.getSimulatedTimeUnit());
+		if (this.updateConsumption) {
+			// immediate internal event when a reading is triggered.
+			return Duration.zero(this.getSimulatedTimeUnit()) ;
+		} else {
+			return Duration.INFINITY ;
+		}
 	}
 	
 	/**
@@ -128,6 +187,13 @@ extends AtomicHIOA{
 	public void			initialiseState(Time initialTime)
 	{
 		this.rgConsumption.reSeed();
+		this.lastTimeEmitCons = initialTime.getSimulatedTime();
+		this.consumptions.clear();
+		if (this.consPlotter != null) {
+			this.consPlotter.initialise() ;
+			this.consPlotter.showPlotter() ;
+		}
+		
 		super.initialiseState(initialTime);
 	}
 	

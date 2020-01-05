@@ -6,7 +6,7 @@ import fr.sorbonne_u.devs_simulation.models.time.Time;
 
 /**
  * The class <code>TVConsumptionEvent</code> describes an event
- * giving the information of the consumption of the TV at a time
+ * giving the information of the consumption of the TV
  * 
  * @author Laurie Rakotoarisoa
  *
