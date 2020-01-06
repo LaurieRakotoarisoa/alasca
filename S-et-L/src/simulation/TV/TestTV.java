@@ -31,6 +31,8 @@ import simulation.Controller.EnergyController;
 import simulation.Controller.TVController;
 import simulation.Controller.events.EconomyEvent;
 import simulation.Controller.events.NoEconomyEvent;
+import simulation.Fridge.FridgeModel;
+import simulation.Fridge.FridgeSensorTemperature;
 import simulation.Fridge.FridgeTemperature;
 import simulation.TV.events.TVSwitch;
 public class TestTV {
@@ -55,9 +57,9 @@ public class TestTV {
 							TVStateModel.URI,
 							TimeUnit.SECONDS,null,SimulationEngineCreationMode.ATOMIC_ENGINE));
 			
-			atomicModelDescriptors.put(TicModel.URI,
+			atomicModelDescriptors.put(TicModel.URI+"-1",
 					AtomicModelDescriptor.create(TicModel.class,
-							TicModel.URI,
+							TicModel.URI+"-1",
 							TimeUnit.SECONDS,null,SimulationEngineCreationMode.ATOMIC_ENGINE));
 			atomicModelDescriptors.put(TVConsumption.URI,
 					AtomicModelDescriptor.create(TVConsumption.class,
@@ -67,7 +69,7 @@ public class TestTV {
 			Set<String> submodels1 = new HashSet<String>() ;
 			submodels1.add(TVUserModel.URI);
 			submodels1.add(TVStateModel.URI);
-			submodels1.add(TicModel.URI);
+			submodels1.add(TicModel.URI+"-1");
 			submodels1.add(TVConsumption.URI);
 			
 			Map<Class<? extends EventI>,EventSink[]> imported1 =
@@ -99,7 +101,7 @@ public class TestTV {
 			connections1.put(from11, to11) ;
 			
 			EventSource from12 =
-					new EventSource(TicModel.URI,
+					new EventSource(TicModel.URI+"-1",
 									TicEvent.class) ;
 			EventSink[] to12 =
 					new EventSink[] {
@@ -156,48 +158,89 @@ public class TestTV {
 					FridgeTemperature.URI,
 					TimeUnit.SECONDS,null,SimulationEngineCreationMode.ATOMIC_ENGINE));
 			
-			// ----------------------------------------------------------------
-			// Full architecture and Global model
-			// ----------------------------------------------------------------
+			atomicModelDescriptors.put(FridgeSensorTemperature.URI,
+					AtomicModelDescriptor.create(FridgeSensorTemperature.class,
+							FridgeSensorTemperature.URI,
+							TimeUnit.SECONDS,null,SimulationEngineCreationMode.ATOMIC_ENGINE));
+
 			Set<String> submodels2 = new HashSet<String>() ;
-			submodels2.add(TVModel.URI);
-			submodels2.add(TVController.URI);
 			submodels2.add(FridgeTemperature.URI);
+			submodels2.add(FridgeSensorTemperature.URI);
 			
 			Map<EventSource,EventSink[]> connections2 =
 					new HashMap<EventSource,EventSink[]>() ;
 					
-			EventSource from21 =
+			Map<VariableSource,VariableSink[]> bindings2 =
+					new HashMap<VariableSource,VariableSink[]>() ;
+					
+			VariableSource source21 =
+					new VariableSource("temperature",
+									   Double.class,
+									   FridgeTemperature.URI) ;
+				VariableSink[] sinks21 =
+					new VariableSink[] {
+							new VariableSink("temperature",
+											 Double.class,
+											 FridgeSensorTemperature.URI)} ;
+					
+			bindings2.put(source21, sinks21);
+			
+			coupledModelDescriptors.put(
+					FridgeModel.URI,
+					new CoupledHIOA_Descriptor(
+							FridgeModel.class,
+							FridgeModel.URI,
+							submodels2,
+							null,
+							null,
+							connections2,
+							null,
+							SimulationEngineCreationMode.COORDINATION_ENGINE,
+							null, null, bindings2)) ;
+			
+			
+			// ----------------------------------------------------------------
+			// Full architecture and Global model
+			// ----------------------------------------------------------------
+			Set<String> submodels3 = new HashSet<String>() ;
+			submodels3.add(TVModel.URI);
+			submodels3.add(TVController.URI);
+			submodels3.add(FridgeModel.URI);
+			
+			Map<EventSource,EventSink[]> connections3 =
+					new HashMap<EventSource,EventSink[]>() ;
+					
+			EventSource from31 =
 					new EventSource(
 							TVController.URI,
 							EconomyEvent.class) ;
-			EventSink[] to21 =
+			EventSink[] to31 =
 					new EventSink[] {
 							new EventSink(
 									TVModel.URI,
 									EconomyEvent.class)} ;
-			connections2.put(from21, to21) ;
+			connections3.put(from31, to31) ;
 			
-			EventSource from22 =
+			EventSource from32 =
 					new EventSource(
 							TVController.URI,
 							NoEconomyEvent.class) ;
-			EventSink[] to22 =
+			EventSink[] to32 =
 					new EventSink[] {
 							new EventSink(
 									TVModel.URI,
 									NoEconomyEvent.class)} ;
-			connections2.put(from22, to22) ;
+			connections3.put(from32, to32) ;
 			
 			coupledModelDescriptors.put(
 					EnergyController.URI,
 					new CoupledModelDescriptor(
 							EnergyController.class,
-							MoleneModel.URI,
-							submodels2,
+							EnergyController.URI,
+							submodels3,
 							null,
 							null,
-							connections2,
+							connections3,
 							null,
 							SimulationEngineCreationMode.COORDINATION_ENGINE)) ;
 

@@ -4,9 +4,8 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
-import components.controller.utilController.TV;
+
 import fr.sorbonne_u.devs_simulation.hioa.annotations.ExportedVariable;
-import fr.sorbonne_u.devs_simulation.hioa.models.AtomicHIOA;
 import fr.sorbonne_u.devs_simulation.hioa.models.AtomicHIOAwithEquations;
 import fr.sorbonne_u.devs_simulation.hioa.models.vars.Value;
 import fr.sorbonne_u.devs_simulation.interfaces.SimulationReportI;
@@ -22,7 +21,6 @@ import fr.sorbonne_u.utils.XYPlotter;
 import simulation.AtomicModels.events.TvStateEvent;
 import simulation.Controller.events.EconomyEvent;
 import simulation.Controller.events.NoEconomyEvent;
-import simulation.TV.TVUserModel.TVUserModelReport;
 import simulation.TV.events.TVSwitch;
 import utils.TVMode;
 
@@ -91,9 +89,6 @@ extends AtomicHIOAwithEquations{
 	// Constants and variables
 	// -------------------------------------------------------------------------
 	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	
 	public static final String URI = "TV-STATE";
@@ -101,6 +96,7 @@ extends AtomicHIOAwithEquations{
 	/** stored output events for report */
 	protected Vector<TvStateEvent> states;
 	
+	/** current state of the TV (On, Off) */
 	protected TVMode currentState;
 	
 	private static final String	SERIES1 = "TV state" ;
@@ -110,15 +106,16 @@ extends AtomicHIOAwithEquations{
 	/** Frame used to plot the state during the simulation.			*/
 	protected XYPlotter			statePlotter ;
 	
-	/** default value of tv backlight */
+	/** default value of tv backlight when mode economy is not activated */
 	public static double DEFAULT_TV_BACKLIGHT = 70.0;
 	
-	/** max value of backlight when mode economy activated */
+	/** maximum value of backlight when mode economy activated */
 	public static double MAX_ECO_BACKLIGHT = 30.0;
 	
 	/** Last value of backlight when TV was on	 */
 	private double last_value_backlight;
 	
+	/** true if controller have actived energy economy */
 	protected boolean modeEco;
 	
 	// -------------------------------------------------------------------------

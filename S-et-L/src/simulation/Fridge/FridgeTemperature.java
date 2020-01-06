@@ -38,26 +38,33 @@ extends AtomicHIOA{
 
 	private static final long serialVersionUID = 1L;
 	
-	protected Mode variationMode;
+	/** evolution mode depending on variable temperature */
+	protected Variation_Temperature variationTemp;
 	
 	public static final String URI = "fridge-temperature";
 	
 	/** target temperature for the fridge */
 	public static final double TARGET_TEMP = 4.0;
 	
+	/** INITIAL mean temperature */
 	public static final double MEAN_TEMP = 4.0;
 	
-	public static double NO_RATE = 0.5 * TARGET_TEMP/MEAN_TEMP;
+	/** increasing rate when two compressors are running */
+	public static double NO_RATE = 0.01 * TARGET_TEMP/MEAN_TEMP;
 	
 	private static final String	SERIES1 = "Fridge temperature" ;
 	
+	/** maximum difference between current temperature and target */
+	public static final double DIF_LIMIT = 0.5;
+	
+	/** run parameter to plot the evolution of temperature */
 	public static final String FRIDGE_TEMP_PLOTTING_PARAM_NAME = "fridge-temp-plot";
 	
 	/** Frame used to plot the temperature during the simulation.			*/
 	protected XYPlotter			tempPlotter ;
 
 	
-	protected enum Mode {
+	protected enum Variation_Temperature {
 		DECREASE, INCREASE
 	}
 	
@@ -80,7 +87,7 @@ extends AtomicHIOA{
 
 	@Override
 	public Duration timeAdvance() {
-		return Duration.INFINITY;
+		return new Duration(10.0, this.getSimulatedTimeUnit());
 	}
 	
 	/**
@@ -103,7 +110,7 @@ extends AtomicHIOA{
 	@Override
 	public void			initialiseState(Time initialTime)
 	{
-		this.variationMode = Mode.INCREASE;
+		this.variationTemp = Variation_Temperature.INCREASE;
 		if (this.tempPlotter != null) {
 			this.tempPlotter.initialise() ;
 			this.tempPlotter.showPlotter() ;
@@ -135,6 +142,7 @@ extends AtomicHIOA{
 	@Override
 	public void			userDefinedInternalTransition(Duration elapsedTime)
 	{
+		this.logMessage("intern "+elapsedTime);
 		super.userDefinedInternalTransition(elapsedTime) ;
 		double delta_t = elapsedTime.getSimulatedDuration() ;
 		this.computeNewTemp(this.getCurrentStateTime(),delta_t);
@@ -143,7 +151,7 @@ extends AtomicHIOA{
 	protected void computeNewTemp(Time current, double delta_t) {
 		double oldTemp = this.temperature.v;
 		double oldTime = this.getCurrentStateTime().getSimulatedTime() - delta_t;
-		if(this.variationMode == Mode.INCREASE) {
+		if(this.variationTemp == Variation_Temperature.INCREASE) {
 			this.temperature.v = this.temperature.v + delta_t * NO_RATE;
 		}
 		else {
@@ -154,6 +162,14 @@ extends AtomicHIOA{
 			this.tempPlotter.addData(SERIES1,
 							 				current.getSimulatedTime(),
 							 				this.temperature.v) ;
+		}
+		
+		//TODO modifier l'emplacement ou supprimer ?
+		if(this.temperature.v > MEAN_TEMP+DIF_LIMIT) {
+			this.variationTemp = Variation_Temperature.DECREASE;
+		}
+		else if(this.temperature.v < MEAN_TEMP-DIF_LIMIT) {
+			this.variationTemp = Variation_Temperature.INCREASE;
 		}
 		
 	}
