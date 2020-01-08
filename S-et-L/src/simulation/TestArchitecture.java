@@ -49,6 +49,10 @@ import simulation.environment.UserModel;
 import simulation.environment.electricity.Electricity_ESModel;
 import simulation.environment.electricity.events.RestoreElecEvent;
 import simulation.environment.electricity.events.SheddingEvent;
+import simulation.oven.events.OvenSwitchEvent;
+import simulation.oven.models.OvenConsumptionModel;
+import simulation.oven.models.OvenModel;
+import simulation.oven.models.OvenStateModel;
 public class TestArchitecture{
 
 	public static void main(String[] args) {
@@ -203,34 +207,38 @@ public class TestArchitecture{
 //					UserFridgeModel.URI,
 //					TimeUnit.SECONDS,null,SimulationEngineCreationMode.ATOMIC_ENGINE));
 			
+			// ----------------------------------------------------------------
+			// Fridge Model V2
+			// ----------------------------------------------------------------
+
 			atomicModelDescriptors.put(FridgeV2Model.URI,
 					AtomicModelDescriptor.create(FridgeV2Model.class,
 							FridgeV2Model.URI,
 							TimeUnit.SECONDS,null,SimulationEngineCreationMode.ATOMIC_ENGINE));
 
-			Set<String> submodels2 = new HashSet<String>() ;
-			submodels2.add(UserFridgeModel.URI);
-			submodels2.add(FridgeV2Model.URI);
-			
-			Map<Class<? extends EventI>,EventSink[]> imported2 =
-					new HashMap<Class<? extends EventI>,EventSink[]>() ;
-					
-			imported2.put(EconomyEvent.class,
-					new EventSink[] {
-							new EventSink(FridgeV2Model.URI,
-									EconomyEvent.class)});
-			imported2.put(NoEconomyEvent.class,
-					new EventSink[] {
-							new EventSink(FridgeV2Model.URI,
-									NoEconomyEvent.class)});
-			
-			Map<EventSource,EventSink[]> connections2 =
-					new HashMap<EventSource,EventSink[]>() ;
-					
-					
-					
-			Map<VariableSource,VariableSink[]> bindings2 =
-					new HashMap<VariableSource,VariableSink[]>() ;
+//			Set<String> submodels2 = new HashSet<String>() ;
+//			submodels2.add(UserFridgeModel.URI);
+//			submodels2.add(FridgeV2Model.URI);
+//			
+//			Map<Class<? extends EventI>,EventSink[]> imported2 =
+//					new HashMap<Class<? extends EventI>,EventSink[]>() ;
+//					
+//			imported2.put(EconomyEvent.class,
+//					new EventSink[] {
+//							new EventSink(FridgeV2Model.URI,
+//									EconomyEvent.class)});
+//			imported2.put(NoEconomyEvent.class,
+//					new EventSink[] {
+//							new EventSink(FridgeV2Model.URI,
+//									NoEconomyEvent.class)});
+//			
+//			Map<EventSource,EventSink[]> connections2 =
+//					new HashMap<EventSource,EventSink[]>() ;
+//					
+//					
+//					
+//			Map<VariableSource,VariableSink[]> bindings2 =
+//					new HashMap<VariableSource,VariableSink[]>() ;
 			
 //			coupledModelDescriptors.put(
 //					FridgeModel.URI,
@@ -244,6 +252,92 @@ public class TestArchitecture{
 //							null,
 //							SimulationEngineCreationMode.COORDINATION_ENGINE,
 //							null, null, bindings2)) ;
+					
+			// ----------------------------------------------------------------
+			// OvenModel
+			// ----------------------------------------------------------------
+			atomicModelDescriptors.put(OvenStateModel.URI,
+					AtomicModelDescriptor.create(OvenStateModel.class,
+							OvenStateModel.URI,
+							TimeUnit.SECONDS,null,SimulationEngineCreationMode.ATOMIC_ENGINE));
+			
+			atomicModelDescriptors.put(OvenConsumptionModel.URI,
+					AtomicModelDescriptor.create(OvenConsumptionModel.class,
+							OvenConsumptionModel.URI,
+							TimeUnit.SECONDS,null,SimulationEngineCreationMode.ATOMIC_ENGINE));	
+			
+			atomicModelDescriptors.put(TicModel.URI+"-2",
+					AtomicModelDescriptor.create(TicModel.class,
+							TicModel.URI+"-2",
+							TimeUnit.SECONDS,null,SimulationEngineCreationMode.ATOMIC_ENGINE));
+			
+			
+			Set<String> submodels2 = new HashSet<String>() ;
+			submodels2.add(OvenStateModel.URI);
+			submodels2.add(OvenConsumptionModel.URI);
+			submodels2.add(TicModel.URI+"-2");
+			
+			Map<Class<? extends EventI>,EventSink[]> imported2 =
+					new HashMap<Class<? extends EventI>,EventSink[]>() ;
+					
+			imported2.put(EconomyEvent.class,
+					new EventSink[] {
+							new EventSink(OvenStateModel.URI,
+									EconomyEvent.class)});
+			imported2.put(NoEconomyEvent.class,
+					new EventSink[] {
+							new EventSink(OvenStateModel.URI,
+									NoEconomyEvent.class)});
+			
+			imported2.put(OvenSwitchEvent.class,
+					new EventSink[] {
+							new EventSink(OvenStateModel.URI,
+									OvenSwitchEvent.class)});
+			
+			Map<EventSource,EventSink[]> connections2 =
+					new HashMap<EventSource,EventSink[]>() ;
+					
+					EventSource from21 =
+							new EventSource(TicModel.URI+"-2",
+											TicEvent.class) ;
+					EventSink[] to21 =
+							new EventSink[] {
+								new EventSink(OvenConsumptionModel.URI,
+											  TicEvent.class)} ;
+					connections2.put(from21, to21) ;
+					
+					
+					
+			Map<VariableSource,VariableSink[]> bindings2 =
+					new HashMap<VariableSource,VariableSink[]>() ;
+					
+			VariableSource source21 =
+					new VariableSource("temperature",
+									   Double.class,
+									   OvenStateModel.URI) ;
+				VariableSink[] sinks21 =
+					new VariableSink[] {
+							new VariableSink("temperature",
+											 Double.class,
+											 OvenConsumptionModel.URI)} ;
+				
+				bindings2.put(source21, sinks21);
+				
+				coupledModelDescriptors.put(
+						OvenModel.URI,
+						new CoupledHIOA_Descriptor(
+								OvenModel.class,
+								OvenModel.URI,
+								submodels2,
+								imported2,
+								null,
+								connections2,
+								null,
+								SimulationEngineCreationMode.COORDINATION_ENGINE,
+								null,
+								null,
+								bindings2)) ;
+			
 			
 			// ----------------------------------------------------------------
 			// Home Controller model
@@ -279,6 +373,7 @@ public class TestArchitecture{
 			submodels3.add(Electricity_ESModel.URI);
 			submodels3.add(HomeController.URI);
 			submodels3.add(UserModel.URI);
+			submodels3.add(OvenModel.URI);
 			
 			Map<EventSource,EventSink[]> connections3 =
 					new HashMap<EventSource,EventSink[]>() ;
@@ -294,6 +389,9 @@ public class TestArchitecture{
 									EconomyEvent.class),
 							new EventSink(
 									FridgeV2Model.URI,
+									EconomyEvent.class),
+							new EventSink(
+									OvenModel.URI,
 									EconomyEvent.class)} ;
 			connections3.put(from31, to31) ;
 			
@@ -308,7 +406,11 @@ public class TestArchitecture{
 									NoEconomyEvent.class),
 							new EventSink(
 									FridgeV2Model.URI,
-									NoEconomyEvent.class)} ;
+									NoEconomyEvent.class),
+							new EventSink(
+									OvenModel.URI,
+									EconomyEvent.class)} ;
+			
 			connections3.put(from32, to32) ;
 			
 			EventSource from33 =
@@ -362,6 +464,17 @@ public class TestArchitecture{
 						new EventSink(FridgeV2Model.URI,
 									  CloseDoor.class)} ;
 			connections3.put(from37, to37) ;
+			
+			EventSource from38 =
+					new EventSource(UserModel.URI,
+									OvenSwitchEvent.class) ;
+			EventSink[] to38 =
+					new EventSink[] {
+						new EventSink(OvenModel.URI,
+									  OvenSwitchEvent.class)} ;
+			connections3.put(from38, to38) ;
+			
+			
 			
 			coupledModelDescriptors.put(
 					EnergyController.URI,
@@ -442,12 +555,40 @@ public class TestArchitecture{
 								2 * SimulationMain.getPlotterHeight(),
 							SimulationMain.getPlotterWidth(),
 							SimulationMain.getPlotterHeight()));
+			
+			//Oven State Model
+			modelURI = OvenStateModel.URI;
+			simParams.put(modelURI + ":" + OvenStateModel.OVENSTATE_PLOTTING_PARAM_NAME,
+					new PlotterDescription(
+							"Oven Model - State",
+							"Time (sec)",
+							"Consumption (Watt)",
+							SimulationMain.ORIGIN_X +
+						  		SimulationMain.getPlotterWidth(),
+							SimulationMain.ORIGIN_Y +
+								2 * SimulationMain.getPlotterHeight(),
+							SimulationMain.getPlotterWidth(),
+							SimulationMain.getPlotterHeight()));
+			
+			//Oven cons Model
+			modelURI = OvenConsumptionModel.URI;
+			simParams.put(modelURI + ":" + OvenConsumptionModel.OVENCONS_PLOTTING_PARAM_NAME,
+					new PlotterDescription(
+							"Oven Model - Consumption",
+							"Time (sec)",
+							"Consumption (Watt)",
+							SimulationMain.ORIGIN_X +
+						  		SimulationMain.getPlotterWidth(),
+							SimulationMain.ORIGIN_Y +
+								2 * SimulationMain.getPlotterHeight(),
+							SimulationMain.getPlotterWidth(),
+							SimulationMain.getPlotterHeight()));
 
 			se.setSimulationRunParameters(simParams) ;
 			
 			SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 0L ;
 			long start = System.currentTimeMillis() ;
-			se.doStandAloneSimulation(0.0, 5000) ;
+			se.doStandAloneSimulation(0.0, 10000) ;
 			long end = System.currentTimeMillis() ;
 			System.out.println(se.getFinalReport()) ;
 			System.out.println("Simulation ends. " + (end - start)) ;
@@ -473,6 +614,7 @@ public class TestArchitecture{
 		events.add(new CloseDoor(t.add(new Duration(500.0, TimeUnit.SECONDS))));
 		events.add(new TVSwitch(new Time(2000.0, TimeUnit.SECONDS)));
 		events.add(new TVSwitch(new Time(4500.0, TimeUnit.SECONDS)));
+		events.add(new OvenSwitchEvent(new Time(7000.0, TimeUnit.SECONDS)));
 		return events;
 	}
 

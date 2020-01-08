@@ -174,6 +174,7 @@ extends AtomicHIOA{
 
 	@Override
 	public Duration timeAdvance() {
+		//return Duration.one(this.getSimulatedTimeUnit());
 		return Duration.INFINITY;
 	}
 	

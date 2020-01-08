@@ -15,8 +15,9 @@ import fr.sorbonne_u.devs_simulation.utils.AbstractSimulationReport;
 import simulation.Fridge.events.CloseDoor;
 import simulation.Fridge.events.OpenDoor;
 import simulation.TV.events.TVSwitch;
+import simulation.oven.events.OvenSwitchEvent;
 
-@ModelExternalEvents(exported = {TVSwitch.class, OpenDoor.class, CloseDoor.class})
+@ModelExternalEvents(exported = {TVSwitch.class, OpenDoor.class, CloseDoor.class, OvenSwitchEvent.class})
 public class UserModel 
 extends AtomicES_Model{
 	
