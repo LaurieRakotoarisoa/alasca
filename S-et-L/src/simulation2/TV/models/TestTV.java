@@ -1,4 +1,4 @@
-package simulation.TV.models;
+package simulation2.TV.models;
 
 import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
 
@@ -8,7 +8,7 @@ public class TestTV {
 		
 		
 			
-			SimulationEngine se = TVModel.build().constructSimulator() ;
+			SimulationEngine se = TVModel.getArchitecture().constructSimulator() ;
 			se.setDebugLevel(0);
 			
 			se.setSimulationRunParameters(TVModel.getSettingRunParameters()) ;

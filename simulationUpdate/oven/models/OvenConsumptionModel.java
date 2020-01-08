@@ -1,4 +1,4 @@
-package simulation.TV.models;
+package simulation.oven.models;
 
 import java.util.Map;
 import java.util.Vector;
@@ -7,7 +7,6 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.math3.random.RandomDataGenerator;
 
 import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicEvent;
-import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicModel;
 import fr.sorbonne_u.devs_simulation.hioa.annotations.ImportedVariable;
 import fr.sorbonne_u.devs_simulation.hioa.models.AtomicHIOA;
 import fr.sorbonne_u.devs_simulation.hioa.models.vars.Value;
@@ -20,26 +19,26 @@ import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 import fr.sorbonne_u.devs_simulation.utils.AbstractSimulationReport;
 import fr.sorbonne_u.utils.PlotterDescription;
 import fr.sorbonne_u.utils.XYPlotter;
-import simulation.TV.events.TVConsumptionEvent;
+import simulation.oven.events.OvenConsumptionEvent;
 
 @ModelExternalEvents(imported = TicEvent.class,
-					exported = TVConsumptionEvent.class)
-public class TVConsumption 
+					exported = OvenConsumptionEvent.class)
+public class OvenConsumptionModel 
 extends AtomicHIOA{
 	
 	// -------------------------------------------------------------------------
 	// Inner classes
 	// -------------------------------------------------------------------------
 	
-	public static class TVConsumptionModelReport 
+	public static class OvenConsumptionModelReport 
 	extends		AbstractSimulationReport
 	{
 		private static final long 					serialVersionUID = 1L ;
-		public final Vector<TVConsumptionEvent>	readings ;
+		public final Vector<OvenConsumptionEvent>	readings ;
 
-		public			TVConsumptionModelReport(
+		public			OvenConsumptionModelReport(
 			String modelURI,
-			Vector<TVConsumptionEvent> readings
+			Vector<OvenConsumptionEvent> readings
 			)
 		{
 			super(modelURI) ;
@@ -53,7 +52,7 @@ extends AtomicHIOA{
 		public String	toString()
 		{
 			String ret = "\n-----------------------------------------\n" ;
-			ret += "TV Consumption Model Report\n" ;
+			ret += "Oven Consumption Model Report\n" ;
 			ret += "-----------------------------------------\n" ;
 			ret += "number of consumption = " + this.readings.size() + "\n" ;
 			ret += "Consumptions :\n" ;
@@ -69,9 +68,9 @@ extends AtomicHIOA{
 	// Constructors
 	// -------------------------------------------------------------------------
 	
-	public TVConsumption(String uri, TimeUnit simulatedTimeUnit, SimulatorI simulationEngine) throws Exception {
+	public OvenConsumptionModel(String uri, TimeUnit simulatedTimeUnit, SimulatorI simulationEngine) throws Exception {
 		super(uri, simulatedTimeUnit, simulationEngine);
-		consumptions = new Vector<TVConsumptionEvent>();
+		consumptions = new Vector<OvenConsumptionEvent>();
 		this.updateConsumption = false;
 		this.rgConsumption = new RandomDataGenerator();
 		this.lastConsumption = 0.0;
@@ -82,32 +81,31 @@ extends AtomicHIOA{
 	// -------------------------------------------------------------------------
 	private static final long serialVersionUID = 1L;
 	
-	public static final String URI = "TV-CONSUMPTION";
+	public static final String URI = "Oven-CONSUMPTION";
+	
+	public static final String OVENCONS_PLOTTING_PARAM_NAME = "oven-cons-plot";
+	
+	private static final String	SERIES_COMSUMPTION = "OVEN consumption" ;
 	
 	/** stored output events for report */
-	protected Vector<TVConsumptionEvent> consumptions;
+	protected Vector<OvenConsumptionEvent> consumptions;
 	
-	/** true when tv consumption must be updated */
+	/** true when oven consumption must be updated */
 	protected boolean updateConsumption;
 	
 	protected double lastConsumption;
 	
 	protected double lastTimeEmitCons;
 	
-	/** random generator for consumption depending on rate backlight parameter */
+	/** random generator for consumption depending on rate temperature parameter */
 	protected final RandomDataGenerator rgConsumption;
 	
-	/** minimum factor to generate consumption depending on backlight */
-	protected final double MIN_RATE_BL = 2.5;
+	/** minimum factor to generate consumption depending on temperature */
+	protected final double MIN_RATE_BL = 50.0;
 	
-	/** maximum factor to generate consumption depending on backlight */
-	protected final double MAX_RATE_BL = 3.0;
+	/** maximum factor to generate consumption depending on temperature */
+	protected final double MAX_RATE_BL = 100.0;
 	
-	public static final String TVCONS_PLOTTING_PARAM_NAME = "tv-cons-plot";
-	
-	private static final String	SERIES1 = "TV consumption" ;
-	
-	/** Frame used to plot the consumption during the simulation.			*/
 	protected XYPlotter			consPlotter ;
 	
 	// -------------------------------------------------------------------------
@@ -115,8 +113,7 @@ extends AtomicHIOA{
 	// -------------------------------------------------------------------------
 	
 	@ImportedVariable (type = Double.class)
-	protected Value<Double> tvBack;
-	
+	protected Value<Double> temperature;
 	
 	/**
 	 * @see fr.sorbonne_u.devs_simulation.models.Model#setSimulationRunParameters(java.util.Map)
@@ -128,13 +125,13 @@ extends AtomicHIOA{
 	{
 		
 		String vname = this.getURI() + ":" +
-				TVCONS_PLOTTING_PARAM_NAME ;
-	PlotterDescription pd = (PlotterDescription) simParams.get(vname) ;
-	this.consPlotter = new XYPlotter(pd) ;
-	this.consPlotter.createSeries(SERIES1) ;
+				OVENCONS_PLOTTING_PARAM_NAME ;
+		PlotterDescription pd = (PlotterDescription) simParams.get(vname) ;
+		this.consPlotter = new XYPlotter(pd) ;
+		this.consPlotter.createSeries(SERIES_COMSUMPTION) ;
 	
 	}
-
+	
 	@Override
 	public Vector<EventI> output() {
 		Vector<EventI> ret = new Vector<EventI>();
@@ -146,7 +143,11 @@ extends AtomicHIOA{
 			// Plotting
 			if (this.consPlotter != null) {
 				this.consPlotter.addData(
-						SERIES1,
+						SERIES_COMSUMPTION,
+						this.lastTimeEmitCons,
+						newConsumption) ;
+				this.consPlotter.addData(
+						SERIES_COMSUMPTION,
 						this.getCurrentStateTime().getSimulatedTime(),
 						newConsumption) ;
 			}
@@ -157,7 +158,7 @@ extends AtomicHIOA{
 			
 			
 			Time t = this.getCurrentStateTime().add(this.getNextTimeAdvance()) ;
-			TVConsumptionEvent e = new TVConsumptionEvent(t, newConsumption);
+			OvenConsumptionEvent e = new OvenConsumptionEvent(t, newConsumption);
 			ret.add(e);
 			consumptions.add(e);
 			updateConsumption = false;
@@ -214,13 +215,13 @@ extends AtomicHIOA{
 	}
 	
 	/**
-	 * generate TV consumption as double value depending on tv backlight
-	 * @return TV consumption as double value
+	 * generate Oven consumption as double value depending on oven temperature
+	 * @return Oven consumption as double value
 	 */
 	public double generateConsumption() {
 		double rateConsumption = rgConsumption.nextUniform(MIN_RATE_BL, MAX_RATE_BL);
 		assert rateConsumption > MIN_RATE_BL && rateConsumption < MAX_RATE_BL;
-		double newConsumption = this.tvBack.v * rateConsumption; 
+		double newConsumption = this.temperature.v * rateConsumption; 
 		return newConsumption;
 	}
 	
@@ -230,7 +231,6 @@ extends AtomicHIOA{
 	@Override
 	public SimulationReportI	getFinalReport() throws Exception
 	{
-		return new TVConsumptionModelReport(this.getURI(),consumptions);
+		return new OvenConsumptionModelReport(this.getURI(),consumptions);
 	}
-
 }

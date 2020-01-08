@@ -1,8 +1,8 @@
-package simulation;
+package simulation2;
 
 import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
-import simulation.TV.models.TVModel;
-import simulation.oven.models.OvenModel;
+import simulation2.TV.models.TVModel;
+import simulation2.oven.models.OvenModel;
 
 public class SimulationMain {
 	
@@ -12,7 +12,7 @@ public class SimulationMain {
 		ovenSimulation.setDebugLevel(0);
 		ovenSimulation.setSimulationRunParameters(OvenModel.getSettingRunParameters()) ;
 		
-		SimulationEngine tvSimulation = TVModel.build().constructSimulator() ;
+		SimulationEngine tvSimulation = TVModel.getArchitecture().constructSimulator() ;
 		tvSimulation.setDebugLevel(0);
 		tvSimulation.setSimulationRunParameters(TVModel.getSettingRunParameters()) ;
 		

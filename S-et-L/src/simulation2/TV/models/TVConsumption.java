@@ -1,4 +1,4 @@
-package simulation.TV.models;
+package simulation2.TV.models;
 
 import java.util.Map;
 import java.util.Vector;
@@ -20,7 +20,7 @@ import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 import fr.sorbonne_u.devs_simulation.utils.AbstractSimulationReport;
 import fr.sorbonne_u.utils.PlotterDescription;
 import fr.sorbonne_u.utils.XYPlotter;
-import simulation.TV.events.TVConsumptionEvent;
+import simulation2.TV.events.TVConsumptionEvent;
 
 @ModelExternalEvents(imported = TicEvent.class,
 					exported = TVConsumptionEvent.class)
@@ -145,6 +145,10 @@ extends AtomicHIOA{
 			
 			// Plotting
 			if (this.consPlotter != null) {
+				this.consPlotter.addData(
+						SERIES1,
+						this.lastTimeEmitCons,
+						newConsumption) ;
 				this.consPlotter.addData(
 						SERIES1,
 						this.getCurrentStateTime().getSimulatedTime(),

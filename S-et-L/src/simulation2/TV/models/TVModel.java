@@ -1,4 +1,4 @@
-package simulation.TV.models;
+package simulation2.TV.models;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,11 +31,11 @@ import fr.sorbonne_u.devs_simulation.models.time.Time;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 import fr.sorbonne_u.devs_simulation.utils.AbstractSimulationReport;
 import fr.sorbonne_u.utils.PlotterDescription;
-import simulation.Controller.EnergyController;
-import simulation.Controller.TVController;
-import simulation.Controller.events.EconomyEvent;
-import simulation.Controller.events.NoEconomyEvent;
-import simulation.TV.events.TVSwitch;
+import simulation2.Controller.EnergyController;
+import simulation2.Controller.TVController;
+import simulation2.Controller.events.EconomyEvent;
+import simulation2.Controller.events.NoEconomyEvent;
+import simulation2.TV.events.TVSwitch;
 
 public class TVModel 
 extends CoupledModel{
@@ -100,9 +100,7 @@ extends CoupledModel{
 		return new TVModelReport(this.getURI(), reports) ;
 	}
 	
-	public static Architecture build() {
-		
-		
+	public static Architecture getArchitecture() {
 		Map<String,AbstractAtomicModelDescriptor> atomicModelDescriptors =
 				new HashMap<>() ;
 		try {
@@ -111,6 +109,10 @@ extends CoupledModel{
 			// ----------------------------------------------------------------
 			// TV Model 
 			// ----------------------------------------------------------------
+			atomicModelDescriptors.put(TVUserModel.URI,
+					AtomicModelDescriptor.create(TVUserModel.class,
+							TVUserModel.URI,
+							TimeUnit.SECONDS,null,SimulationEngineCreationMode.ATOMIC_ENGINE));
 			
 			atomicModelDescriptors.put(TVStateModel.URI,
 					AtomicModelDescriptor.create(TVStateModel.class,
@@ -121,13 +123,13 @@ extends CoupledModel{
 					AtomicModelDescriptor.create(TicModel.class,
 							TicModel.URI,
 							TimeUnit.SECONDS,null,SimulationEngineCreationMode.ATOMIC_ENGINE));
-			
 			atomicModelDescriptors.put(TVConsumption.URI,
 					AtomicModelDescriptor.create(TVConsumption.class,
 							TVConsumption.URI,
 							TimeUnit.SECONDS,null,SimulationEngineCreationMode.ATOMIC_ENGINE));
 			
 			Set<String> submodels1 = new HashSet<String>() ;
+			submodels1.add(TVUserModel.URI);
 			submodels1.add(TVStateModel.URI);
 			submodels1.add(TicModel.URI);
 			submodels1.add(TVConsumption.URI);
@@ -201,11 +203,63 @@ extends CoupledModel{
 							null,
 							null,
 							bindings1)) ;
+			
+			// ----------------------------------------------------------------
+			// TV Controller
+			// ----------------------------------------------------------------
+			atomicModelDescriptors.put(TVController.URI,
+			AtomicModelDescriptor.create(TVController.class,
+					TVController.URI,
+					TimeUnit.SECONDS,null,SimulationEngineCreationMode.ATOMIC_ENGINE));
+			
+			// ----------------------------------------------------------------
+			// Full architecture and Global model
+			// ----------------------------------------------------------------
+			Set<String> submodels2 = new HashSet<String>() ;
+			submodels2.add(TVModel.URI);
+			submodels2.add(TVController.URI);
+			
+			Map<EventSource,EventSink[]> connections2 =
+					new HashMap<EventSource,EventSink[]>() ;
+					
+			EventSource from21 =
+					new EventSource(
+							TVController.URI,
+							EconomyEvent.class) ;
+			EventSink[] to21 =
+					new EventSink[] {
+							new EventSink(
+									TVModel.URI,
+									EconomyEvent.class)} ;
+			connections2.put(from21, to21) ;
+			
+			EventSource from22 =
+					new EventSource(
+							TVController.URI,
+							NoEconomyEvent.class) ;
+			EventSink[] to22 =
+					new EventSink[] {
+							new EventSink(
+									TVModel.URI,
+									NoEconomyEvent.class)} ;
+			connections2.put(from22, to22) ;
+			
+			coupledModelDescriptors.put(
+					EnergyController.URI,
+					new CoupledModelDescriptor(
+							EnergyController.class,
+							MoleneModel.URI,
+							submodels2,
+							null,
+							null,
+							connections2,
+							null,
+							SimulationEngineCreationMode.COORDINATION_ENGINE)) ;
 
 	
 			
 			return new Architecture(
-							TVModel.URI,
+							EnergyController.URI,
 							atomicModelDescriptors,
 							coupledModelDescriptors,
 							TimeUnit.SECONDS) ;

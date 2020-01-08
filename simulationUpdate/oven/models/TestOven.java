@@ -1,17 +1,16 @@
-package simulation.TV.models;
+package simulation.oven.models;
 
 import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
 
-public class TestTV {
-
+public class TestOven {
+	
 	public static void main(String[] args) throws Exception {
 		
 		
-			
-			SimulationEngine se = TVModel.build().constructSimulator() ;
+			SimulationEngine se = OvenModel.getArchitecture().constructSimulator() ;
 			se.setDebugLevel(0);
 			
-			se.setSimulationRunParameters(TVModel.getSettingRunParameters()) ;
+			se.setSimulationRunParameters(OvenModel.getSettingRunParameters()) ;
 			
 			SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 0L ;
 			long start = System.currentTimeMillis() ;

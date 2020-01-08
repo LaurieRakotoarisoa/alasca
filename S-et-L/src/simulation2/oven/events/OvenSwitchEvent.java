@@ -1,21 +1,13 @@
-package simulation.TV.events;
+package simulation2.oven.events;
 
-import fr.sorbonne_u.devs_simulation.es.events.ES_Event;
 import fr.sorbonne_u.devs_simulation.models.events.Event;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
 
+public class OvenSwitchEvent 
+extends Event{
 
-/**
- * The class <code>TVSwitch</code> describes the event turning on the TV 
- * @author laurie
- *
- */
-public class TVSwitch 
-extends ES_Event{
-
-	public TVSwitch(Time timeOfOccurrence) {
+	public OvenSwitchEvent(Time timeOfOccurrence) {
 		super(timeOfOccurrence, null);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -26,7 +18,7 @@ extends ES_Event{
 	@Override
 	public String		eventAsString()
 	{
-		return "TVSwitch(" +
+		return "Oven Switch(" +
 						this.getTimeOfOccurrence().getSimulatedTime() +" "+this.getTimeOfOccurrence().getTimeUnit()+ ")" ;
 	}
 
