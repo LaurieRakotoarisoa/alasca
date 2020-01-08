@@ -1,4 +1,4 @@
-package simulation.TV;
+package simulation.TV.models;
 
 import java.util.Map;
 import java.util.Vector;

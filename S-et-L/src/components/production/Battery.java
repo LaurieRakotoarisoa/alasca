@@ -7,11 +7,11 @@ import interfaces.ProductionI;
 import ports.production.ProductionInboundPort;
 
 @OfferedInterfaces (offered = ProductionI.class)
-public class Production extends AbstractComponent{
+public class Battery extends AbstractComponent{
 	
 	protected int production =1000000;
 	
-	protected Production(String uri, String inboundURI) throws Exception {
+	protected Battery(String uri, String inboundURI) throws Exception {
 		super(uri,1, 0);
 		
 		//Create and publish port for remote control

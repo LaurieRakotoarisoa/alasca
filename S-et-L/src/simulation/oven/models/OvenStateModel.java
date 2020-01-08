@@ -1,9 +1,8 @@
-package simulation.TV;
+package simulation.oven.models;
 
 import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
-
 
 import fr.sorbonne_u.devs_simulation.hioa.annotations.ExportedVariable;
 import fr.sorbonne_u.devs_simulation.hioa.models.AtomicHIOAwithEquations;
@@ -18,35 +17,34 @@ import fr.sorbonne_u.devs_simulation.utils.AbstractSimulationReport;
 import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
 import fr.sorbonne_u.utils.PlotterDescription;
 import fr.sorbonne_u.utils.XYPlotter;
-import simulation.AtomicModels.events.TvStateEvent;
 import simulation.Controller.events.EconomyEvent;
 import simulation.Controller.events.NoEconomyEvent;
-import simulation.TV.events.TVSwitch;
-import utils.TVMode;
+import simulation.oven.events.OvenStateEvent;
+import simulation.oven.events.OvenSwitchEvent;
+import utils.oven.OvenMode;
 
 /**
- * The class <code>TVStateModel</code> describes the evolution of a TV State 
- * @author Laurie Rakotoarisoa
+ * The class <code>OvenSateModel</code> describes the evolution of a Oven State 
+ * @author Saad CHIADMI
  *
  */
-
-@ModelExternalEvents(imported = {TVSwitch.class, EconomyEvent.class, NoEconomyEvent.class})
-public class TVStateModel 
+@ModelExternalEvents(imported = {OvenSwitchEvent.class, EconomyEvent.class, NoEconomyEvent.class})
+public class OvenStateModel 
 extends AtomicHIOAwithEquations{
-	
+
 	// -------------------------------------------------------------------------
 	// Inner classes
 	// -------------------------------------------------------------------------
 	
-	public static class TVStateModelReport 
+	public static class OvenStateModelReport 
 	extends		AbstractSimulationReport
 	{
 		private static final long 					serialVersionUID = 1L ;
-		public final Vector<TvStateEvent>	readings ;
+		public final Vector<OvenStateEvent>	readings ;
 
-		public			TVStateModelReport(
+		public			OvenStateModelReport(
 			String modelURI,
-			Vector<TvStateEvent> readings
+			Vector<OvenStateEvent> readings
 			)
 		{
 			super(modelURI) ;
@@ -60,7 +58,7 @@ extends AtomicHIOAwithEquations{
 		public String	toString()
 		{
 			String ret = "\n-----------------------------------------\n" ;
-			ret += "TV State Model Report\n" ;
+			ret += "Oven State Model Report\n" ;
 			ret += "-----------------------------------------\n" ;
 			ret += "number of changes = " + this.readings.size() + "\n" ;
 			ret += "Changes of state :\n" ;
@@ -72,48 +70,44 @@ extends AtomicHIOAwithEquations{
 		}
 	}
 	
-	// -------------------------------------------------------------------------
-	// Constructors
-	// -------------------------------------------------------------------------
 
-	public TVStateModel(String uri, TimeUnit simulatedTimeUnit, SimulatorI simulationEngine) throws Exception {
+	public OvenStateModel(String uri, TimeUnit simulatedTimeUnit, SimulatorI simulationEngine) throws Exception {
 		super(uri, simulatedTimeUnit, simulationEngine);
 		this.setLogger(new StandardLogger()) ;
 		this.setDebugLevel(1);
-		states = new Vector<TvStateEvent>();
-		assert this.tvBack != null;
+		states = new Vector<OvenStateEvent>();
+		assert this.temperature != null;
 		this.staticInitialiseVariables();
 	}
-
-	// -------------------------------------------------------------------------
-	// Constants and variables
-	// -------------------------------------------------------------------------
 	
+
+	/**
+	 * 
+	 */
 	private static final long serialVersionUID = 1L;
 	
-	public static final String URI = "TV-STATE";
+	public static final String URI = "Oven-STATE";
 	
 	/** stored output events for report */
-	protected Vector<TvStateEvent> states;
+	protected Vector<OvenStateEvent> states;
+	/** current state of the OVEN (On, Off) */
+	protected OvenMode currentState;
 	
-	/** current state of the TV (On, Off) */
-	protected TVMode currentState;
+	private static final String	SERIES_STATE = "Oven state" ;
 	
-	private static final String	SERIES1 = "TV state" ;
-	
-	public static final String TVSTATE_PLOTTING_PARAM_NAME = "tv-state-plot";
+	public static final String OVENSTATE_PLOTTING_PARAM_NAME = "oven-state-plot";
 	
 	/** Frame used to plot the state during the simulation.			*/
 	protected XYPlotter			statePlotter ;
 	
-	/** default value of tv backlight when mode economy is not activated */
-	public static double DEFAULT_TV_BACKLIGHT = 70.0;
+	/** default value of oven temperature */
+	public static double DEFAULT_OVEN_TEMPERATURE = 70.0;
 	
-	/** maximum value of backlight when mode economy activated */
-	public static double MAX_ECO_BACKLIGHT = 30.0;
+	/** max value of temperature when mode economy activated */
+	public static double MAX_ECO_TEMPERATURE = 30.0;
 	
-	/** Last value of backlight when TV was on	 */
-	private double last_value_backlight;
+	/** Last value of temperature when oven was on	 */
+	private double last_value_temperature;
 	
 	/** true if controller have actived energy economy */
 	protected boolean modeEco;
@@ -122,22 +116,22 @@ extends AtomicHIOAwithEquations{
 	// HIOA model variables
 	// -------------------------------------------------------------------------
 
-	/** TVConsumption in Watt.								*/
+	/** OvenConsumption in Watt.								*/
 	@ExportedVariable(type = Double.class)
-	protected final Value<Double>		tvBack =
+	protected final Value<Double>		temperature =
 											new Value<Double>(this, 0.0, 0) ;
 	
 	
 	/**
-	 * return an integer for the state of the TV for plot
-	 * @param mode state of TV 
+	 * return an integer for the state of the Oven for plot
+	 * @param mode state of Oven
 	 * @return
 	 */
-	public static int	state2int(TVMode mode) {
+	public static int	state2int(OvenMode mode) {
 		assert mode != null;
-		if(mode == TVMode.On) return 1;
+		if(mode == OvenMode.On) return 1;
 		else {
-			assert mode == TVMode.Off;
+			assert mode == OvenMode.Off;
 			return 0;
 		}
 	}
@@ -151,34 +145,31 @@ extends AtomicHIOAwithEquations{
 		) throws Exception
 	{
 		
-		String vname = this.getURI() + ":" +
-				TVSTATE_PLOTTING_PARAM_NAME ;
-	PlotterDescription pd = (PlotterDescription) simParams.get(vname) ;
-	this.statePlotter = new XYPlotter(pd) ;
-	this.statePlotter.createSeries(SERIES1) ;
+	String stateName = this.getURI() + ":" +
+			OVENSTATE_PLOTTING_PARAM_NAME ;
+	PlotterDescription pdState = (PlotterDescription) simParams.get(stateName) ;
+	this.statePlotter = new XYPlotter(pdState) ;
+	this.statePlotter.createSeries(SERIES_STATE) ;
 	
 	}
 	
 	@Override
 	public void			initialiseState(Time initialTime)
 	{
-		this.currentState = TVMode.Off;
+		this.currentState = OvenMode.Off;
 		this.modeEco = false;
-		this.last_value_backlight = DEFAULT_TV_BACKLIGHT;
+		this.last_value_temperature = DEFAULT_OVEN_TEMPERATURE;
 		if (this.statePlotter != null) {
 			this.statePlotter.initialise() ;
 			this.statePlotter.showPlotter() ;
 		}
-		
 		super.initialiseState(initialTime);
 		if (this.statePlotter != null) {
 			this.statePlotter.addData(
-				SERIES1,
+				SERIES_STATE,
 				initialTime.getSimulatedTime(),
 				state2int(this.currentState)) ;
 		}
-		
-		
 	}
 	
 	/**
@@ -187,10 +178,42 @@ extends AtomicHIOAwithEquations{
 	@Override
 	protected void		initialiseVariables(Time startTime)
 	{
-		super.initialiseVariables(startTime);
-		this.tvBack.v = 0.0;
-		assert	startTime.equals(this.tvBack.time) ;
+		//super.initialiseState(startTime);
+		this.temperature.v = 0.0;
+		assert	startTime.equals(this.temperature.time) ;
+		
+//		this.temperature.v = 0.0;
+//		super.initialiseState(startTime);
+//		if (this.statePlotter != null) {
+//			this.statePlotter.addData(
+//				SERIES_STATE,
+//				startTime.getSimulatedTime(),
+//				state2int(this.currentState)) ;
+//		}
+		
 	}
+	
+//	/**
+//	 * @see fr.sorbonne_u.devs_simulation.models.AtomicModel#userDefinedInternalTransition(fr.sorbonne_u.devs_simulation.models.time.Duration)
+//	 */
+//	@Override
+//	public void			userDefinedInternalTransition(Duration elapsedTime)
+//	{
+//		this.logMessage("at internal transition " +
+//				this.getCurrentStateTime().getSimulatedTime() +
+//				" " + elapsedTime.getSimulatedDuration()) ;
+//
+//		if (elapsedTime.greaterThan(Duration.zero(getSimulatedTimeUnit()))) {
+//		super.userDefinedInternalTransition(elapsedTime) ;
+//		if (this.currentState == OvenMode.On) {
+//			// the value of the bandwidth at the next internal transition
+//			// is computed in the timeAdvance function when computing
+//			// the delay until the next internal transition.
+//			this.temperature.v = 30.0 ;
+//		}
+//		this.temperature.time = this.getCurrentStateTime() ;
+//		}
+//	}
 	
 	/**
 	 * @see fr.sorbonne_u.devs_simulation.models.AtomicModel#userDefinedExternalTransition(fr.sorbonne_u.devs_simulation.models.time.Duration)
@@ -202,7 +225,7 @@ extends AtomicHIOAwithEquations{
 		Vector<EventI> current = this.getStoredEventAndReset();
 		assert current != null & current.size() == 1;
 		EventI e = current.get(0);
-		if(e instanceof TVSwitch) {
+		if(e instanceof OvenSwitchEvent) {
 			switchState(this.getCurrentStateTime().getSimulatedTime());
 			
 		}
@@ -211,14 +234,22 @@ extends AtomicHIOAwithEquations{
 		}
 		else if(e instanceof NoEconomyEvent) {
 			if(modeEco) deactivateEnergyEco();
-		}			
+		}	
 		
 	}
 	
 	@Override
 	public Vector<EventI> output() {
+//		Vector<EventI> ret = new Vector<EventI>();
+//		if(receivedEvent) {
+//			Time t = this.getCurrentStateTime().add(getNextTimeAdvance());
+//			OvenStateEvent e = new OvenStateEvent(t,currentState);
+//			states.addElement(e);
+//			this.logMessage(e.eventAsString());
+//			receivedEvent = false;
+//		}
+//		return ret;
 		return null;
-		
 	}
 
 	@Override
@@ -229,33 +260,33 @@ extends AtomicHIOAwithEquations{
 	@Override
 	public SimulationReportI	getFinalReport() throws Exception
 	{
-		return new TVStateModelReport(this.getURI(),states);
+		return new OvenStateModelReport(this.getURI(),states);
 	}
 	
 	private void switchState(double currentTime) {
-		TVMode oldState = this.currentState;
-		if(oldState == TVMode.Off) {
-			currentState = TVMode.On;
-			tvBack.v = this.last_value_backlight;
+		OvenMode oldState = this.currentState;
+		if(oldState == OvenMode.Off) {
+			currentState = OvenMode.On;
+			temperature.v = this.last_value_temperature;
 		}
 		else
 		{
-			assert oldState == TVMode.On;
-			currentState = TVMode.Off;
-			last_value_backlight = tvBack.v;
-			tvBack.v = 0.0;
+			assert oldState == OvenMode.On;
+			currentState = OvenMode.Off;
+			last_value_temperature = temperature.v;
+			temperature.v = 0.0;
 			
 		} 
 		
-		tvBack.time = this.getCurrentStateTime();
+		temperature.time = this.getCurrentStateTime();
 		
 		if (this.statePlotter != null && oldState != this.currentState) {
 			this.statePlotter.addData(
-					SERIES1,
+					SERIES_STATE,
 					currentTime,
 					state2int(oldState)) ;
 			this.statePlotter.addData(
-					SERIES1,
+					SERIES_STATE,
 					currentTime,
 					state2int(this.currentState)) ;
 		}
@@ -264,29 +295,25 @@ extends AtomicHIOAwithEquations{
 	
 	private void activateEnergyEco() {
 		this.modeEco = true;
-		if(tvBack.v > MAX_ECO_BACKLIGHT) {
-			tvBack.v = MAX_ECO_BACKLIGHT;
-			tvBack.time = this.getCurrentStateTime();
+		if(temperature.v > MAX_ECO_TEMPERATURE) {
+			temperature.v = MAX_ECO_TEMPERATURE;
+			temperature.time = this.getCurrentStateTime();
 		}
-		else if(this.currentState == TVMode.Off){
-			this.last_value_backlight = MAX_ECO_BACKLIGHT;
+		else if(this.currentState == OvenMode.Off){
+			this.last_value_temperature = MAX_ECO_TEMPERATURE;
 		}
 	}
 	
 	private void deactivateEnergyEco() {
 		this.modeEco = false;
-		if(tvBack.v < DEFAULT_TV_BACKLIGHT && this.currentState == TVMode.On) {
-			tvBack.v = DEFAULT_TV_BACKLIGHT;
-			tvBack.time = this.getCurrentStateTime();
+		if(temperature.v < DEFAULT_OVEN_TEMPERATURE && this.currentState == OvenMode.On) {
+			temperature.v = DEFAULT_OVEN_TEMPERATURE;
+			temperature.time = this.getCurrentStateTime();
 		}
 		else {
-			this.last_value_backlight = DEFAULT_TV_BACKLIGHT;
+			this.last_value_temperature = DEFAULT_OVEN_TEMPERATURE;
 		}
 		
 	}
-	
-	
-	
-	
 
 }

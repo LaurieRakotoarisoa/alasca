@@ -5,7 +5,7 @@ import components.controller.EnergyController;
 import components.device.Oven;
 import components.device.Fridge;
 import components.device.TV;
-import components.production.Production;
+import components.production.Battery;
 import components.production.WindTurbine;
 import connectors.OvenConnector;
 import connectors.ProductionConnector;
@@ -90,7 +90,7 @@ public class CVM extends AbstractCVM{
 		// create the Production component
 		this.productionURI =
 				AbstractComponent.createComponent(
-						Production.class.getCanonicalName(),
+						Battery.class.getCanonicalName(),
 						new Object[]{URI.PRODUCTION_COMPONENT_URI,
 								URI.ProductionInboundPortURI}) ;
 		assert	this.isDeployedComponent(this.productionURI) ;
