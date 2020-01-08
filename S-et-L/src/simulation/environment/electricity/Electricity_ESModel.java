@@ -57,6 +57,10 @@ extends AtomicES_Model{
 		Set<ES_EventI> events = new HashSet<ES_EventI>();
 		events.add(new SheddingEvent(occurrence));
 		events.add(new RestoreElecEvent(occurrence.add(new Duration(500, getSimulatedTimeUnit()))));
+		
+		occurrence = new Time(6000, this.getSimulatedTimeUnit());
+		events.add(new SheddingEvent(occurrence));
+		events.add(new RestoreElecEvent(occurrence.add(new Duration(8000, getSimulatedTimeUnit()))));
 		this.scheduleEvents(events) ;
 		// re-initialisation of the time of occurrence of the next event
 		// required here after adding a new event in the schedule.

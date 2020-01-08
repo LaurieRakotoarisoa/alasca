@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.math3.random.RandomDataGenerator;
 
+import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicEvent;
 import fr.sorbonne_u.devs_simulation.hioa.annotations.ExportedVariable;
 import fr.sorbonne_u.devs_simulation.hioa.models.AtomicHIOA;
 import fr.sorbonne_u.devs_simulation.hioa.models.vars.Value;
@@ -28,7 +29,8 @@ import utils.fridge.FridgeMode;
 @ModelExternalEvents( imported = {CloseDoor.class,
 								  OpenDoor.class,
 								  NoEconomyEvent.class,
-								  EconomyEvent.class
+								  EconomyEvent.class,
+								  TicEvent.class
 									})
 public class FridgeV2Model 
 extends AtomicHIOA{
@@ -174,7 +176,6 @@ extends AtomicHIOA{
 
 	@Override
 	public Duration timeAdvance() {
-		//return Duration.one(this.getSimulatedTimeUnit());
 		return Duration.INFINITY;
 	}
 	
