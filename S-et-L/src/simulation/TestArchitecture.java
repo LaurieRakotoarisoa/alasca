@@ -198,7 +198,7 @@ public class TestArchitecture{
 					new EventSink[] {
 						new EventSink(FridgeV2Model.URI,
 									  TicEvent.class)} ;
-			connections1.put(from41, to41) ;
+			connections4.put(from41, to41) ;
 			
 			coupledModelDescriptors.put(
 					FridgeModel.URI,
