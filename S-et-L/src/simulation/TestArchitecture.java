@@ -10,9 +10,7 @@ import java.util.concurrent.TimeUnit;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.devs_simulation.architectures.ArchitectureI;
 import fr.sorbonne_u.devs_simulation.architectures.SimulationEngineCreationMode;
-import fr.sorbonne_u.devs_simulation.es.events.ES_Event;
 import fr.sorbonne_u.devs_simulation.es.events.ES_EventI;
-import fr.sorbonne_u.devs_simulation.examples.molene.MoleneModel;
 import fr.sorbonne_u.devs_simulation.examples.molene.SimulationMain;
 import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicEvent;
 import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicModel;
@@ -32,20 +30,16 @@ import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
 import fr.sorbonne_u.utils.PlotterDescription;
 import simulation.Controller.EnergyController;
 import simulation.Controller.HomeController;
-import simulation.Controller.TVController;
 import simulation.Controller.events.EconomyEvent;
 import simulation.Controller.events.NoEconomyEvent;
-import simulation.Fridge.actions.DoorAction;
 import simulation.Fridge.events.CloseDoor;
 import simulation.Fridge.events.OpenDoor;
 import simulation.Fridge.models.FridgeModel;
 import simulation.Fridge.models.FridgeV2Model;
-import simulation.Fridge.models.UserFridgeModel;
 import simulation.TV.events.TVSwitch;
 import simulation.TV.models.TVConsumption;
 import simulation.TV.models.TVModel;
 import simulation.TV.models.TVStateModel;
-import simulation.TV.models.TVUserModel;
 import simulation.environment.UserModel;
 import simulation.environment.electricity.Electricity_ESModel;
 import simulation.environment.electricity.events.RestoreElecEvent;
@@ -66,10 +60,6 @@ public class TestArchitecture{
 			// ----------------------------------------------------------------
 			// TV Model 
 			// ----------------------------------------------------------------
-//			atomicModelDescriptors.put(TVUserModel.URI,
-//					AtomicModelDescriptor.create(TVUserModel.class,
-//							TVUserModel.URI,
-//							TimeUnit.SECONDS,null,SimulationEngineCreationMode.ATOMIC_ENGINE));
 			
 			atomicModelDescriptors.put(TVStateModel.URI,
 					AtomicModelDescriptor.create(TVStateModel.class,
@@ -158,55 +148,6 @@ public class TestArchitecture{
 							null,
 							bindings1)) ;
 			
-			// ----------------------------------------------------------------
-			// TV Controller
-			// ----------------------------------------------------------------
-//			atomicModelDescriptors.put(TVController.URI,
-//			AtomicModelDescriptor.create(TVController.class,
-//					TVController.URI,
-//					TimeUnit.SECONDS,null,SimulationEngineCreationMode.ATOMIC_ENGINE));
-			
-			// ----------------------------------------------------------------
-			// Fridge Model
-			// ----------------------------------------------------------------
-
-			
-//			atomicModelDescriptors.put(FridgeTemperature.URI,
-//			AtomicModelDescriptor.create(FridgeTemperature.class,
-//					FridgeTemperature.URI,
-//					TimeUnit.SECONDS,null,SimulationEngineCreationMode.ATOMIC_ENGINE));
-//			
-//			atomicModelDescriptors.put(FridgeSensorTemperature.URI,
-//					AtomicModelDescriptor.create(FridgeSensorTemperature.class,
-//							FridgeSensorTemperature.URI,
-//							TimeUnit.SECONDS,null,SimulationEngineCreationMode.ATOMIC_ENGINE));
-//
-//			Set<String> submodels2 = new HashSet<String>() ;
-//			submodels2.add(FridgeTemperature.URI);
-//			submodels2.add(FridgeSensorTemperature.URI);
-//			
-//			Map<EventSource,EventSink[]> connections2 =
-//					new HashMap<EventSource,EventSink[]>() ;
-//					
-//			Map<VariableSource,VariableSink[]> bindings2 =
-//					new HashMap<VariableSource,VariableSink[]>() ;
-//					
-//			VariableSource source21 =
-//					new VariableSource("temperature",
-//									   Double.class,
-//									   FridgeTemperature.URI) ;
-//				VariableSink[] sinks21 =
-//					new VariableSink[] {
-//							new VariableSink("temperature",
-//											 Double.class,
-//											 FridgeSensorTemperature.URI)} ;
-//					
-//			bindings2.put(source21, sinks21);
-			
-//			atomicModelDescriptors.put(UserFridgeModel.URI,
-//			AtomicModelDescriptor.create(UserFridgeModel.class,
-//					UserFridgeModel.URI,
-//					TimeUnit.SECONDS,null,SimulationEngineCreationMode.ATOMIC_ENGINE));
 			
 			// ----------------------------------------------------------------
 			// Fridge Model V2
@@ -251,17 +192,17 @@ public class TestArchitecture{
 					new HashMap<EventSource,EventSink[]>() ;
 			
 			EventSource from41 =
-					new EventSource(TicModel.URI+"-1",
+					new EventSource(TicModel.URI+"-3",
 									TicEvent.class) ;
 			EventSink[] to41 =
 					new EventSink[] {
-						new EventSink(TVConsumption.URI,
+						new EventSink(FridgeV2Model.URI,
 									  TicEvent.class)} ;
 			connections1.put(from41, to41) ;
 			
 			coupledModelDescriptors.put(
 					FridgeModel.URI,
-					new CoupledHIOA_Descriptor(
+					new CoupledModelDescriptor(
 							FridgeModel.class,
 							FridgeModel.URI,
 							submodels4,
@@ -269,48 +210,9 @@ public class TestArchitecture{
 							null,
 							connections4,
 							null,
-							SimulationEngineCreationMode.COORDINATION_ENGINE,
-							null,
-							null,
-							null)) ;
-
-//			Set<String> submodels2 = new HashSet<String>() ;
-//			submodels2.add(UserFridgeModel.URI);
-//			submodels2.add(FridgeV2Model.URI);
-//			
-//			Map<Class<? extends EventI>,EventSink[]> imported2 =
-//					new HashMap<Class<? extends EventI>,EventSink[]>() ;
-//					
-//			imported2.put(EconomyEvent.class,
-//					new EventSink[] {
-//							new EventSink(FridgeV2Model.URI,
-//									EconomyEvent.class)});
-//			imported2.put(NoEconomyEvent.class,
-//					new EventSink[] {
-//							new EventSink(FridgeV2Model.URI,
-//									NoEconomyEvent.class)});
-//			
-//			Map<EventSource,EventSink[]> connections2 =
-//					new HashMap<EventSource,EventSink[]>() ;
-//					
-//					
-//					
-//			Map<VariableSource,VariableSink[]> bindings2 =
-//					new HashMap<VariableSource,VariableSink[]>() ;
+							SimulationEngineCreationMode.COORDINATION_ENGINE)) ;
 			
-//			coupledModelDescriptors.put(
-//					FridgeModel.URI,
-//					new CoupledHIOA_Descriptor(
-//							FridgeModel.class,
-//							FridgeModel.URI,
-//							submodels2,
-//							imported2,
-//							null,
-//							connections2,
-//							null,
-//							SimulationEngineCreationMode.COORDINATION_ENGINE,
-//							null, null, bindings2)) ;
-					
+			
 			// ----------------------------------------------------------------
 			// OvenModel
 			// ----------------------------------------------------------------

@@ -203,12 +203,7 @@ extends AtomicHIOA{
 		//update current consumption
 		this.updateCons(this.getCurrentStateTime());
 		// Plotting
-		if (this.consPlotter != null) {
-			this.consPlotter.addData(
-					SERIES,
-					this.getCurrentStateTime().getSimulatedTime(),
-					this.fridgeConsumption.v) ;
-		}
+		
 		super.userDefinedInternalTransition(elapsedTime) ;
 		
 	}
@@ -235,6 +230,9 @@ extends AtomicHIOA{
 		}
 		else if(e instanceof NoEconomyEvent) {
 			setEconomyMode(false, this.getCurrentStateTime());
+		}else if (e instanceof TicEvent) {
+			
+			this.updateCons(this.getCurrentStateTime());
 		}
 		
 	}
@@ -299,6 +297,13 @@ extends AtomicHIOA{
 			this.fridgeConsumption.v = rgConsumption.nextUniform(LOW_POWER_CONS-SIGMA,LOW_POWER_CONS+SIGMA);
 		}
 		this.fridgeConsumption.time = current;
+		
+		if (this.consPlotter != null) {
+			this.consPlotter.addData(
+					SERIES,
+					current.getSimulatedTime(),
+					this.fridgeConsumption.v) ;
+		}
 			
 	}
 	
