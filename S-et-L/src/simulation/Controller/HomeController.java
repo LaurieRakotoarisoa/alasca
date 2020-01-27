@@ -7,7 +7,9 @@ import java.util.concurrent.TimeUnit;
 
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.devs_simulation.architectures.SimulationEngineCreationMode;
+import fr.sorbonne_u.devs_simulation.hioa.annotations.ImportedVariable;
 import fr.sorbonne_u.devs_simulation.hioa.models.AtomicHIOA;
+import fr.sorbonne_u.devs_simulation.hioa.models.vars.Value;
 import fr.sorbonne_u.devs_simulation.interfaces.SimulationReportI;
 import fr.sorbonne_u.devs_simulation.models.annotations.ModelExternalEvents;
 import fr.sorbonne_u.devs_simulation.models.architectures.AbstractAtomicModelDescriptor;
@@ -47,6 +49,12 @@ extends AtomicHIOA{
 	
 	private boolean reduceCons;
 	private boolean restoreCons;
+	
+	// -------------------------------------------------------------------------
+	// Constants and variables
+	// -------------------------------------------------------------------------
+	@ImportedVariable (type = Double.class)
+	protected Value<Double> totalCons;
 	
 	// -------------------------------------------------------------------------
 	// Simulation methods and protocol

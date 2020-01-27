@@ -12,6 +12,8 @@ import fr.sorbonne_u.devs_simulation.architectures.ArchitectureI;
 import fr.sorbonne_u.devs_simulation.architectures.SimulationEngineCreationMode;
 import fr.sorbonne_u.devs_simulation.es.events.ES_EventI;
 import fr.sorbonne_u.devs_simulation.examples.molene.SimulationMain;
+import fr.sorbonne_u.devs_simulation.examples.molene.bsm.BatteryLevel;
+import fr.sorbonne_u.devs_simulation.examples.molene.bsm.BatterySensorModel;
 import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicEvent;
 import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicModel;
 import fr.sorbonne_u.devs_simulation.hioa.architectures.CoupledHIOA_Descriptor;
@@ -32,14 +34,17 @@ import simulation.Controller.EnergyController;
 import simulation.Controller.HomeController;
 import simulation.Controller.events.EconomyEvent;
 import simulation.Controller.events.NoEconomyEvent;
+import simulation.Counter.CounterModel;
 import simulation.Fridge.events.ActiveCompressor;
 import simulation.Fridge.events.CloseDoor;
+import simulation.Fridge.events.FridgeConsumptionEvent;
 import simulation.Fridge.events.InactiveCompressor;
 import simulation.Fridge.events.OpenDoor;
 import simulation.Fridge.models.FridgeModel;
 import simulation.Fridge.models.FridgeV2Model;
 import simulation.Fridge.models2.FridgeConsumption;
 import simulation.Fridge.models2.FridgeState;
+import simulation.TV.events.TVConsumptionEvent;
 import simulation.TV.events.TVSwitch;
 import simulation.TV.models.TVConsumption;
 import simulation.TV.models.TVModel;
@@ -104,9 +109,13 @@ public class TestArchitecture{
 					new EventSink[] {
 							new EventSink(TVStateModel.URI,
 									TVSwitch.class)});
-					
+			
 			Map<Class<? extends EventI>,ReexportedEvent> reexported1 =
 					new HashMap<Class<? extends EventI>,ReexportedEvent>() ;
+			reexported1.put(
+					TVConsumptionEvent.class,
+					new ReexportedEvent(TVConsumption.URI,
+										TVConsumptionEvent.class)) ;
 			
 			Map<EventSource,EventSink[]> connections1 =
 					new HashMap<EventSource,EventSink[]>() ;
@@ -155,7 +164,7 @@ public class TestArchitecture{
 			
 			
 			// ----------------------------------------------------------------
-			// Fridge Model V2
+			// Fridge Model 
 			// ----------------------------------------------------------------
 
 			atomicModelDescriptors.put(FridgeState.URI,
@@ -193,6 +202,13 @@ public class TestArchitecture{
 							new EventSink(FridgeState.URI,
 									OpenDoor.class)});
 			
+			Map<Class<? extends EventI>,ReexportedEvent> reexported4 =
+					new HashMap<Class<? extends EventI>,ReexportedEvent>() ;
+			reexported4.put(
+					FridgeConsumptionEvent.class,
+					new ReexportedEvent(FridgeConsumption.URI,
+										FridgeConsumptionEvent.class)) ;
+			
 			Map<EventSource,EventSink[]> connections4 =
 					new HashMap<EventSource,EventSink[]>() ;
 			
@@ -221,7 +237,7 @@ public class TestArchitecture{
 							FridgeModel.URI,
 							submodels4,
 							imported4,
-							null,
+							reexported4,
 							connections4,
 							null,
 							SimulationEngineCreationMode.COORDINATION_ENGINE)) ;
@@ -339,6 +355,14 @@ public class TestArchitecture{
 							TimeUnit.SECONDS,null,SimulationEngineCreationMode.ATOMIC_ENGINE));
 			
 			// ----------------------------------------------------------------
+			// Counter model
+			// ----------------------------------------------------------------
+			atomicModelDescriptors.put(CounterModel.URI,
+					AtomicModelDescriptor.create(CounterModel.class,
+							CounterModel.URI,
+							TimeUnit.SECONDS,null,SimulationEngineCreationMode.ATOMIC_ENGINE));
+			
+			// ----------------------------------------------------------------
 			// Full architecture and Global model
 			// ----------------------------------------------------------------
 			Set<String> submodels3 = new HashSet<String>() ;
@@ -348,6 +372,7 @@ public class TestArchitecture{
 			submodels3.add(HomeController.URI);
 			submodels3.add(UserModel.URI);
 			submodels3.add(OvenModel.URI);
+			submodels3.add(CounterModel.URI);
 			
 			Map<EventSource,EventSink[]> connections3 =
 					new HashMap<EventSource,EventSink[]>() ;
@@ -448,6 +473,25 @@ public class TestArchitecture{
 									  OvenSwitchEvent.class)} ;
 			connections3.put(from38, to38) ;
 			
+			EventSource from39 =
+					new EventSource(FridgeModel.URI,
+									FridgeConsumptionEvent.class) ;
+			EventSink[] to39 =
+					new EventSink[] {
+						new EventSink(CounterModel.URI,
+									  FridgeConsumptionEvent.class)} ;
+			connections3.put(from39, to39) ;
+			
+			EventSource from310 =
+					new EventSource(TVModel.URI,
+									TVConsumptionEvent.class) ;
+			EventSink[] to310 =
+					new EventSink[] {
+						new EventSink(CounterModel.URI,
+									  TVConsumptionEvent.class)} ;
+			
+			connections3.put(from310, to310) ;
+			
 			
 			
 			coupledModelDescriptors.put(
@@ -487,7 +531,7 @@ public class TestArchitecture{
 			eventsTime.addElement(new Time(2000.0, TimeUnit.SECONDS));
 
 			String modelURI = UserModel.URI;
-			simParams.put(modelURI + ":" + UserModel.USER_EVENTS_PARAM , UserScenarii.createFridgeScenario());
+			simParams.put(modelURI + ":" + UserModel.USER_EVENTS_PARAM , UserScenarii.createGlobalScenario());
 			
 			//TV State Model
 			modelURI = TVStateModel.URI;
@@ -572,6 +616,8 @@ public class TestArchitecture{
 							SimulationMain.getPlotterWidth(),
 							SimulationMain.getPlotterHeight()));
 			
+			
+			//TICS
 			modelURI = TicModel.URI  + "-1" ;
 			simParams.put(modelURI + ":" + TicModel.DELAY_PARAMETER_NAME,
 						  new Duration(10.0, TimeUnit.SECONDS)) ;
@@ -579,6 +625,20 @@ public class TestArchitecture{
 			modelURI = TicModel.URI  + "-2" ;
 			simParams.put(modelURI + ":" + TicModel.DELAY_PARAMETER_NAME,
 						  new Duration(15.0, TimeUnit.SECONDS)) ;
+			
+			//Counter model
+			modelURI = CounterModel.URI;
+			simParams.put(modelURI+":"+CounterModel.HOMECONS_PLOTTING_PARAM_NAME,
+					new PlotterDescription(
+							"Counter Model - Home Consumption",
+							"Time (sec)",
+							"Consumption (Watt)",
+							SimulationMain.ORIGIN_X +
+						  		SimulationMain.getPlotterWidth(),
+							SimulationMain.ORIGIN_Y +
+								2 * SimulationMain.getPlotterHeight(),
+							SimulationMain.getPlotterWidth(),
+							SimulationMain.getPlotterHeight()));
 			
 			
 

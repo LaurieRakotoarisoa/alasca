@@ -153,9 +153,11 @@ extends AtomicHIOAwithEquations{
 		
 		String vname = this.getURI() + ":" +
 				TVSTATE_PLOTTING_PARAM_NAME ;
-	PlotterDescription pd = (PlotterDescription) simParams.get(vname) ;
-	this.statePlotter = new XYPlotter(pd) ;
-	this.statePlotter.createSeries(SERIES1) ;
+		if(simParams.get(vname) != null) {
+			PlotterDescription pd = (PlotterDescription) simParams.get(vname) ;
+			this.statePlotter = new XYPlotter(pd) ;
+			this.statePlotter.createSeries(SERIES1) ;
+		}
 	
 	}
 	

@@ -18,7 +18,8 @@ import simulation.Fridge.events.FridgeConsumptionEvent;
 import simulation.Fridge.events.InactiveCompressor;
 
 @ModelExternalEvents( imported = {InactiveCompressor.class,
-								ActiveCompressor.class})
+								ActiveCompressor.class},
+					exported = { FridgeConsumptionEvent.class})
 public class FridgeConsumption 
 extends AtomicHIOA{
 	
@@ -30,6 +31,7 @@ extends AtomicHIOA{
 	public FridgeConsumption(String uri, TimeUnit simulatedTimeUnit, SimulatorI simulationEngine) throws Exception {
 		super(uri, simulatedTimeUnit, simulationEngine);
 		this.consumption = DEFAULT_CONS;
+		this.triggerUpdate = false;
 	}
 
 	// -------------------------------------------------------------------------
@@ -52,6 +54,8 @@ extends AtomicHIOA{
 	protected XYPlotter			consPlotter ;
 	
 	private static final String	SERIES = "Fridge consumption" ;
+	
+	private boolean triggerUpdate;
 
 	// -------------------------------------------------------------------------
 	// Methods
@@ -92,14 +96,19 @@ extends AtomicHIOA{
 	
 	@Override
 	public Vector<EventI> output() {
-		Vector<EventI> ret = new Vector<EventI>();
-		Time t = this.getCurrentStateTime().add(getNextTimeAdvance());
-		ret.add(new FridgeConsumptionEvent(t, consumption));
-		return ret;
+		if(this.triggerUpdate) {
+			Vector<EventI> ret = new Vector<EventI>();
+			Time t = this.getCurrentStateTime().add(getNextTimeAdvance());
+			ret.add(new FridgeConsumptionEvent(t, consumption));
+			this.triggerUpdate = false;
+			return ret;
+		}	
+		return null;
 	}
 
 	@Override
 	public Duration timeAdvance() {
+		if(this.triggerUpdate) return Duration.zero(TimeUnit.SECONDS);
 		return Duration.INFINITY;
 	}
 	
@@ -145,6 +154,8 @@ extends AtomicHIOA{
 				this.getCurrentStateTime().getSimulatedTime(),
 				this.consumption) ;
 		}
+		
+		this.triggerUpdate = true;
 		
 	}
 	

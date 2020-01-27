@@ -3,6 +3,7 @@ package simulation.Fridge.events;
 import fr.sorbonne_u.devs_simulation.models.events.Event;
 import fr.sorbonne_u.devs_simulation.models.events.EventInformationI;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
+import utils.events.ConsumptionEventI;
 
 /**
  * The class <code>FridgeConsumptionEvent</code> describes an event
@@ -12,7 +13,7 @@ import fr.sorbonne_u.devs_simulation.models.time.Time;
  *
  */
 public class FridgeConsumptionEvent
-extends Event{
+extends Event implements ConsumptionEventI{
 
 	public FridgeConsumptionEvent(Time timeOfOccurrence, double consumption) {
 		super(timeOfOccurrence, new Reading(consumption));
@@ -54,5 +55,9 @@ extends Event{
 		return	"time = " + this.getTimeOfOccurrence() + ", " +
 				"level = " + ((Reading)this.getEventInformation()).value
 												+ " watt";
+	}
+	
+	public double getConsumption() {
+		return ((Reading)this.getEventInformation()).value;
 	}
 }
