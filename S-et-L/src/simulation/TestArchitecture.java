@@ -32,15 +32,20 @@ import simulation.Controller.EnergyController;
 import simulation.Controller.HomeController;
 import simulation.Controller.events.EconomyEvent;
 import simulation.Controller.events.NoEconomyEvent;
+import simulation.Fridge.events.ActiveCompressor;
 import simulation.Fridge.events.CloseDoor;
+import simulation.Fridge.events.InactiveCompressor;
 import simulation.Fridge.events.OpenDoor;
 import simulation.Fridge.models.FridgeModel;
 import simulation.Fridge.models.FridgeV2Model;
+import simulation.Fridge.models2.FridgeConsumption;
+import simulation.Fridge.models2.FridgeState;
 import simulation.TV.events.TVSwitch;
 import simulation.TV.models.TVConsumption;
 import simulation.TV.models.TVModel;
 import simulation.TV.models.TVStateModel;
 import simulation.environment.UserModel;
+import simulation.environment.UserScenarii;
 import simulation.environment.electricity.Electricity_ESModel;
 import simulation.environment.electricity.events.RestoreElecEvent;
 import simulation.environment.electricity.events.SheddingEvent;
@@ -153,52 +158,61 @@ public class TestArchitecture{
 			// Fridge Model V2
 			// ----------------------------------------------------------------
 
-			atomicModelDescriptors.put(FridgeV2Model.URI,
-					AtomicModelDescriptor.create(FridgeV2Model.class,
-							FridgeV2Model.URI,
+			atomicModelDescriptors.put(FridgeState.URI,
+					AtomicModelDescriptor.create(FridgeState.class,
+							FridgeState.URI,
 							TimeUnit.SECONDS,null,SimulationEngineCreationMode.ATOMIC_ENGINE));
 			
-			atomicModelDescriptors.put(TicModel.URI+"-3",
-					AtomicModelDescriptor.create(TicModel.class,
-							TicModel.URI+"-3",
+			atomicModelDescriptors.put(FridgeConsumption.URI,
+					AtomicModelDescriptor.create(FridgeConsumption.class,
+							FridgeConsumption.URI,
 							TimeUnit.SECONDS,null,SimulationEngineCreationMode.ATOMIC_ENGINE));
 			
 			Set<String> submodels4 = new HashSet<String>() ;
-			submodels4.add(FridgeV2Model.URI);
-			submodels4.add(TicModel.URI+"-3");
+			submodels4.add(FridgeState.URI);
+			submodels4.add(FridgeConsumption.URI);
 			
 			Map<Class<? extends EventI>,EventSink[]> imported4 =
 					new HashMap<Class<? extends EventI>,EventSink[]>() ;
 					
 			imported4.put(EconomyEvent.class,
 					new EventSink[] {
-							new EventSink(FridgeV2Model.URI,
+							new EventSink(FridgeState.URI,
 									EconomyEvent.class)});
 			imported4.put(NoEconomyEvent.class,
 					new EventSink[] {
-							new EventSink(FridgeV2Model.URI,
+							new EventSink(FridgeState.URI,
 									NoEconomyEvent.class)});
 			
 			imported4.put(CloseDoor.class,
 					new EventSink[] {
-							new EventSink(FridgeV2Model.URI,
+							new EventSink(FridgeState.URI,
 									CloseDoor.class)});
 			imported4.put(OpenDoor.class,
 					new EventSink[] {
-							new EventSink(FridgeV2Model.URI,
+							new EventSink(FridgeState.URI,
 									OpenDoor.class)});
 			
 			Map<EventSource,EventSink[]> connections4 =
 					new HashMap<EventSource,EventSink[]>() ;
 			
 			EventSource from41 =
-					new EventSource(TicModel.URI+"-3",
-									TicEvent.class) ;
+					new EventSource(FridgeState.URI,
+									ActiveCompressor.class) ;
 			EventSink[] to41 =
 					new EventSink[] {
-						new EventSink(FridgeV2Model.URI,
-									  TicEvent.class)} ;
+						new EventSink(FridgeConsumption.URI,
+									  ActiveCompressor.class)} ;
 			connections4.put(from41, to41) ;
+			
+			EventSource from42 =
+					new EventSource(FridgeState.URI,
+									InactiveCompressor.class) ;
+			EventSink[] to42 =
+					new EventSink[] {
+						new EventSink(FridgeConsumption.URI,
+									  InactiveCompressor.class)} ;
+			connections4.put(from42, to42) ;
 			
 			coupledModelDescriptors.put(
 					FridgeModel.URI,
@@ -348,10 +362,10 @@ public class TestArchitecture{
 									TVModel.URI,
 									EconomyEvent.class),
 							new EventSink(
-									FridgeModel.URI,
+									OvenModel.URI,
 									EconomyEvent.class),
 							new EventSink(
-									OvenModel.URI,
+									FridgeModel.URI,
 									EconomyEvent.class)} ;
 			connections3.put(from31, to31) ;
 			
@@ -365,11 +379,11 @@ public class TestArchitecture{
 									TVModel.URI,
 									NoEconomyEvent.class),
 							new EventSink(
-									FridgeModel.URI,
+									OvenModel.URI,
 									NoEconomyEvent.class),
 							new EventSink(
-									OvenModel.URI,
-									EconomyEvent.class)} ;
+									FridgeModel.URI,
+									NoEconomyEvent.class)} ;
 			
 			connections3.put(from32, to32) ;
 			
@@ -473,7 +487,7 @@ public class TestArchitecture{
 			eventsTime.addElement(new Time(2000.0, TimeUnit.SECONDS));
 
 			String modelURI = UserModel.URI;
-			simParams.put(modelURI + ":" + UserModel.USER_EVENTS_PARAM , createUserScenario());
+			simParams.put(modelURI + ":" + UserModel.USER_EVENTS_PARAM , UserScenarii.createFridgeScenario());
 			
 			//TV State Model
 			modelURI = TVStateModel.URI;
@@ -502,13 +516,27 @@ public class TestArchitecture{
 								2 * SimulationMain.getPlotterHeight(),
 							SimulationMain.getPlotterWidth(),
 							SimulationMain.getPlotterHeight()));
-						
-			modelURI = FridgeV2Model.URI;
-			simParams.put(modelURI + ":" + FridgeV2Model.FRIDGECONS_PLOTTING_PARAM_NAME,
+			
+			//Fridge Model
+			modelURI = FridgeState.URI;
+			simParams.put(modelURI + ":" + FridgeState.FRIDGE_TEMP_PLOTTING_PARAM_NAME,
+					new PlotterDescription(
+							"Fridge - Temperature",
+							"Time (sec)",
+							"Consumption (watt)",
+							SimulationMain.ORIGIN_X +
+						  		SimulationMain.getPlotterWidth(),
+							SimulationMain.ORIGIN_Y +
+								2 * SimulationMain.getPlotterHeight(),
+							SimulationMain.getPlotterWidth(),
+							SimulationMain.getPlotterHeight()));
+			
+			modelURI = FridgeConsumption.URI;
+			simParams.put(modelURI + ":" + FridgeConsumption.FRIDGE_CONS_PLOTTING_PARAM_NAME,
 					new PlotterDescription(
 							"Fridge - Consumption",
 							"Time (sec)",
-							"Consumption (watt)",
+							"Consumption (kWh)",
 							SimulationMain.ORIGIN_X +
 						  		SimulationMain.getPlotterWidth(),
 							SimulationMain.ORIGIN_Y +
@@ -552,10 +580,6 @@ public class TestArchitecture{
 			simParams.put(modelURI + ":" + TicModel.DELAY_PARAMETER_NAME,
 						  new Duration(15.0, TimeUnit.SECONDS)) ;
 			
-			modelURI = TicModel.URI  + "-3" ;
-			simParams.put(modelURI + ":" + TicModel.DELAY_PARAMETER_NAME,
-						  new Duration(20.0, TimeUnit.SECONDS)) ;
-			
 			
 
 			se.setSimulationRunParameters(simParams) ;
@@ -576,20 +600,8 @@ public class TestArchitecture{
 		
 	}
 	
-	public static Set<ES_EventI> createUserScenario(){
-		Set<ES_EventI> events = new HashSet<ES_EventI>();
-		Time t = new Time(7.0, TimeUnit.SECONDS);
-		events.add(new OpenDoor(t));
-		events.add(new CloseDoor(t.add(new Duration(100, TimeUnit.SECONDS))));
-		events.add(new TVSwitch(new Time(1.0, TimeUnit.SECONDS)));
-		events.add(new TVSwitch(new Time(1000.0, TimeUnit.SECONDS)));
-		t = new Time(3000.0, TimeUnit.SECONDS);
-		events.add(new OpenDoor(t));
-		events.add(new CloseDoor(t.add(new Duration(500.0, TimeUnit.SECONDS))));
-		events.add(new TVSwitch(new Time(2000.0, TimeUnit.SECONDS)));
-		events.add(new TVSwitch(new Time(4500.0, TimeUnit.SECONDS)));
-		events.add(new OvenSwitchEvent(new Time(5000.0, TimeUnit.SECONDS)));
-		return events;
-	}
+	
+	
+	
 
 }

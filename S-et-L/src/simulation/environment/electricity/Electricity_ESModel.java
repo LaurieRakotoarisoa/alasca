@@ -53,14 +53,14 @@ extends AtomicES_Model{
 		super.initialiseState(initialTime) ;
 
 		// Schedule the first TicEvent.
-		Time occurrence = initialTime.add(new Duration(4000, this.getSimulatedTimeUnit())) ;
+		Time occurrence = initialTime.add(new Duration(3000, this.getSimulatedTimeUnit())) ;
 		Set<ES_EventI> events = new HashSet<ES_EventI>();
 		events.add(new SheddingEvent(occurrence));
-		events.add(new RestoreElecEvent(occurrence.add(new Duration(500, getSimulatedTimeUnit()))));
+		events.add(new RestoreElecEvent(occurrence.add(new Duration(2000, getSimulatedTimeUnit()))));
 		
-		occurrence = new Time(6000, this.getSimulatedTimeUnit());
-		events.add(new SheddingEvent(occurrence));
-		events.add(new RestoreElecEvent(occurrence.add(new Duration(8000, getSimulatedTimeUnit()))));
+//		occurrence = new Time(6000, this.getSimulatedTimeUnit());
+//		events.add(new SheddingEvent(occurrence));
+//		events.add(new RestoreElecEvent(occurrence.add(new Duration(1000, getSimulatedTimeUnit()))));
 		this.scheduleEvents(events) ;
 		// re-initialisation of the time of occurrence of the next event
 		// required here after adding a new event in the schedule.

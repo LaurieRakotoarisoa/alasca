@@ -230,7 +230,16 @@ extends AtomicHIOA{
 	@Override
 	public SimulationReportI	getFinalReport() throws Exception
 	{
-		return new TVConsumptionModelReport(this.getURI(),consumptions);
+		final String uri = this.uri ;
+		return new SimulationReportI() {
+					private static final long serialVersionUID = 1L;
+					@Override
+					public String getModelURI() {
+						return uri ;
+					}				
+				};
+				
+		//return new TVConsumptionModelReport(this.getURI(),consumptions);
 	}
 
 }
