@@ -1,5 +1,6 @@
 package simulation.oven.models;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
@@ -133,8 +134,8 @@ extends AtomicHIOA{
 	}
 	
 	@Override
-	public Vector<EventI> output() {
-		Vector<EventI> ret = new Vector<EventI>();
+	public ArrayList<EventI> output() {
+		ArrayList<EventI> ret = new ArrayList<EventI>();
 		if(updateConsumption) {
 			
 			//update current consumption
@@ -202,7 +203,7 @@ extends AtomicHIOA{
 	{
 		super.userDefinedExternalTransition(elapsedTime) ;
 
-		Vector<EventI> current = this.getStoredEventAndReset() ;
+		ArrayList<EventI> current = this.getStoredEventAndReset() ;
 		boolean	ticReceived = false ;
 		for (int i = 0 ; !ticReceived && i < current.size() ; i++) {
 			if (current.get(i) instanceof TicEvent) {

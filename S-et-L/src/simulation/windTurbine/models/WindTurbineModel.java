@@ -1,5 +1,6 @@
 package simulation.windTurbine.models;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
@@ -102,7 +103,7 @@ extends AtomicHIOA{
 	public void			userDefinedExternalTransition(Duration elapsedTime)
 	{
 		super.userDefinedExternalTransition(elapsedTime) ;
-		Vector<EventI> current = this.getStoredEventAndReset();
+		ArrayList<EventI> current = this.getStoredEventAndReset();
 		assert current != null & current.size() == 1;
 		EventI e = current.get(0);
 		
@@ -118,7 +119,7 @@ extends AtomicHIOA{
 	}
 
 	@Override
-	public Vector<EventI> output() {
+	public ArrayList<EventI> output() {
 		return null;
 	}
 

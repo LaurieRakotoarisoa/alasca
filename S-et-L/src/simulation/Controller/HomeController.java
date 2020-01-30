@@ -1,6 +1,8 @@
 package simulation.Controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
@@ -60,8 +62,8 @@ extends AtomicHIOA{
 	// Simulation methods and protocol
 	// -------------------------------------------------------------------------
 	@Override
-	public Vector<EventI> output() {
-		Vector<EventI> ret = new Vector<EventI>();
+	public ArrayList<EventI> output() {
+		ArrayList<EventI> ret = new ArrayList<EventI>();
 		if(restoreCons) {
 			Time t = this.getCurrentStateTime().add(this.getNextTimeAdvance());
 			NoEconomyEvent e = new NoEconomyEvent(t);
@@ -95,7 +97,7 @@ extends AtomicHIOA{
 	{
 		super.userDefinedExternalTransition(elapsedTime) ;
 
-		Vector<EventI> current = this.getStoredEventAndReset() ;
+		ArrayList<EventI> current = this.getStoredEventAndReset() ;
 		assert current != null & current.size() == 1;
 		EventI e = current.get(0);
 		

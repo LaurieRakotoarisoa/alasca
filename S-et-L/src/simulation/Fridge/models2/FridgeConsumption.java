@@ -1,5 +1,6 @@
 package simulation.Fridge.models2;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
@@ -95,9 +96,9 @@ extends AtomicHIOA{
 	}
 	
 	@Override
-	public Vector<EventI> output() {
+	public ArrayList<EventI> output() {
 		if(this.triggerUpdate) {
-			Vector<EventI> ret = new Vector<EventI>();
+			ArrayList<EventI> ret = new ArrayList<EventI>();
 			Time t = this.getCurrentStateTime().add(getNextTimeAdvance());
 			ret.add(new FridgeConsumptionEvent(t, consumption));
 			this.triggerUpdate = false;
@@ -119,7 +120,7 @@ extends AtomicHIOA{
 	public void			userDefinedExternalTransition(Duration elapsedTime)
 	{
 		super.userDefinedExternalTransition(elapsedTime) ;
-		Vector<EventI> current = this.getStoredEventAndReset();
+		ArrayList<EventI> current = this.getStoredEventAndReset();
 		assert current != null & current.size() == 1;
 		EventI e = current.get(0);
 		
