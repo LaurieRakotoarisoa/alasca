@@ -74,7 +74,6 @@ extends AtomicHIOA{
 		consumptions = new Vector<TVConsumptionEvent>();
 		this.updateConsumption = false;
 		this.rgConsumption = new RandomDataGenerator();
-		this.lastConsumption = 0.0;
 	}
 	
 	// -------------------------------------------------------------------------
@@ -89,10 +88,6 @@ extends AtomicHIOA{
 	
 	/** true when tv consumption must be updated */
 	protected boolean updateConsumption;
-	
-	protected double lastConsumption;
-	
-	protected double lastTimeEmitCons;
 	
 	/** random generator for consumption depending on rate backlight parameter */
 	protected final RandomDataGenerator rgConsumption;
@@ -151,10 +146,6 @@ extends AtomicHIOA{
 						newConsumption) ;
 			}
 			
-			//Memorise last consumption
-			this.lastConsumption = newConsumption;
-			this.lastTimeEmitCons = this.getCurrentStateTime().getSimulatedTime();
-			
 			
 			Time t = this.getCurrentStateTime().add(this.getNextTimeAdvance()) ;
 			TVConsumptionEvent e = new TVConsumptionEvent(t, newConsumption);
@@ -183,7 +174,6 @@ extends AtomicHIOA{
 	public void			initialiseState(Time initialTime)
 	{
 		this.rgConsumption.reSeed();
-		this.lastTimeEmitCons = initialTime.getSimulatedTime();
 		this.consumptions.clear();
 		if (this.consPlotter != null) {
 			this.consPlotter.initialise() ;

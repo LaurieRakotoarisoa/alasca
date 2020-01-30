@@ -54,10 +54,15 @@ import simulation.environment.UserScenarii;
 import simulation.environment.electricity.Electricity_ESModel;
 import simulation.environment.electricity.events.RestoreElecEvent;
 import simulation.environment.electricity.events.SheddingEvent;
+import simulation.environment.wind.events.ModerateWindEvent;
+import simulation.environment.wind.events.WaftEvent;
+import simulation.environment.wind.events.WindGustsEvent;
+import simulation.environment.wind.models.WindModel;
 import simulation.oven.events.OvenSwitchEvent;
 import simulation.oven.models.OvenConsumptionModel;
 import simulation.oven.models.OvenModel;
 import simulation.oven.models.OvenStateModel;
+import simulation.windTurbine.models.WindTurbineModel;
 public class TestArchitecture{
 
 	public static void main(String[] args) {
@@ -346,6 +351,23 @@ public class TestArchitecture{
 							Electricity_ESModel.URI,
 							TimeUnit.SECONDS,null,SimulationEngineCreationMode.ATOMIC_ENGINE));
 			
+
+			// ----------------------------------------------------------------
+			// Wind Turbine model
+			// ----------------------------------------------------------------
+			atomicModelDescriptors.put(WindTurbineModel.URI,
+					AtomicModelDescriptor.create(WindTurbineModel.class,
+							WindTurbineModel.URI,
+							TimeUnit.SECONDS,null,SimulationEngineCreationMode.ATOMIC_ENGINE));
+			
+			// ----------------------------------------------------------------
+			// Wind model
+			// ----------------------------------------------------------------
+			atomicModelDescriptors.put(WindModel.URI,
+					AtomicModelDescriptor.create(WindModel.class,
+							WindModel.URI,
+							TimeUnit.SECONDS,null,SimulationEngineCreationMode.ATOMIC_ENGINE));
+			
 			// ----------------------------------------------------------------
 			// User model
 			// ----------------------------------------------------------------
@@ -373,6 +395,8 @@ public class TestArchitecture{
 			submodels3.add(UserModel.URI);
 			submodels3.add(OvenModel.URI);
 			submodels3.add(CounterModel.URI);
+			submodels3.add(WindTurbineModel.URI);
+			submodels3.add(WindModel.URI);
 			
 			Map<EventSource,EventSink[]> connections3 =
 					new HashMap<EventSource,EventSink[]>() ;
@@ -492,6 +516,36 @@ public class TestArchitecture{
 			
 			connections3.put(from310, to310) ;
 			
+			EventSource from311 =
+					new EventSource(WindModel.URI,
+									WaftEvent.class) ;
+			EventSink[] to311 =
+					new EventSink[] {
+						new EventSink(WindTurbineModel.URI,
+									  WaftEvent.class)} ;
+			
+			connections3.put(from311, to311) ;
+			
+			EventSource from312 =
+					new EventSource(WindModel.URI,
+									ModerateWindEvent.class) ;
+			EventSink[] to312 =
+					new EventSink[] {
+						new EventSink(WindTurbineModel.URI,
+									  ModerateWindEvent.class)} ;
+			
+			connections3.put(from312, to312) ;
+			
+			EventSource from313 =
+					new EventSource(WindModel.URI,
+									WindGustsEvent.class) ;
+			EventSink[] to313 =
+					new EventSink[] {
+						new EventSink(WindTurbineModel.URI,
+									  WindGustsEvent.class)} ;
+			
+			connections3.put(from313, to313) ;
+			
 			
 			
 			coupledModelDescriptors.put(
@@ -540,10 +594,8 @@ public class TestArchitecture{
 							"TV Model - State",
 							"Time (sec)",
 							"State",
-							SimulationMain.ORIGIN_X +
-						  		SimulationMain.getPlotterWidth(),
-							SimulationMain.ORIGIN_Y +
-								2 * SimulationMain.getPlotterHeight(),
+							SimulationMain.ORIGIN_X,
+							SimulationMain.ORIGIN_Y,
 							SimulationMain.getPlotterWidth(),
 							SimulationMain.getPlotterHeight()));
 			
@@ -554,10 +606,9 @@ public class TestArchitecture{
 							"TV Model - Consumption",
 							"Time (sec)",
 							"Consumption",
-							SimulationMain.ORIGIN_X +
-						  		SimulationMain.getPlotterWidth(),
+							SimulationMain.ORIGIN_X,
 							SimulationMain.ORIGIN_Y +
-								2 * SimulationMain.getPlotterHeight(),
+								SimulationMain.getPlotterHeight(),
 							SimulationMain.getPlotterWidth(),
 							SimulationMain.getPlotterHeight()));
 			
@@ -570,8 +621,7 @@ public class TestArchitecture{
 							"Consumption (watt)",
 							SimulationMain.ORIGIN_X +
 						  		SimulationMain.getPlotterWidth(),
-							SimulationMain.ORIGIN_Y +
-								2 * SimulationMain.getPlotterHeight(),
+							SimulationMain.ORIGIN_Y,
 							SimulationMain.getPlotterWidth(),
 							SimulationMain.getPlotterHeight()));
 			
@@ -584,7 +634,7 @@ public class TestArchitecture{
 							SimulationMain.ORIGIN_X +
 						  		SimulationMain.getPlotterWidth(),
 							SimulationMain.ORIGIN_Y +
-								2 * SimulationMain.getPlotterHeight(),
+								SimulationMain.getPlotterHeight(),
 							SimulationMain.getPlotterWidth(),
 							SimulationMain.getPlotterHeight()));
 			
@@ -596,9 +646,8 @@ public class TestArchitecture{
 							"Time (sec)",
 							"Consumption (Watt)",
 							SimulationMain.ORIGIN_X +
-						  		SimulationMain.getPlotterWidth(),
-							SimulationMain.ORIGIN_Y +
-								2 * SimulationMain.getPlotterHeight(),
+						  		2*SimulationMain.getPlotterWidth(),
+							SimulationMain.ORIGIN_Y,
 							SimulationMain.getPlotterWidth(),
 							SimulationMain.getPlotterHeight()));
 			
@@ -610,9 +659,9 @@ public class TestArchitecture{
 							"Time (sec)",
 							"Consumption (Watt)",
 							SimulationMain.ORIGIN_X +
-						  		SimulationMain.getPlotterWidth(),
+						  		2*SimulationMain.getPlotterWidth(),
 							SimulationMain.ORIGIN_Y +
-								2 * SimulationMain.getPlotterHeight(),
+								SimulationMain.getPlotterHeight(),
 							SimulationMain.getPlotterWidth(),
 							SimulationMain.getPlotterHeight()));
 			
@@ -624,7 +673,7 @@ public class TestArchitecture{
 
 			modelURI = TicModel.URI  + "-2" ;
 			simParams.put(modelURI + ":" + TicModel.DELAY_PARAMETER_NAME,
-						  new Duration(15.0, TimeUnit.SECONDS)) ;
+						  new Duration(45.0, TimeUnit.SECONDS)) ;
 			
 			//Counter model
 			modelURI = CounterModel.URI;
@@ -637,6 +686,20 @@ public class TestArchitecture{
 						  		SimulationMain.getPlotterWidth(),
 							SimulationMain.ORIGIN_Y +
 								2 * SimulationMain.getPlotterHeight(),
+							SimulationMain.getPlotterWidth(),
+							SimulationMain.getPlotterHeight()));
+			
+			//Wind Turbine model
+			modelURI = WindTurbineModel.URI;
+			simParams.put(modelURI+":"+WindTurbineModel.TURBINE_ENERGY_PLOTTING_PARAM_NAME,
+					new PlotterDescription(
+							"Wind Turbine Model - Wind Energy",
+							"Time (sec)",
+							"Production (Watt)",
+							SimulationMain.ORIGIN_X +
+						  		SimulationMain.getPlotterWidth(),
+							SimulationMain.ORIGIN_Y +
+								3 * SimulationMain.getPlotterHeight(),
 							SimulationMain.getPlotterWidth(),
 							SimulationMain.getPlotterHeight()));
 			

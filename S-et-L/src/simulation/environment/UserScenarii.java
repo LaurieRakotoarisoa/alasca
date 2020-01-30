@@ -26,6 +26,7 @@ public class UserScenarii {
 		events.add(new CloseDoor(t.add(new Duration(2000.0, TimeUnit.SECONDS))));
 		events.add(new TVSwitch(new Time(2000.0, TimeUnit.SECONDS)));
 		events.add(new TVSwitch(new Time(4500.0, TimeUnit.SECONDS)));
+		events.add(new OvenSwitchEvent(new Time(4501.0, TimeUnit.SECONDS)));
 		events.add(new OpenDoor(new Time(6000.0, TimeUnit.SECONDS)));
 		return events;
 	}
