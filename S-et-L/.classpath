@@ -10,6 +10,7 @@
 	<classpathentry kind="lib" path="libs/jfreechart-1.6.0-snapshot.jar"/>
 	<classpathentry kind="lib" path="libs/BCM-03122019.jar"/>
 	<classpathentry kind="lib" path="libs/Simulation-23012020.jar"/>
+	<classpathentry kind="lib" path="libs/BCM-CyPhy-Components-26112019.jar"/>
 	<classpathentry kind="lib" path="libs/BCM-CyPhy-Components-23012020.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

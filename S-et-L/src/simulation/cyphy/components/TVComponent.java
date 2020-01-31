@@ -3,7 +3,7 @@ package simulation.cyphy.components;
 import fr.sorbonne_u.components.cyphy.AbstractCyPhyComponent;
 import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentStateAccessI;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
-import simulation.TV.models.TVModel;
+import simulation.TV.models.TVMILCoupledModel;
 
 public class TVComponent 
 extends AbstractCyPhyComponent
@@ -22,7 +22,7 @@ implements EmbeddingComponentStateAccessI{
 
 	@Override
 	protected Architecture createLocalArchitecture(String architectureURI) throws Exception {
-		return TVModel.build();
+		return TVMILCoupledModel.build();
 	}
 
 }

@@ -1,5 +1,6 @@
 package simulation.oven.models;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
@@ -74,8 +75,8 @@ extends AtomicModel{
 	}
 
 	@Override
-	public Vector<EventI> output() {
-		Vector<EventI> ret = new Vector<EventI>() ;
+	public ArrayList<EventI> output() {
+		ArrayList<EventI> ret = new ArrayList<EventI>() ;
 		// compute the current simulation time because it has not been
 		// updated yet.
 		Time t = this.getCurrentStateTime().add(this.getNextTimeAdvance()) ;

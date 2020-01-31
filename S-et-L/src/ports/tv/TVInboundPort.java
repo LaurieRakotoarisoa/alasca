@@ -59,7 +59,7 @@ implements TVI{
 	}
 
 	@Override
-	public int getCons() throws Exception {
+	public double getCons() throws Exception {
 		return this.getOwner().handleRequestSync(owner -> ((TV)owner).getCons());
 	}
 

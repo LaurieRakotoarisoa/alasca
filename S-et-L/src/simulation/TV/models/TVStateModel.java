@@ -5,9 +5,9 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
-
+import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentStateAccessI;
 import fr.sorbonne_u.devs_simulation.hioa.annotations.ExportedVariable;
-import fr.sorbonne_u.devs_simulation.hioa.models.AtomicHIOAwithEquations;
+import fr.sorbonne_u.devs_simulation.hioa.models.AtomicHIOA;
 import fr.sorbonne_u.devs_simulation.hioa.models.vars.Value;
 import fr.sorbonne_u.devs_simulation.interfaces.SimulationReportI;
 import fr.sorbonne_u.devs_simulation.models.annotations.ModelExternalEvents;
@@ -33,7 +33,7 @@ import utils.TVMode;
 
 @ModelExternalEvents(imported = {TVSwitch.class, EconomyEvent.class, NoEconomyEvent.class})
 public class TVStateModel 
-extends AtomicHIOAwithEquations{
+extends AtomicHIOA{
 	
 	// -------------------------------------------------------------------------
 	// Inner classes
@@ -79,11 +79,24 @@ extends AtomicHIOAwithEquations{
 
 	public TVStateModel(String uri, TimeUnit simulatedTimeUnit, SimulatorI simulationEngine) throws Exception {
 		super(uri, simulatedTimeUnit, simulationEngine);
-		this.setLogger(new StandardLogger()) ;
-		this.setDebugLevel(1);
+		this.setDebugLevel(2);
 		states = new Vector<TvStateEvent>();
 		assert this.tvBack != null;
 		this.staticInitialiseVariables();
+		PlotterDescription pd =
+				new PlotterDescription(
+						"TV State Model",
+						"Time (sec)",
+						"Intensity (Amp)",
+						100,
+						0,
+						600,
+						400) ;
+		this.statePlotter = new XYPlotter(pd) ;
+		this.statePlotter.createSeries(SERIES) ;
+
+		// create a standard logger (logging on the terminal)
+		this.setLogger(new StandardLogger()) ;
 	}
 
 	// -------------------------------------------------------------------------
@@ -100,7 +113,7 @@ extends AtomicHIOAwithEquations{
 	/** current state of the TV (On, Off) */
 	protected TVMode currentState;
 	
-	private static final String	SERIES1 = "TV state" ;
+	private static final String	SERIES = "TV state" ;
 	
 	public static final String TVSTATE_PLOTTING_PARAM_NAME = "tv-state-plot";
 	
@@ -118,6 +131,10 @@ extends AtomicHIOAwithEquations{
 	
 	/** true if controller have actived energy economy */
 	protected boolean modeEco;
+	
+	/** reference on the object representing the component that holds the
+	 *  model; enables the model to access the state of this component.		*/
+	protected EmbeddingComponentStateAccessI componentRef ;
 	
 	// -------------------------------------------------------------------------
 	// HIOA model variables
@@ -152,13 +169,9 @@ extends AtomicHIOAwithEquations{
 		) throws Exception
 	{
 		
-		String vname = this.getURI() + ":" +
-				TVSTATE_PLOTTING_PARAM_NAME ;
-		if(simParams.get(vname) != null) {
-			PlotterDescription pd = (PlotterDescription) simParams.get(vname) ;
-			this.statePlotter = new XYPlotter(pd) ;
-			this.statePlotter.createSeries(SERIES1) ;
-		}
+		// The reference to the embedding component
+		this.componentRef =
+			(EmbeddingComponentStateAccessI) simParams.get(TVStateModel.URI+":componentRef") ;
 	
 	}
 	
@@ -168,18 +181,23 @@ extends AtomicHIOAwithEquations{
 		this.currentState = TVMode.Off;
 		this.modeEco = false;
 		this.last_value_backlight = DEFAULT_TV_BACKLIGHT;
-		if (this.statePlotter != null) {
-			this.statePlotter.initialise() ;
-			this.statePlotter.showPlotter() ;
+		
+		this.statePlotter.initialise() ;
+		this.statePlotter.showPlotter() ;
+		
+		try {
+			// set the debug level triggering the production of log messages.
+			this.setDebugLevel(1) ;
+		} catch (Exception e) {
+			throw new RuntimeException(e) ;
 		}
 		
 		super.initialiseState(initialTime);
-		if (this.statePlotter != null) {
-			this.statePlotter.addData(
-				SERIES1,
+		
+		this.statePlotter.addData(
+				SERIES,
 				initialTime.getSimulatedTime(),
 				state2int(this.currentState)) ;
-		}
 		
 		
 	}
@@ -214,7 +232,9 @@ extends AtomicHIOAwithEquations{
 		}
 		else if(e instanceof NoEconomyEvent) {
 			if(modeEco) deactivateEnergyEco();
-		}			
+		}
+		
+		e.executeOn(this);
 		
 	}
 	
@@ -252,16 +272,14 @@ extends AtomicHIOAwithEquations{
 		
 		tvBack.time = this.getCurrentStateTime();
 		
-		if (this.statePlotter != null && oldState != this.currentState) {
-			this.statePlotter.addData(
-					SERIES1,
-					currentTime,
-					state2int(oldState)) ;
-			this.statePlotter.addData(
-					SERIES1,
-					currentTime,
-					state2int(this.currentState)) ;
-		}
+		this.statePlotter.addData(
+				SERIES,
+				currentTime,
+				state2int(oldState)) ;
+		this.statePlotter.addData(
+				SERIES,
+				currentTime,
+				state2int(this.currentState)) ;
 		
 	}
 	
@@ -286,6 +304,10 @@ extends AtomicHIOAwithEquations{
 			this.last_value_backlight = DEFAULT_TV_BACKLIGHT;
 		}
 		
+	}
+	
+	public double getBacklight() {
+		return this.tvBack.v;
 	}
 	
 	

@@ -19,6 +19,7 @@ import fr.sorbonne_u.devs_simulation.models.time.Duration;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 import fr.sorbonne_u.devs_simulation.utils.AbstractSimulationReport;
+import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
 import fr.sorbonne_u.utils.PlotterDescription;
 import fr.sorbonne_u.utils.XYPlotter;
 import simulation.TV.events.TVConsumptionEvent;
@@ -75,6 +76,20 @@ extends AtomicHIOA{
 		consumptions = new Vector<TVConsumptionEvent>();
 		this.updateConsumption = false;
 		this.rgConsumption = new RandomDataGenerator();
+		this.consumption = 0;
+		PlotterDescription pd =
+				new PlotterDescription(
+						"TV consumption",
+						"Time (sec)",
+						"Consumption (Watt)",
+						100,
+						0,
+						600,
+						400) ;
+		this.consPlotter = new XYPlotter(pd) ;
+		this.consPlotter.createSeries(SERIES) ;
+		
+		this.setLogger(new StandardLogger()) ;
 	}
 	
 	// -------------------------------------------------------------------------
@@ -101,10 +116,12 @@ extends AtomicHIOA{
 	
 	public static final String TVCONS_PLOTTING_PARAM_NAME = "tv-cons-plot";
 	
-	private static final String	SERIES1 = "TV consumption" ;
+	private static final String	SERIES = "TV consumption" ;
 	
 	/** Frame used to plot the consumption during the simulation.			*/
 	protected XYPlotter			consPlotter ;
+	
+	private double consumption;
 	
 	// -------------------------------------------------------------------------
 	// HIOA Model Variables
@@ -127,7 +144,7 @@ extends AtomicHIOA{
 				TVCONS_PLOTTING_PARAM_NAME ;
 	PlotterDescription pd = (PlotterDescription) simParams.get(vname) ;
 	this.consPlotter = new XYPlotter(pd) ;
-	this.consPlotter.createSeries(SERIES1) ;
+	this.consPlotter.createSeries(SERIES) ;
 	
 	}
 
@@ -136,20 +153,9 @@ extends AtomicHIOA{
 		ArrayList<EventI> ret = new ArrayList<EventI>();
 		if(updateConsumption) {
 			
-			//update current consumption
-			double newConsumption = generateConsumption();
-			
-			// Plotting
-			if (this.consPlotter != null) {
-				this.consPlotter.addData(
-						SERIES1,
-						this.getCurrentStateTime().getSimulatedTime(),
-						newConsumption) ;
-			}
-			
 			
 			Time t = this.getCurrentStateTime().add(this.getNextTimeAdvance()) ;
-			TVConsumptionEvent e = new TVConsumptionEvent(t, newConsumption);
+			TVConsumptionEvent e = new TVConsumptionEvent(t, consumption);
 			ret.add(e);
 			consumptions.add(e);
 			updateConsumption = false;
@@ -176,10 +182,21 @@ extends AtomicHIOA{
 	{
 		this.rgConsumption.reSeed();
 		this.consumptions.clear();
-		if (this.consPlotter != null) {
-			this.consPlotter.initialise() ;
-			this.consPlotter.showPlotter() ;
+		this.consPlotter.initialise() ;
+		this.consPlotter.showPlotter() ;
+		
+		try {
+			// set the debug level triggering the production of log messages.
+			this.setDebugLevel(1) ;
+		} catch (Exception e) {
+			throw new RuntimeException(e) ;
 		}
+		
+		// first data in the plotter to start the plot.
+		this.consPlotter.addData(
+				SERIES,
+				initialTime.getSimulatedTime(),
+				this.getCons());
 		
 		super.initialiseState(initialTime);
 	}
@@ -200,6 +217,11 @@ extends AtomicHIOA{
 			}
 		}
 		if (ticReceived) {
+			this.consumption = generateConsumption();
+			this.consPlotter.addData(
+					SERIES,
+					this.getCurrentStateTime().getSimulatedTime(),
+					this.getCons());
 			this.updateConsumption = true;
 		}
 	}
@@ -213,6 +235,10 @@ extends AtomicHIOA{
 		assert rateConsumption > MIN_RATE_BL && rateConsumption < MAX_RATE_BL;
 		double newConsumption = this.tvBack.v * rateConsumption; 
 		return newConsumption;
+	}
+	
+	public double getCons() {
+		return consumption;
 	}
 	
 	/**

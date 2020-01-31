@@ -10,10 +10,7 @@ import java.util.concurrent.TimeUnit;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.devs_simulation.architectures.ArchitectureI;
 import fr.sorbonne_u.devs_simulation.architectures.SimulationEngineCreationMode;
-import fr.sorbonne_u.devs_simulation.es.events.ES_EventI;
 import fr.sorbonne_u.devs_simulation.examples.molene.SimulationMain;
-import fr.sorbonne_u.devs_simulation.examples.molene.bsm.BatteryLevel;
-import fr.sorbonne_u.devs_simulation.examples.molene.bsm.BatterySensorModel;
 import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicEvent;
 import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicModel;
 import fr.sorbonne_u.devs_simulation.hioa.architectures.CoupledHIOA_Descriptor;
@@ -40,14 +37,13 @@ import simulation.Fridge.events.CloseDoor;
 import simulation.Fridge.events.FridgeConsumptionEvent;
 import simulation.Fridge.events.InactiveCompressor;
 import simulation.Fridge.events.OpenDoor;
-import simulation.Fridge.models.FridgeModel;
-import simulation.Fridge.models.FridgeV2Model;
 import simulation.Fridge.models2.FridgeConsumption;
+import simulation.Fridge.models2.FridgeCoupledModel;
 import simulation.Fridge.models2.FridgeState;
 import simulation.TV.events.TVConsumptionEvent;
 import simulation.TV.events.TVSwitch;
 import simulation.TV.models.TVConsumption;
-import simulation.TV.models.TVModel;
+import simulation.TV.models.TVMILCoupledModel;
 import simulation.TV.models.TVStateModel;
 import simulation.environment.UserModel;
 import simulation.environment.UserScenarii;
@@ -153,10 +149,10 @@ public class TestArchitecture{
 					new HashMap<>() ;
 			
 			coupledModelDescriptors.put(
-					TVModel.URI,
+					TVMILCoupledModel.URI,
 					new CoupledHIOA_Descriptor(
-							TVModel.class,
-							TVModel.URI,
+							TVMILCoupledModel.class,
+							TVMILCoupledModel.URI,
 							submodels1,
 							imported1,
 							reexported1,
@@ -236,10 +232,10 @@ public class TestArchitecture{
 			connections4.put(from42, to42) ;
 			
 			coupledModelDescriptors.put(
-					FridgeModel.URI,
+					FridgeCoupledModel.URI,
 					new CoupledModelDescriptor(
-							FridgeModel.class,
-							FridgeModel.URI,
+							FridgeCoupledModel.class,
+							FridgeCoupledModel.URI,
 							submodels4,
 							imported4,
 							reexported4,
@@ -388,8 +384,8 @@ public class TestArchitecture{
 			// Full architecture and Global model
 			// ----------------------------------------------------------------
 			Set<String> submodels3 = new HashSet<String>() ;
-			submodels3.add(TVModel.URI);
-			submodels3.add(FridgeModel.URI);
+			submodels3.add(TVMILCoupledModel.URI);
+			submodels3.add(FridgeCoupledModel.URI);
 			submodels3.add(Electricity_ESModel.URI);
 			submodels3.add(HomeController.URI);
 			submodels3.add(UserModel.URI);
@@ -408,13 +404,13 @@ public class TestArchitecture{
 			EventSink[] to31 =
 					new EventSink[] {
 							new EventSink(
-									TVModel.URI,
+									TVMILCoupledModel.URI,
 									EconomyEvent.class),
 							new EventSink(
 									OvenModel.URI,
 									EconomyEvent.class),
 							new EventSink(
-									FridgeModel.URI,
+									FridgeCoupledModel.URI,
 									EconomyEvent.class)} ;
 			connections3.put(from31, to31) ;
 			
@@ -425,13 +421,13 @@ public class TestArchitecture{
 			EventSink[] to32 =
 					new EventSink[] {
 							new EventSink(
-									TVModel.URI,
+									TVMILCoupledModel.URI,
 									NoEconomyEvent.class),
 							new EventSink(
 									OvenModel.URI,
 									NoEconomyEvent.class),
 							new EventSink(
-									FridgeModel.URI,
+									FridgeCoupledModel.URI,
 									NoEconomyEvent.class)} ;
 			
 			connections3.put(from32, to32) ;
@@ -466,7 +462,7 @@ public class TestArchitecture{
 			EventSink[] to35 =
 					new EventSink[] {
 							new EventSink(
-									TVModel.URI,
+									TVMILCoupledModel.URI,
 									TVSwitch.class)} ;
 			connections3.put(from35, to35) ;
 			
@@ -475,7 +471,7 @@ public class TestArchitecture{
 									OpenDoor.class) ;
 			EventSink[] to36 =
 					new EventSink[] {
-						new EventSink(FridgeModel.URI,
+						new EventSink(FridgeCoupledModel.URI,
 									  OpenDoor.class)} ;
 			connections3.put(from36, to36) ;
 			
@@ -484,7 +480,7 @@ public class TestArchitecture{
 									CloseDoor.class) ;
 			EventSink[] to37 =
 					new EventSink[] {
-						new EventSink(FridgeModel.URI,
+						new EventSink(FridgeCoupledModel.URI,
 									  CloseDoor.class)} ;
 			connections3.put(from37, to37) ;
 			
@@ -498,7 +494,7 @@ public class TestArchitecture{
 			connections3.put(from38, to38) ;
 			
 			EventSource from39 =
-					new EventSource(FridgeModel.URI,
+					new EventSource(FridgeCoupledModel.URI,
 									FridgeConsumptionEvent.class) ;
 			EventSink[] to39 =
 					new EventSink[] {
@@ -507,7 +503,7 @@ public class TestArchitecture{
 			connections3.put(from39, to39) ;
 			
 			EventSource from310 =
-					new EventSource(TVModel.URI,
+					new EventSource(TVMILCoupledModel.URI,
 									TVConsumptionEvent.class) ;
 			EventSink[] to310 =
 					new EventSink[] {

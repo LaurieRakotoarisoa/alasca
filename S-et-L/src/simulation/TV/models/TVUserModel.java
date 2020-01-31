@@ -1,21 +1,21 @@
 package simulation.TV.models;
 
+import java.util.ArrayList;
 import java.util.Map;
+import java.util.Random;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.math3.random.RandomDataGenerator;
+
 import fr.sorbonne_u.devs_simulation.es.models.AtomicES_Model;
 import fr.sorbonne_u.devs_simulation.interfaces.SimulationReportI;
-import fr.sorbonne_u.devs_simulation.models.AtomicModel;
 import fr.sorbonne_u.devs_simulation.models.annotations.ModelExternalEvents;
-import fr.sorbonne_u.devs_simulation.models.events.EventI;
 import fr.sorbonne_u.devs_simulation.models.time.Duration;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 import fr.sorbonne_u.devs_simulation.utils.AbstractSimulationReport;
 import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
-import simulation.Controller.events.EconomyEvent;
-import simulation.Controller.events.NoEconomyEvent;
 import simulation.TV.events.TVSwitch;
 
 @ModelExternalEvents(exported = {TVSwitch.class})
@@ -26,11 +26,11 @@ extends AtomicES_Model{
 	extends		AbstractSimulationReport
 	{
 		private static final long 					serialVersionUID = 1L ;
-		public final Vector<TVSwitch>	readings ;
+		public final ArrayList<TVSwitch>	readings ;
 
 		public			TVUserModelReport(
 			String modelURI,
-			Vector<TVSwitch> readings
+			ArrayList<TVSwitch> readings
 			)
 		{
 			super(modelURI) ;
@@ -60,20 +60,23 @@ extends AtomicES_Model{
 	private Vector<Time> eventsTime;
 	
 	/** events sent	 */
-	private Vector<TVSwitch> sent;
+	private ArrayList<TVSwitch> sent;
 	
 	private static final long serialVersionUID = 1L;
 	
 	public static final String URI = "TV-USER";
 	
 	public static final String USER_EVENTS = "switch-event";
+	
+	private RandomDataGenerator rg;
 
 	public TVUserModel(String uri, TimeUnit simulatedTimeUnit, SimulatorI simulationEngine) throws Exception {
 		super(uri, simulatedTimeUnit, simulationEngine);
 		this.setLogger(new StandardLogger()) ;
 		this.toggleDebugMode() ;
 		
-		sent = new Vector<TVSwitch>();
+		sent = new ArrayList<TVSwitch>();
+		rg = new RandomDataGenerator();
 		
 	}
 	
@@ -82,10 +85,12 @@ extends AtomicES_Model{
 	 */
 	@Override
 	public void			initialiseState(Time initialTime) {
+		
+		rg.reSeed();
 		super.initialiseState(initialTime) ;
 
 		// Schedule the first Economy Event
-		Time occurrence = eventsTime.remove(0);
+		Time occurrence = initialTime.add(new Duration(rg.nextUniform(30, 500, false),TimeUnit.SECONDS));
 		this.scheduleEvent(new TVSwitch(occurrence)) ;
 		// re-initialisation of the time of occurrence of the next event
 		// required here after adding a new event in the schedule.
@@ -106,28 +111,18 @@ extends AtomicES_Model{
 		// called when an event that must be exported occurs, hence it is
 		// called here when the previous economy event has been sent so we must
 		// schedule the next one.
-		if(!eventsTime.isEmpty()) {
-			this.logMessage(this.getCurrentStateTime() + "|TV Switch sent.") ;
-			// Schedule the next TicEvent after the prescribed delay
-			Time occurrence = this.getCurrentStateTime().add(new Duration(eventsTime.remove(0).getSimulatedTime(), this.getSimulatedTimeUnit()));
-			this.scheduleEvent(new TVSwitch(occurrence)) ;
-		}
+		this.logMessage(this.getCurrentStateTime() + "|TV Switch sent.") ;
+		// Schedule the next TicEvent after the prescribed delay
+		this.scheduleEvent(newTVSwitchEvent(getCurrentStateTime()));
 
 		
 	}
 	
-	/**
-	 * @see fr.sorbonne_u.devs_simulation.models.Model#setSimulationRunParameters(java.util.Map)
-	 */
-	@SuppressWarnings("unchecked")
-	@Override
-	public void			setSimulationRunParameters(
-		Map<String, Object> simParams
-		) throws Exception
-	{
-		String vname = this.getURI() + ":" + USER_EVENTS ;
-		this.eventsTime = (Vector<Time>) simParams.get(vname);
+	public TVSwitch newTVSwitchEvent(Time current) {
+		Time newTime = current.add(new Duration(rg.nextUniform(200, 1000), TimeUnit.SECONDS));
+		return new TVSwitch(newTime);
 	}
+	
 	
 	/**
 	 * @see fr.sorbonne_u.devs_simulation.models.Model#getFinalReport()

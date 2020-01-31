@@ -53,7 +53,7 @@ public class TV extends AbstractComponent{
 	 * (On, off)
 	 * @return {@link Integer}
 	 */
-	public int getCons() {
+	public double getCons() {
 		return cons;
 	}
 	
