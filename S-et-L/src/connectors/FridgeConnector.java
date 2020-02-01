@@ -25,14 +25,26 @@ implements FridgeI{
 	}
 
 	@Override
-	public void setTemperature(int temperature) throws Exception {
+	public void setTemperature(double temperature) throws Exception {
 		((FridgeI)this.offering).setTemperature(temperature);
 		
 	}
 
 	@Override
-	public int getCons() throws Exception {
+	public double getCons() throws Exception {
 		return ((FridgeI)this.offering).getCons();
+	}
+
+	@Override
+	public void activateEcoMode() throws Exception {
+		((FridgeI)this.offering).activateEcoMode();
+		
+	}
+
+	@Override
+	public void deactivateEcoMode() throws Exception {
+		((FridgeI)this.offering).deactivateEcoMode();
+		
 	}
 
 }

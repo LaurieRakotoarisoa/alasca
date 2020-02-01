@@ -26,7 +26,7 @@ public interface FridgeI extends OfferedI, RequiredI{
 	 * @return  a state from {@link TVMode} enum
 	 * @throws Exception
 	 */
-	public int getCons() throws Exception;
+	public double getCons() throws Exception;
 	
 	/**
 	 * Turn off the Fridge
@@ -44,6 +44,19 @@ public interface FridgeI extends OfferedI, RequiredI{
 	 * set the temperature of the Fridge
 	 * @throws Exception
 	 */
-	public void setTemperature(int temperature) throws Exception; 
+	public void setTemperature(double temperature) throws Exception;
+	
+	/**
+	 * activate economy mode for the fridge
+	 * @throws Exception
+	 */
+	public void activateEcoMode() throws Exception;
+	
+	/**
+	 * deactivate economy mode for the fridge
+	 * @throws Exception
+	 */
+	public void deactivateEcoMode() throws Exception;
+	
 	
 }

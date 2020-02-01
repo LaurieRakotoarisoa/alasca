@@ -1,5 +1,6 @@
 package ports.fridge;
 
+import clean.equipments.fridge.components.FridgeComponent;
 import components.device.Fridge;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractInboundPort;
@@ -19,7 +20,7 @@ implements FridgeI{
 	
 	public FridgeInboundPort(String uri,ComponentI owner) throws Exception {
 		super(uri, FridgeI.class, owner);
-		assert owner instanceof Fridge;
+		assert owner instanceof Fridge || owner instanceof FridgeComponent;
 	}
 
 	/**
@@ -48,14 +49,26 @@ implements FridgeI{
 	}
 
 	@Override
-	public void setTemperature(int temperature) throws Exception {
+	public void setTemperature(double temperature) throws Exception {
 		this.getOwner().handleRequestSync(owner -> ((Fridge)owner).setTemperature(temperature));
 		
 	}
 
 	@Override
-	public int getCons() throws Exception {
+	public double getCons() throws Exception {
 		return this.getOwner().handleRequestSync(owner -> ((Fridge)owner).getCons());
+	}
+
+	@Override
+	public void activateEcoMode() throws Exception {
+		this.getOwner().handleRequestSync(owner -> ((Fridge)owner).setEcoMode(true));
+		
+	}
+
+	@Override
+	public void deactivateEcoMode() throws Exception {
+		this.getOwner().handleRequestSync(owner -> ((Fridge)owner).setEcoMode(false));
+		
 	}
 
 }

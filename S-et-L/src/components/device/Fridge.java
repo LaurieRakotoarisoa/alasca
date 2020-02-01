@@ -24,12 +24,17 @@ public class Fridge extends AbstractComponent{
 	/**
 	 * Current consommation
 	 */
-	protected int cons = 0;
+	protected double cons = 0;
 	/**
 	 * the temperature of the fridge
 	 * between 0 and 5
 	 */
-	protected int temperature = 3;
+	protected double temperature = 3;
+	
+	/**
+	 * true if economy mode is activated
+	 */
+	protected boolean ecoMode = false;
 	
 	/**
 	 * @param URI Component uri
@@ -59,7 +64,7 @@ public class Fridge extends AbstractComponent{
 	 * <p>Give information about the current cons of the Fridge</p>
 	 * @return {@link Integer}
 	 */
-	public int getCons() {
+	public double getCons() {
 		return cons;
 	}
 	
@@ -67,7 +72,7 @@ public class Fridge extends AbstractComponent{
 	 * <p>set the current state of the TV</p>
 	 * (On, off)
 	 */
-	public int setTemperature(int temperature) {
+	public double setTemperature(double temperature) {
 		if (this.state == FridgeMode.On_Open) this.cons = temperature*4;
 		else if(this.state == FridgeMode.On_Close) this.cons = temperature*2;
 		this.temperature = temperature;
@@ -76,7 +81,7 @@ public class Fridge extends AbstractComponent{
 	}
 	
 	/**
-	 * <p>set the current state of the TV</p>
+	 * <p>set the current state of the Fridge</p>
 	 * (On, off)
 	 */
 	public FridgeMode setModeService(FridgeMode state) {
@@ -87,6 +92,12 @@ public class Fridge extends AbstractComponent{
 		this.state = state;
 		this.logMessage("Modification state à "+ state);
 		return state;
+	}
+	
+	public boolean setEcoMode(boolean mode) {
+		assert ecoMode != mode;
+		this.ecoMode = mode;
+		return mode;
 	}
 	
 	/**

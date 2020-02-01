@@ -2,17 +2,15 @@ package simulation.TV.components;
 
 import java.util.HashMap;
 
+import clean.equipments.tv.mil.models.TVMILCoupledModel;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.OfferedInterfaces;
 import fr.sorbonne_u.components.cyphy.AbstractCyPhyComponent;
 import fr.sorbonne_u.components.cyphy.examples.hem.simulations.SimulationArchitectures;
 import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentStateAccessI;
-import fr.sorbonne_u.cyphy.examples.sg.equipments.hairdryer.models.HairDryerModel;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
 import interfaces.TVI;
-import simulation.TV.models.TVConsumption;
-import simulation.TV.models.TVMILCoupledModel;
 import simulation.TV.models.TVStateModel;
 import utils.TVMode;
 @OfferedInterfaces (offered = TVI.class)
@@ -62,7 +60,7 @@ implements	TVI,EmbeddingComponentStateAccessI{
 	protected Architecture	createLocalArchitecture(String architectureURI)
 	throws Exception
 	{
-		return TVMILCoupledModel.build();
+		return TVMILCoupledModel.buildArchitecture();
 	}
 	
 	/**
@@ -97,8 +95,7 @@ implements	TVI,EmbeddingComponentStateAccessI{
 		// to use the simulation model access facility by the component.
 		for (int i = 0 ; i < 100 ; i++) {
 			this.logMessage("TV " +
-				this.asp.getModelStateValue(TVStateModel.URI, "state") + " " +
-				this.asp.getModelStateValue(TVConsumption.URI, "consumption")) ;
+				this.asp.getModelStateValue(TVStateModel.URI, "state"));
 			Thread.sleep(5L) ;
 		}
 	}
@@ -110,47 +107,7 @@ implements	TVI,EmbeddingComponentStateAccessI{
 	
 	protected void initialise(String simArchitectureURI) throws Exception{
 		
-		if (!simArchitectureURI.equals(SimulationArchitectures.NONE)) {
-			String modelURI = null ;
-			if (simArchitectureURI.equals(SimulationArchitectures.MIL)) {
-				modelURI = TVMILCoupledModel.URI ;
-				this.simMode = SimulationArchitectures.SimulationMode.MIL ;
-			} else if (simArchitectureURI.equals(TV.SIL_STAND_ALONE)) {
-				modelURI = HairDryerSILCoupledModel.URI ;
-				this.simMode =
-						SimulationArchitectures.SimulationMode.SIL_STAND_ALONE ;
-			} else if (simArchitectureURI.equals(SimulationArchitectures.SIL)) {
-				modelURI = HairDryerSILCoupledModel.URI ;
-				this.simMode = SimulationArchitectures.SimulationMode.SIL ;
-			} else {
-				throw new Exception("unknown simulation architecture URI: " +
-														simArchitectureURI) ;
-			}
-			// The coupled model has been made able to create the simulation
-			// architecture description.
-			Architecture localArchitecture =
-										this.createLocalArchitecture(modelURI) ;
-			// Create the appropriate DEVS simulation plug-in.
-			this.asp = new TVSimulatorPlugin() ;
-			// Set the URI of the plug-in, using the URI of its associated
-			// simulation model.
-			this.asp.setPluginURI(localArchitecture.getRootModelURI()) ;
-			// Set the simulation architecture.
-			this.asp.setSimulationArchitecture(localArchitecture) ;
-			// Install the plug-in on the component, starting its own life-cycle.
-			this.installPlugin(this.asp) ;
-		} else {
-			this.simMode = null ;
-		}
-
-		this.servicesInboundPort = new TVInboundPort(this) ;
-		this.servicesInboundPort.publishPort() ;
-
-		// Toggle logging on to get a log on the screen.
-		this.tracer.setTitle("Hair dryer") ;
-		this.tracer.setRelativePosition(1, 1) ;
-		this.toggleTracing() ;	
-	}
+		//NOT DONE
 	}
 
 	@Override
@@ -179,6 +136,18 @@ implements	TVI,EmbeddingComponentStateAccessI{
 
 	@Override
 	public void setBacklight(int backlight) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void activateEcoMode() throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void deactivateEcoMode() throws Exception {
 		// TODO Auto-generated method stub
 		
 	}

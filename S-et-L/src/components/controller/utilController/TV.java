@@ -7,16 +7,16 @@ import utils.TVMode;
 
 public class TV {
 	
-	public static int getCons(TVOutboundPort tvOutbound,
+	public static double getCons(TVOutboundPort tvOutbound,
 			EnergyController counter) throws Exception{
-		int cons = tvOutbound.getCons();
+		double cons = tvOutbound.getCons();
 		counter.logMessage("Consomation de la télé : "+cons);
 		return cons;
 	}
 	
-	public static int getCons(TVOutboundPort tvOutbound,
+	public static double getCons(TVOutboundPort tvOutbound,
 			Compteur counter) throws Exception{
-		int cons = tvOutbound.getCons();
+		double cons = tvOutbound.getCons();
 		counter.logMessage("Consomation de la télé : "+cons);
 		return cons;
 	}
@@ -48,6 +48,18 @@ public class TV {
 		TVMode m = tvOutbound.getState();
 		controller.logMessage("Etat de la télé : "+m);
 		
+	}
+	
+	public static void activateEcoMode(TVOutboundPort tvOutbound, 
+							EnergyController controller) throws Exception{
+		tvOutbound.activateEcoMode();
+		controller.logMessage("Mode économie activé pour la télé");
+	}
+	
+	public static void deactivateEcoMode(TVOutboundPort tvOutbound, 
+			EnergyController controller) throws Exception{
+	tvOutbound.deactivateEcoMode();
+	controller.logMessage("Mode économie désactivé pour la télé");
 	}
 
 }

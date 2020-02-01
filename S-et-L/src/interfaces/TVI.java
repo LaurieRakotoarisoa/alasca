@@ -45,6 +45,18 @@ public interface TVI extends OfferedI, RequiredI{
 	 */
 	public void setBacklight(int backlight) throws Exception;
 	
+	/**
+	 * put the tv in economy mode i.e change backlight if it's on
+	 * @throws Exception
+	 */
+	public void activateEcoMode() throws Exception;
+	
+	/**
+	 * deactivate tv economy mode i.e change backlight if it's on
+	 * @throws Exception
+	 */
+	public void deactivateEcoMode() throws Exception;
+	
 	
 	
 }

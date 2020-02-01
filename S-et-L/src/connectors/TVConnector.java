@@ -36,4 +36,16 @@ implements TVI{
 		return ((TVI)this.offering).getCons();
 	}
 
+	@Override
+	public void activateEcoMode() throws Exception {
+		((TVI)this.offering).activateEcoMode();
+		
+	}
+
+	@Override
+	public void deactivateEcoMode() throws Exception {
+		((TVI)this.offering).deactivateEcoMode();
+		
+	}
+
 }

@@ -53,4 +53,18 @@ implements TVI{
 		return ((TVI)this.connector).getCons();
 	}
 
+
+	@Override
+	public void activateEcoMode() throws Exception {
+		((TVI)this.connector).activateEcoMode();
+		
+	}
+
+
+	@Override
+	public void deactivateEcoMode() throws Exception {
+		((TVI)this.connector).deactivateEcoMode();
+		
+	}
+
 }

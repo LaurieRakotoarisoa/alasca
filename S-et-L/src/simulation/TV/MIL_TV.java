@@ -1,8 +1,8 @@
 package simulation.TV;
 
+import clean.equipments.tv.mil.models.TVMILCoupledModel;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
-import simulation.TV.models.TVMILCoupledModel;
 
 public class MIL_TV {
 	
@@ -10,7 +10,7 @@ public class MIL_TV {
 		SimulationEngine se;
 		
 		try {
-			Architecture localArchitecture = TVMILCoupledModel.build();
+			Architecture localArchitecture = TVMILCoupledModel.buildArchitecture();
 			se = localArchitecture.constructSimulator() ;
 			se.setDebugLevel(0) ;
 			System.out.println(se.simulatorAsString()) ;

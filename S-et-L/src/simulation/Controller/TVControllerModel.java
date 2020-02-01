@@ -14,7 +14,7 @@ import simulation.Controller.events.NoEconomyEvent;
 
 @ModelExternalEvents(exported = { EconomyEvent.class, 
 								NoEconomyEvent.class })
-public class TVController 
+public class TVControllerModel 
 extends AtomicES_Model{
 
 	
@@ -62,7 +62,7 @@ extends AtomicES_Model{
 	 * @param simulationEngine		simulation engine enacting the model.
 	 * @throws Exception			<i>todo.</i>
 	 */
-	public				TVController(
+	public				TVControllerModel(
 		String uri,
 		TimeUnit simulatedTimeUnit,
 		SimulatorI simulationEngine
@@ -70,7 +70,7 @@ extends AtomicES_Model{
 	{
 		super(uri, simulatedTimeUnit, simulationEngine) ;
 
-		this.delay = TVController.STANDARD_DURATION ;
+		this.delay = TVControllerModel.STANDARD_DURATION ;
 	}
 	
 	// -------------------------------------------------------------------------
@@ -106,7 +106,7 @@ extends AtomicES_Model{
 		) throws Exception
 	{
 		String varName =
-					this.getURI() + ":" + TVController.DELAY_PARAMETER_NAME ;
+					this.getURI() + ":" + TVControllerModel.DELAY_PARAMETER_NAME ;
 		if (simParams.containsKey(varName)) {
 			this.delay = (Duration) simParams.get(varName) ;
 		}

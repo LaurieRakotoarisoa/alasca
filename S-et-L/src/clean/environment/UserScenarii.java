@@ -1,4 +1,4 @@
-package simulation.environment;
+package clean.environment;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -10,7 +10,6 @@ import fr.sorbonne_u.devs_simulation.models.time.Time;
 import simulation.Fridge.events.CloseDoor;
 import simulation.Fridge.events.OpenDoor;
 import simulation.TV.events.TVSwitch;
-import simulation.oven.events.OvenSwitchEvent;
 
 public class UserScenarii {
 	
@@ -26,7 +25,6 @@ public class UserScenarii {
 		events.add(new CloseDoor(t.add(new Duration(2000.0, TimeUnit.SECONDS))));
 		events.add(new TVSwitch(new Time(2000.0, TimeUnit.SECONDS)));
 		events.add(new TVSwitch(new Time(4500.0, TimeUnit.SECONDS)));
-		events.add(new OvenSwitchEvent(new Time(4501.0, TimeUnit.SECONDS)));
 		events.add(new OpenDoor(new Time(6000.0, TimeUnit.SECONDS)));
 		return events;
 	}
@@ -43,6 +41,21 @@ public class UserScenarii {
 		events.add(new OpenDoor(t));
 		events.add(new CloseDoor(t.add(new Duration(309.0, TimeUnit.SECONDS))));
 		return events;
+	}
+	
+	public static Set<ES_EventI> createTVScenario(){
+		Set<ES_EventI> events = new HashSet<ES_EventI>();
+		Time t = new Time(100.0, TimeUnit.SECONDS);
+		events.add(new TVSwitch(t));
+		events.add(new TVSwitch(t.add(new Duration(1500, TimeUnit.SECONDS))));
+		t = new Time(2000.0, TimeUnit.SECONDS);
+		events.add(new TVSwitch(t));
+		events.add(new TVSwitch(t.add(new Duration(1500, TimeUnit.SECONDS))));
+		t = new Time(4000.0, TimeUnit.SECONDS);
+		events.add(new TVSwitch(t));
+		events.add(new TVSwitch(t.add(new Duration(100, TimeUnit.SECONDS))));
+		return events;
+		
 	}
 
 }

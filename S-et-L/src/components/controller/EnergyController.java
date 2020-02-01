@@ -54,6 +54,8 @@ public class EnergyController extends AbstractComponent{
 	public void tvTurnOn() throws Exception {TV.turnOn(tvOutbound, this);}
 	public void tvSetBacklight(int backlight) throws Exception {TV.setBacklight(tvOutbound, this, backlight);}
 	public void tvGetMode() throws Exception {TV.getMode(tvOutbound, this);}
+	public void tvSetEcoMode() throws Exception { TV.activateEcoMode(tvOutbound, this);}
+	public void tvUnsetEcoMode() throws Exception { TV.deactivateEcoMode(tvOutbound, this);}
 	
 	//Fridge methode's
 	public void fridgeTurnOff() throws Exception {Fridge.turnOff(fridgeOutbound, this);}
@@ -121,6 +123,7 @@ public class EnergyController extends AbstractComponent{
 						((EnergyController)this.getTaskOwner()).tvGetMode();
 						((EnergyController)this.getTaskOwner()).getAllCons();
 						((EnergyController)this.getTaskOwner()).setProduction(getAllCons());
+						((EnergyController)this.getTaskOwner()).tvSetEcoMode();
 					} catch (Exception e) {
 						throw new RuntimeException(e) ;
 					}
@@ -139,6 +142,7 @@ public class EnergyController extends AbstractComponent{
 						((EnergyController)this.getTaskOwner()).fridgeSetTemperature(4);
 						((EnergyController)this.getTaskOwner()).getAllCons();
 						((EnergyController)this.getTaskOwner()).setProduction(getAllCons());
+						((EnergyController)this.getTaskOwner()).tvUnsetEcoMode();
 					} catch (Exception e) {
 						throw new RuntimeException(e) ;
 					}

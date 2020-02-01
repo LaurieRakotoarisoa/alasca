@@ -19,7 +19,7 @@ import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
 import simulation.TV.events.TVSwitch;
 
 @ModelExternalEvents(exported = {TVSwitch.class})
-public class TVUserModel 
+public class UserMILModel 
 extends AtomicES_Model{
 	
 	public static class TVUserModelReport 
@@ -70,7 +70,7 @@ extends AtomicES_Model{
 	
 	private RandomDataGenerator rg;
 
-	public TVUserModel(String uri, TimeUnit simulatedTimeUnit, SimulatorI simulationEngine) throws Exception {
+	public UserMILModel(String uri, TimeUnit simulatedTimeUnit, SimulatorI simulationEngine) throws Exception {
 		super(uri, simulatedTimeUnit, simulationEngine);
 		this.setLogger(new StandardLogger()) ;
 		this.toggleDebugMode() ;

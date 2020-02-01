@@ -1,11 +1,12 @@
-package simulation.TV.models;
+package clean.equipments.tv.mil.models;
 
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
-import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentStateAccessI;
+import fr.sorbonne_u.components.cyphy.examples.hem.equipments.hairdryer.mil.models.SGMILModelImplementationI;
+import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentAccessI;
 import fr.sorbonne_u.devs_simulation.hioa.annotations.ExportedVariable;
 import fr.sorbonne_u.devs_simulation.hioa.models.AtomicHIOA;
 import fr.sorbonne_u.devs_simulation.hioa.models.vars.Value;
@@ -25,15 +26,12 @@ import simulation.TV.events.TVSwitch;
 import simulation.TV.events.TvStateEvent;
 import utils.TVMode;
 
-/**
- * The class <code>TVStateModel</code> describes the evolution of a TV State 
- * @author Laurie Rakotoarisoa
- *
- */
-
-@ModelExternalEvents(imported = {TVSwitch.class, EconomyEvent.class, NoEconomyEvent.class})
-public class TVStateModel 
-extends AtomicHIOA{
+@ModelExternalEvents (imported = {NoEconomyEvent.class,
+								EconomyEvent.class,
+								TVSwitch.class})	
+public class TVStateMILModel 
+extends AtomicHIOA
+implements SGMILModelImplementationI{
 	
 	// -------------------------------------------------------------------------
 	// Inner classes
@@ -77,26 +75,26 @@ extends AtomicHIOA{
 	// Constructors
 	// -------------------------------------------------------------------------
 
-	public TVStateModel(String uri, TimeUnit simulatedTimeUnit, SimulatorI simulationEngine) throws Exception {
+	public TVStateMILModel(String uri, TimeUnit simulatedTimeUnit, SimulatorI simulationEngine) throws Exception {
 		super(uri, simulatedTimeUnit, simulationEngine);
 		this.setDebugLevel(2);
 		states = new Vector<TvStateEvent>();
 		assert this.tvBack != null;
-		this.staticInitialiseVariables();
-		PlotterDescription pd =
-				new PlotterDescription(
-						"TV State Model",
-						"Time (sec)",
-						"Intensity (Amp)",
-						100,
-						0,
-						600,
-						400) ;
-		this.statePlotter = new XYPlotter(pd) ;
-		this.statePlotter.createSeries(SERIES) ;
 
 		// create a standard logger (logging on the terminal)
 		this.setLogger(new StandardLogger()) ;
+	}
+	
+	/**
+	 * @see java.lang.Object#finalize()
+	 */
+	@Override
+	protected void		finalize() throws Throwable
+	{
+		if (this.statePlotter != null) {
+			this.statePlotter.dispose() ;
+		}
+		super.finalize();
 	}
 
 	// -------------------------------------------------------------------------
@@ -105,7 +103,10 @@ extends AtomicHIOA{
 	
 	private static final long serialVersionUID = 1L;
 	
-	public static final String URI = "TV-STATE";
+	public static final String URI = TVStateMILModel.class.getName();
+	
+	public static final String		COMPONENT_HOLDER_REF_PARAM_NAME =
+			"tv state component reference" ;
 	
 	/** stored output events for report */
 	protected Vector<TvStateEvent> states;
@@ -134,7 +135,7 @@ extends AtomicHIOA{
 	
 	/** reference on the object representing the component that holds the
 	 *  model; enables the model to access the state of this component.		*/
-	protected EmbeddingComponentStateAccessI componentRef ;
+	protected EmbeddingComponentAccessI componentRef ;
 	
 	// -------------------------------------------------------------------------
 	// HIOA model variables
@@ -145,6 +146,10 @@ extends AtomicHIOA{
 	protected final Value<Double>		tvBack =
 											new Value<Double>(this, 0.0, 0) ;
 	
+	
+	// -------------------------------------------------------------------------
+	// Methods
+	// -------------------------------------------------------------------------
 	
 	/**
 	 * return an integer for the state of the TV for plot
@@ -168,11 +173,10 @@ extends AtomicHIOA{
 		Map<String, Object> simParams
 		) throws Exception
 	{
-		
 		// The reference to the embedding component
 		this.componentRef =
-			(EmbeddingComponentStateAccessI) simParams.get(TVStateModel.URI+":componentRef") ;
-	
+			(EmbeddingComponentAccessI)
+							simParams.get(COMPONENT_HOLDER_REF_PARAM_NAME) ;
 	}
 	
 	@Override
@@ -181,6 +185,18 @@ extends AtomicHIOA{
 		this.currentState = TVMode.Off;
 		this.modeEco = false;
 		this.last_value_backlight = DEFAULT_TV_BACKLIGHT;
+
+		PlotterDescription pd =
+				new PlotterDescription(
+						"TV State Model",
+						"Time (sec)",
+						"Intensity (Amp)",
+						100,
+						0,
+						600,
+						400) ;
+		this.statePlotter = new XYPlotter(pd) ;
+		this.statePlotter.createSeries(SERIES) ;
 		
 		this.statePlotter.initialise() ;
 		this.statePlotter.showPlotter() ;
@@ -194,11 +210,6 @@ extends AtomicHIOA{
 		
 		super.initialiseState(initialTime);
 		
-		this.statePlotter.addData(
-				SERIES,
-				initialTime.getSimulatedTime(),
-				state2int(this.currentState)) ;
-		
 		
 	}
 	
@@ -208,9 +219,37 @@ extends AtomicHIOA{
 	@Override
 	protected void		initialiseVariables(Time startTime)
 	{
-		super.initialiseVariables(startTime);
+		
 		this.tvBack.v = 0.0;
 		assert	startTime.equals(this.tvBack.time) ;
+		
+		this.statePlotter.addData(
+				SERIES,
+				startTime.getSimulatedTime(),
+				state2int(this.currentState)) ;
+		
+		super.initialiseVariables(startTime);
+	}
+	
+	/**
+	 * @see fr.sorbonne_u.devs_simulation.models.AtomicModel#userDefinedInternalTransition(fr.sorbonne_u.devs_simulation.models.time.Duration)
+	 */
+	@Override
+	public void			userDefinedInternalTransition(Duration elapsedTime)
+	{
+		if (this.componentRef != null) {
+			// This is an example showing how to access the component state
+			// from a simulation model; this must be done with care and here
+			// we are not synchronising with other potential component threads
+			// that may access the state of the component object at the same
+			// time.
+			try {
+				this.logMessage("component state = " +
+								currentState) ;
+			} catch (Exception e) {
+				throw new RuntimeException(e) ;
+			}
+		}
 	}
 	
 	/**
@@ -222,18 +261,23 @@ extends AtomicHIOA{
 		super.userDefinedExternalTransition(elapsedTime) ;
 		ArrayList<EventI> current = this.getStoredEventAndReset();
 		assert current != null & current.size() == 1;
-		EventI e = current.get(0);
-		if(e instanceof TVSwitch) {
-			switchState(this.getCurrentStateTime().getSimulatedTime());
-			
-		}
-		else if(e instanceof EconomyEvent) {
-			if(!modeEco) activateEnergyEco();
-		}
-		else if(e instanceof NoEconomyEvent) {
-			if(modeEco) deactivateEnergyEco();
-		}
+		EventI e = current.get(0);		
+		e.executeOn(this);
 		
+	}
+	
+	/**
+	 * @see fr.sorbonne_u.devs_simulation.models.AtomicModel#endSimulation(fr.sorbonne_u.devs_simulation.models.time.Time)
+	 */
+	@Override
+	public void			endSimulation(Time endTime) throws Exception
+	{
+		this.statePlotter.addData(
+				SERIES,
+				endTime.getSimulatedTime(),
+				state2int(this.currentState)) ;
+
+		super.endSimulation(endTime) ;
 	}
 	
 	@Override
@@ -244,7 +288,8 @@ extends AtomicHIOA{
 
 	@Override
 	public Duration timeAdvance() {
-		return Duration.INFINITY;
+		if(this.componentRef == null) return Duration.INFINITY;
+		else return new Duration(10.0, TimeUnit.SECONDS);
 	}
 	
 	@Override
@@ -253,7 +298,7 @@ extends AtomicHIOA{
 		return new TVStateModelReport(this.getURI(),states);
 	}
 	
-	private void switchState(double currentTime) {
+	public void switchState(double currentTime) {
 		TVMode oldState = this.currentState;
 		if(oldState == TVMode.Off) {
 			currentState = TVMode.On;
@@ -281,7 +326,23 @@ extends AtomicHIOA{
 		
 	}
 	
-	private void activateEnergyEco() {
+	// -------------------------------------------------------------------------
+	// Model-specific methods
+	// -------------------------------------------------------------------------
+
+	/**
+	 * @see fr.sorbonne_u.components.cyphy.examples.hem.equipments.hairdryer.mil.models.SGMILModelImplementationI#disposePlotters()
+	 */
+	@Override
+	public void			disposePlotters() throws Exception
+	{
+		if (this.statePlotter != null) {
+			this.statePlotter.dispose() ;
+			this.statePlotter = null ;
+		}
+	}
+	
+	public void activateEnergyEco() {
 		this.modeEco = true;
 		if(tvBack.v > MAX_ECO_BACKLIGHT) {
 			tvBack.v = MAX_ECO_BACKLIGHT;
@@ -292,7 +353,7 @@ extends AtomicHIOA{
 		}
 	}
 	
-	private void deactivateEnergyEco() {
+	public void deactivateEnergyEco() {
 		this.modeEco = false;
 		if(tvBack.v < DEFAULT_TV_BACKLIGHT && this.currentState == TVMode.On) {
 			tvBack.v = DEFAULT_TV_BACKLIGHT;
@@ -308,8 +369,9 @@ extends AtomicHIOA{
 		return this.tvBack.v;
 	}
 	
-	
-	
+	public boolean isEcoActivated() {
+		return modeEco;
+	}
 	
 
 }

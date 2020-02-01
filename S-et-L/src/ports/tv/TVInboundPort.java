@@ -63,4 +63,16 @@ implements TVI{
 		return this.getOwner().handleRequestSync(owner -> ((TV)owner).getCons());
 	}
 
+	@Override
+	public void activateEcoMode() throws Exception {
+		this.getOwner().handleRequestSync(owner -> ((TV) owner).activateEcoMode());
+		
+	}
+	
+	@Override
+	public void deactivateEcoMode() throws Exception {
+		this.getOwner().handleRequestSync(owner -> ((TV) owner).deactivateEcoMode());
+		
+	}
+
 }

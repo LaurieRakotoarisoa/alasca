@@ -26,7 +26,7 @@ import simulation.TV.events.TVConsumptionEvent;
 
 @ModelExternalEvents(imported = TicEvent.class,
 					exported = TVConsumptionEvent.class)
-public class TVConsumption 
+public class TVConsumptionMILModel 
 extends AtomicHIOA{
 	
 	// -------------------------------------------------------------------------
@@ -71,7 +71,7 @@ extends AtomicHIOA{
 	// Constructors
 	// -------------------------------------------------------------------------
 	
-	public TVConsumption(String uri, TimeUnit simulatedTimeUnit, SimulatorI simulationEngine) throws Exception {
+	public TVConsumptionMILModel(String uri, TimeUnit simulatedTimeUnit, SimulatorI simulationEngine) throws Exception {
 		super(uri, simulatedTimeUnit, simulationEngine);
 		consumptions = new Vector<TVConsumptionEvent>();
 		this.updateConsumption = false;

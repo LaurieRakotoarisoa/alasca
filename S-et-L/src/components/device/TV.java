@@ -22,7 +22,9 @@ public class TV extends AbstractComponent{
 	 */
 	protected TVMode state = TVMode.Off;
 	protected int cons = 0;
-	protected int backlight = 50;
+	protected int backlight = 0;
+	protected int lastBacklight = 70;
+	protected boolean ecoMode = false;
 	
 	/**
 	 * @param URI Component uri
@@ -62,9 +64,20 @@ public class TV extends AbstractComponent{
 	 * (On, off)
 	 */
 	public int setBacklight(int backlight) {
-		this.cons = backlight/10;
-		this.backlight = backlight;
-		this.logMessage("Modification rétroeclairage à "+ backlight);
+		if(!ecoMode || backlight <= 30) {
+			if(getModeService() == TVMode.On) {
+				this.cons = backlight/10;
+				this.backlight = backlight;
+				this.logMessage("Modification rétroeclairage à "+ backlight);
+			}
+			else {
+				this.logMessage("Télé éteinte pas de modification de rétroéclairage");
+			}
+		}
+		else{
+			this.logMessage("Mode économie impossible d'augmenter le rétroéclairage à "+backlight);
+		}
+		
 		return backlight;
 	}
 	
@@ -73,11 +86,45 @@ public class TV extends AbstractComponent{
 	 * (On, off)
 	 */
 	public TVMode setModeService(TVMode state) {
-		if (state == TVMode.Off) this.cons = 0;
-		else this.cons = backlight/10;
+		assert this.state != state;
 		this.state = state;
-		this.logMessage("Modification state à "+ state);
+		if (state == TVMode.Off) {
+			this.cons = 0;
+			this.lastBacklight = backlight;
+			this.backlight = 0;
+		}
+		else {
+			if(ecoMode) {
+				this.backlight = 30;
+				
+			}
+			else {
+				this.backlight = lastBacklight;
+			}
+			this.cons = backlight/10;
+			
+		}
+		this.logMessage("Modification state à "+ state+" avec un rétroéclairage de "+this.backlight);
 		return state;
+	}
+	
+	public boolean activateEcoMode() {
+		assert !ecoMode;
+		ecoMode = true;
+		if(state == TVMode.On && backlight > 30) {
+			lastBacklight = backlight;
+			setBacklight(30);
+		}
+		this.logMessage("Mode eco activé : TV state ->"+state+" backlight at "+backlight);
+		return ecoMode;
+	}
+	
+	public boolean deactivateEcoMode() {
+		assert ecoMode;
+		ecoMode = false;
+		if(state == TVMode.On) setBacklight(lastBacklight);
+		this.logMessage("Mode economié désactivé : TV state ->"+state+" backlight at "+backlight);
+		return ecoMode;
 	}
 	
 	/**

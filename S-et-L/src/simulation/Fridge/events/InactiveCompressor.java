@@ -1,5 +1,7 @@
 package simulation.Fridge.events;
 
+import clean.equipments.fridge.mil.FridgeConsumptionMILModel;
+import fr.sorbonne_u.devs_simulation.models.AtomicModel;
 import fr.sorbonne_u.devs_simulation.models.events.Event;
 import fr.sorbonne_u.devs_simulation.models.events.EventInformationI;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
@@ -30,6 +32,14 @@ extends Event{
 	
 	public boolean isDoorOpened() {
 		return ((Reading) content).doorOpened;
+	}
+	
+	@Override
+	public void executeOn(AtomicModel model) {
+		assert model instanceof FridgeConsumptionMILModel;
+		FridgeConsumptionMILModel f = (FridgeConsumptionMILModel) model;
+		//eco mode set false as we don't use it
+		f.updateConsumption(false, isDoorOpened(),false);
 	}
 
 }

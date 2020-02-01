@@ -7,6 +7,9 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
+import clean.environment.UserScenarii;
+import clean.equipments.tv.mil.models.TVMILCoupledModel;
+import clean.simulations.EnergyController;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.devs_simulation.architectures.ArchitectureI;
 import fr.sorbonne_u.devs_simulation.architectures.SimulationEngineCreationMode;
@@ -27,7 +30,6 @@ import fr.sorbonne_u.devs_simulation.models.time.Duration;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
 import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
 import fr.sorbonne_u.utils.PlotterDescription;
-import simulation.Controller.EnergyController;
 import simulation.Controller.HomeController;
 import simulation.Controller.events.EconomyEvent;
 import simulation.Controller.events.NoEconomyEvent;
@@ -42,11 +44,9 @@ import simulation.Fridge.models2.FridgeCoupledModel;
 import simulation.Fridge.models2.FridgeState;
 import simulation.TV.events.TVConsumptionEvent;
 import simulation.TV.events.TVSwitch;
-import simulation.TV.models.TVConsumption;
-import simulation.TV.models.TVMILCoupledModel;
+import simulation.TV.models.TVConsumptionMILModel;
 import simulation.TV.models.TVStateModel;
 import simulation.environment.UserModel;
-import simulation.environment.UserScenarii;
 import simulation.environment.electricity.Electricity_ESModel;
 import simulation.environment.electricity.events.RestoreElecEvent;
 import simulation.environment.electricity.events.SheddingEvent;
@@ -82,16 +82,16 @@ public class TestArchitecture{
 							TicModel.URI+"-1",
 							TimeUnit.SECONDS,null,SimulationEngineCreationMode.ATOMIC_ENGINE));
 			
-			atomicModelDescriptors.put(TVConsumption.URI,
-					AtomicModelDescriptor.create(TVConsumption.class,
-							TVConsumption.URI,
+			atomicModelDescriptors.put(TVConsumptionMILModel.URI,
+					AtomicModelDescriptor.create(TVConsumptionMILModel.class,
+							TVConsumptionMILModel.URI,
 							TimeUnit.SECONDS,null,SimulationEngineCreationMode.ATOMIC_ENGINE));
 			
 			Set<String> submodels1 = new HashSet<String>() ;
 			//submodels1.add(TVUserModel.URI);
 			submodels1.add(TVStateModel.URI);
 			submodels1.add(TicModel.URI+"-1");
-			submodels1.add(TVConsumption.URI);
+			submodels1.add(TVConsumptionMILModel.URI);
 			
 			Map<Class<? extends EventI>,EventSink[]> imported1 =
 					new HashMap<Class<? extends EventI>,EventSink[]>() ;
@@ -115,7 +115,7 @@ public class TestArchitecture{
 					new HashMap<Class<? extends EventI>,ReexportedEvent>() ;
 			reexported1.put(
 					TVConsumptionEvent.class,
-					new ReexportedEvent(TVConsumption.URI,
+					new ReexportedEvent(TVConsumptionMILModel.URI,
 										TVConsumptionEvent.class)) ;
 			
 			Map<EventSource,EventSink[]> connections1 =
@@ -126,7 +126,7 @@ public class TestArchitecture{
 									TicEvent.class) ;
 			EventSink[] to12 =
 					new EventSink[] {
-						new EventSink(TVConsumption.URI,
+						new EventSink(TVConsumptionMILModel.URI,
 									  TicEvent.class)} ;
 			connections1.put(from12, to12) ;
 			
@@ -141,7 +141,7 @@ public class TestArchitecture{
 					new VariableSink[] {
 							new VariableSink("tvBack",
 											 Double.class,
-											 TVConsumption.URI)} ;
+											 TVConsumptionMILModel.URI)} ;
 					
 			bindings1.put(source11, sinks11);
 			
@@ -596,8 +596,8 @@ public class TestArchitecture{
 							SimulationMain.getPlotterHeight()));
 			
 			//TV Consumption Model
-			modelURI = TVConsumption.URI;
-			simParams.put(modelURI + ":" + TVConsumption.TVCONS_PLOTTING_PARAM_NAME,
+			modelURI = TVConsumptionMILModel.URI;
+			simParams.put(modelURI + ":" + TVConsumptionMILModel.TVCONS_PLOTTING_PARAM_NAME,
 					new PlotterDescription(
 							"TV Model - Consumption",
 							"Time (sec)",

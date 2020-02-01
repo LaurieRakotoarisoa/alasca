@@ -2,7 +2,7 @@ package simulation.TV.components;
 
 import fr.sorbonne_u.components.cyphy.plugins.devs.AtomicSimulatorPlugin;
 import fr.sorbonne_u.devs_simulation.interfaces.ModelDescriptionI;
-import simulation.TV.models.TVConsumption;
+import simulation.TV.models.TVConsumptionMILModel;
 import simulation.TV.models.TVStateModel;
 
 public class TVSimulatorPlugin 
@@ -21,9 +21,9 @@ extends AtomicSimulatorPlugin{
 		// simulation model.
 		ModelDescriptionI m = this.simulator.getDescendentModel(modelURI) ;
 		
-		if(m instanceof TVConsumption) {
+		if(m instanceof TVConsumptionMILModel) {
 			assert name.equals("consumption");
-			return ((TVConsumption)m).getCons();
+			return ((TVConsumptionMILModel)m).getCons();
 		}
 		else {
 			assert m instanceof TVStateModel && name.equals("backlight");
