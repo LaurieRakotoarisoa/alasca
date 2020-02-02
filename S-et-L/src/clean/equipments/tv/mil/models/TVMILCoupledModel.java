@@ -7,8 +7,6 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import clean.environment.UserMILModel;
-import clean.equipments.controller.mil.models.ControllerMILModel;
-import clean.equipments.fridge.mil.FridgeStateMILModel;
 import fr.sorbonne_u.components.cyphy.examples.hem.equipments.hairdryer.mil.models.SGMILModelImplementationI;
 
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
@@ -56,7 +54,7 @@ implements SGMILModelImplementationI{
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	public static final String	URI = TVMILCoupledModel.class.getCanonicalName() ;
+	public static final String	URI = TVMILCoupledModel.class.getName() ;
 	
 	public static class	TVModelReport
 	extends		AbstractSimulationReport
@@ -133,6 +131,15 @@ implements SGMILModelImplementationI{
 						TimeUnit.SECONDS,
 						null,
 						SimulationEngineCreationMode.ATOMIC_ENGINE)) ;
+		
+		atomicModelDescriptors.put(
+			UserMILModel.URI,
+				AtomicModelDescriptor.create(
+						UserMILModel.class,
+						UserMILModel.URI,
+						TimeUnit.SECONDS,
+						null,
+						SimulationEngineCreationMode.ATOMIC_ENGINE));
 
 		return atomicModelDescriptors ;
 	}
@@ -168,11 +175,6 @@ implements SGMILModelImplementationI{
 						new EventSink(TVStateMILModel.URI,
 								NoEconomyEvent.class)});
 		
-		imported.put(TVSwitch.class,
-				new EventSink[] {
-						new EventSink(TVStateMILModel.URI,
-								TVSwitch.class)});
-		
 		Map<String,CoupledModelDescriptor> coupledModelDescriptors =
 								new HashMap<String,CoupledModelDescriptor>() ;
 		
@@ -180,6 +182,7 @@ implements SGMILModelImplementationI{
 		submodels.add(TVStateMILModel.URI) ;
 		submodels.add(TVConsumptionMILModel.URI) ;
 		submodels.add(TicModel.URI);
+		submodels.add(UserMILModel.URI);
 		
 		Map<EventSource,EventSink[]> connections =
 				new HashMap<EventSource,EventSink[]>() ;
@@ -190,6 +193,13 @@ implements SGMILModelImplementationI{
 		new EventSink[] {
 			new EventSink(TVConsumptionMILModel.URI, TicEvent.class)} ;
 		connections.put(from1, to1) ;
+		
+		EventSource from2 =
+				new EventSource(UserMILModel.URI, TVSwitch.class) ;
+				EventSink[] to2 =
+				new EventSink[] {
+					new EventSink(TVStateMILModel.URI, TVSwitch.class)} ;
+				connections.put(from2, to2) ;
 				
 		Map<VariableSource, VariableSink[]> bindings = new HashMap<VariableSource, VariableSink[]>();
 		

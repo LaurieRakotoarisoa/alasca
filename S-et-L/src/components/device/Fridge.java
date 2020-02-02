@@ -167,7 +167,7 @@ implements EmbeddingComponentAccessI{
 	public void			execute() throws Exception
 	{
 		this.logMessage("execute");
-		silStandAloneSimulationRun();
+		startSimulation();
 		
 	}
 	

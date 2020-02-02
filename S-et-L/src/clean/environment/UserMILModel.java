@@ -79,7 +79,7 @@ extends AtomicES_Model{
 	@Override
 	public void			initialiseState(Time initialTime) {
 		
-		user_events = UserScenarii.createFridgeScenario();
+		user_events = UserScenarii.createGlobalScenario();
 		
 		super.initialiseState(initialTime) ;
 		

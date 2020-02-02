@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.math3.random.RandomDataGenerator;
 
+import fr.sorbonne_u.components.cyphy.examples.hem.equipments.hairdryer.mil.models.SGMILModelImplementationI;
 import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicEvent;
 import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicModel;
 import fr.sorbonne_u.devs_simulation.hioa.annotations.ImportedVariable;
@@ -27,7 +28,8 @@ import simulation.TV.events.TVConsumptionEvent;
 @ModelExternalEvents(imported = TicEvent.class,
 					exported = TVConsumptionEvent.class)
 public class TVConsumptionMILModel 
-extends AtomicHIOA{
+extends AtomicHIOA
+implements SGMILModelImplementationI{
 	
 	// -------------------------------------------------------------------------
 	// Inner classes
@@ -77,19 +79,21 @@ extends AtomicHIOA{
 		this.updateConsumption = false;
 		this.rgConsumption = new RandomDataGenerator();
 		this.consumption = 0;
-		PlotterDescription pd =
-				new PlotterDescription(
-						"TV consumption",
-						"Time (sec)",
-						"Consumption (Watt)",
-						100,
-						0,
-						600,
-						400) ;
-		this.consPlotter = new XYPlotter(pd) ;
-		this.consPlotter.createSeries(SERIES) ;
+		
 		
 		this.setLogger(new StandardLogger()) ;
+	}
+	
+	/**
+	 * @see java.lang.Object#finalize()
+	 */
+	@Override
+	protected void		finalize() throws Throwable
+	{
+		if (this.consPlotter != null) {
+			this.consPlotter.dispose() ;
+		}
+		super.finalize();
 	}
 	
 	// -------------------------------------------------------------------------
@@ -97,7 +101,7 @@ extends AtomicHIOA{
 	// -------------------------------------------------------------------------
 	private static final long serialVersionUID = 1L;
 	
-	public static final String URI = "TV-CONSUMPTION";
+	public static final String URI = TVConsumptionMILModel.class.getName();
 	
 	/** stored output events for report */
 	protected Vector<TVConsumptionEvent> consumptions;
@@ -131,22 +135,7 @@ extends AtomicHIOA{
 	protected Value<Double> tvBack;
 	
 	
-	/**
-	 * @see fr.sorbonne_u.devs_simulation.models.Model#setSimulationRunParameters(java.util.Map)
-	 */
-	@Override
-	public void			setSimulationRunParameters(
-		Map<String, Object> simParams
-		) throws Exception
-	{
-		
-		String vname = this.getURI() + ":" +
-				TVCONS_PLOTTING_PARAM_NAME ;
-	PlotterDescription pd = (PlotterDescription) simParams.get(vname) ;
-	this.consPlotter = new XYPlotter(pd) ;
-	this.consPlotter.createSeries(SERIES) ;
 	
-	}
 
 	@Override
 	public ArrayList<EventI> output() {
@@ -182,6 +171,19 @@ extends AtomicHIOA{
 	{
 		this.rgConsumption.reSeed();
 		this.consumptions.clear();
+		
+		PlotterDescription pd =
+				new PlotterDescription(
+						"TV consumption",
+						"Time (sec)",
+						"Consumption (Watt)",
+						100,
+						0,
+						600,
+						400) ;
+		this.consPlotter = new XYPlotter(pd) ;
+		this.consPlotter.createSeries(SERIES) ;
+		
 		this.consPlotter.initialise() ;
 		this.consPlotter.showPlotter() ;
 		

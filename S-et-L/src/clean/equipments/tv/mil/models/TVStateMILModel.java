@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
+import components.device.TV;
 import fr.sorbonne_u.components.cyphy.examples.hem.equipments.hairdryer.mil.models.SGMILModelImplementationI;
 import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentAccessI;
 import fr.sorbonne_u.devs_simulation.hioa.annotations.ExportedVariable;
@@ -79,8 +80,7 @@ implements SGMILModelImplementationI{
 		super(uri, simulatedTimeUnit, simulationEngine);
 		this.setDebugLevel(2);
 		states = new Vector<TvStateEvent>();
-		assert this.tvBack != null;
-
+		//assert this.tvBack != null;
 		// create a standard logger (logging on the terminal)
 		this.setLogger(new StandardLogger()) ;
 	}
@@ -173,6 +173,7 @@ implements SGMILModelImplementationI{
 		Map<String, Object> simParams
 		) throws Exception
 	{
+		
 		// The reference to the embedding component
 		this.componentRef =
 			(EmbeddingComponentAccessI)
@@ -207,8 +208,9 @@ implements SGMILModelImplementationI{
 		} catch (Exception e) {
 			throw new RuntimeException(e) ;
 		}
-		
+		System.out.println("init");
 		super.initialiseState(initialTime);
+
 		
 		
 	}
@@ -219,10 +221,7 @@ implements SGMILModelImplementationI{
 	@Override
 	protected void		initialiseVariables(Time startTime)
 	{
-		
 		this.tvBack.v = 0.0;
-		assert	startTime.equals(this.tvBack.time) ;
-		
 		this.statePlotter.addData(
 				SERIES,
 				startTime.getSimulatedTime(),
@@ -237,19 +236,8 @@ implements SGMILModelImplementationI{
 	@Override
 	public void			userDefinedInternalTransition(Duration elapsedTime)
 	{
-		if (this.componentRef != null) {
-			// This is an example showing how to access the component state
-			// from a simulation model; this must be done with care and here
-			// we are not synchronising with other potential component threads
-			// that may access the state of the component object at the same
-			// time.
-			try {
-				this.logMessage("component state = " +
-								currentState) ;
-			} catch (Exception e) {
-				throw new RuntimeException(e) ;
-			}
-		}
+		
+		super.userDefinedInternalTransition(elapsedTime);
 	}
 	
 	/**
@@ -263,6 +251,8 @@ implements SGMILModelImplementationI{
 		assert current != null & current.size() == 1;
 		EventI e = current.get(0);		
 		e.executeOn(this);
+		
+		
 		
 	}
 	
@@ -323,8 +313,16 @@ implements SGMILModelImplementationI{
 				SERIES,
 				currentTime,
 				state2int(this.currentState)) ;
-		
+		if(componentRef != null) {
+			try {
+				this.componentRef.setEmbeddingComponentStateValue(TV.TV_STATE, this.currentState);
+			} catch (Exception e) {
+				throw new RuntimeException();
+			}
+		}
 	}
+	
+	
 	
 	// -------------------------------------------------------------------------
 	// Model-specific methods

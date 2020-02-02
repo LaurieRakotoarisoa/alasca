@@ -308,13 +308,14 @@ implements SGMILModelImplementationI{
 		}
 		this.doorOpened = true;
 		
-		try {
-			this.logMessage("open door at "+getCurrentStateTime());
-			this.logMessage(componentRef.toString());
-			componentRef.setEmbeddingComponentStateValue(Fridge.FRIDGE_STATE,convertFridgeState(doorOpened, compressorActive));
-			
-		} catch (Exception e) {
-			throw new RuntimeException();
+		if(componentRef != null) {
+			try {
+				this.logMessage("open door at "+getCurrentStateTime());
+				componentRef.setEmbeddingComponentStateValue(Fridge.FRIDGE_STATE,convertFridgeState(doorOpened, compressorActive));
+				
+			} catch (Exception e) {
+				throw new RuntimeException();
+			}
 		}
 	}
 	
