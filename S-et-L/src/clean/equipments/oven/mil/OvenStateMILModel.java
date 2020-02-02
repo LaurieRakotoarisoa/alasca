@@ -72,11 +72,11 @@ implements SGMILModelImplementationI{
 	public static final String URI = OvenStateMILModel.class.getName();
 	
 	public static final String		COMPONENT_HOLDER_REF_PARAM_NAME =
-			"fridge state component reference" ;
+			"oven state component reference" ;
 	
-	public static double DEFAULT_RATE = 0.05;
+	public static double DEFAULT_RATE = 0.1;
 	public static double HIGH_RATE = 0.2;
-	public static double LOW_RATE = 0.01;
+	public static double LOW_RATE = 0.05;
 	
 	public static final double MAX_DIFF_TEMP = 2.0;
 	private double targetTemperature;
@@ -92,12 +92,12 @@ implements SGMILModelImplementationI{
 
 	
 	/** run parameter to plot the evolution of temperature */
-	public static final String FRIDGE_TEMP_PLOTTING_PARAM_NAME = "fridge-temp-plot";
+	public static final String Oven_TEMP_PLOTTING_PARAM_NAME = "oven-temp-plot";
 	
 	/** Frame used to plot the temperature during the simulation.			*/
 	protected XYPlotter			tempPlotter ;
 	
-	private static final String	SERIES = "Fridge temperature" ;
+	private static final String	SERIES = "Oven temperature" ;
 	
 	/** reference on the object representing the component that holds the
 	 *  model; enables the model to access the state of this component.		*/
@@ -128,7 +128,7 @@ implements SGMILModelImplementationI{
 	{
 		PlotterDescription pd =
 				new PlotterDescription(
-						"Fridge Temperature Model",
+						"Oven Temperature Model",
 						"Time (sec)",
 						"Temperature (C°)",
 						100,
@@ -342,7 +342,7 @@ implements SGMILModelImplementationI{
 	}
 	
 	/**
-	 * convert the state of the fridge to a FridgeMode enum to set embedded component value
+	 * convert the state of the oven to a OvenMode enum to set embedded component value
 	 * @param doorOpened state of the door
 	 * @param activeCompressor state of the compressor
 	 * @return

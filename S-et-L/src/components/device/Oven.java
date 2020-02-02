@@ -2,6 +2,7 @@ package components.device;
 
 import java.util.HashMap;
 
+import clean.equipments.oven.components.OvenSimulatorPlugin;
 import clean.equipments.oven.mil.OvenConsumptionMILModel;
 import clean.equipments.oven.mil.OvenMILCoupledModel;
 import clean.equipments.oven.mil.OvenStateMILModel;
@@ -51,6 +52,9 @@ implements EmbeddingComponentAccessI{
 	public static final String ECO_MODE = "economy";
 	public static final String Oven_STATE = "oven state";
 	public static final String Oven_CONS = "oven consumption";
+	
+	/** the simulation plug-in holding the simulation models.				*/
+	protected OvenSimulatorPlugin					asp ;
 	
 	
 	/**
@@ -138,6 +142,17 @@ implements EmbeddingComponentAccessI{
 		return mode;
 	}
 	
+	/**
+	 * initialise the oven component.
+	 *
+	 * @param simArchitectureURI		the URI of the simulation architecture to be created and run.
+	 * @throws Exception				<i>to do</i>.
+	 */
+	protected void		initialise(String simArchitectureURI) throws Exception
+	{
+		
+	}
+	
 	
 	/**
 	 * @see fr.sorbonne_u.components.AbstractComponent#start()
@@ -161,7 +176,7 @@ implements EmbeddingComponentAccessI{
 	public void			finalise() throws Exception
 	{
 		this.logMessage("stopping Oven component.") ;
-		this.printExecutionLogOnFile("oven") ;
+		this.printExecutionLogOnFile("Oven") ;
 		super.finalise();
 	}
 	
@@ -216,7 +231,7 @@ implements EmbeddingComponentAccessI{
 					@Override
 					public void run() {
 						try {
-							((Fridge)this.getTaskOwner()).
+							((Oven)this.getTaskOwner()).
 													silStandAloneSimulationRun() ;
 						} catch (Exception e) {
 							throw new RuntimeException(e) ;

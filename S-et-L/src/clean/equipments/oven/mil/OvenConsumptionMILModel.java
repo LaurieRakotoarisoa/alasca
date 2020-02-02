@@ -66,7 +66,7 @@ implements SGMILModelImplementationI{
 	private double consumption;
 	
 	/** run parameter to plot the evolution of temperature */
-	public static final String FRIDGE_CONS_PLOTTING_PARAM_NAME = "oven-temp-plot";
+	public static final String Oven_CONS_PLOTTING_PARAM_NAME = "oven-temp-plot";
 	
 	/** Frame used to plot the temperature during the simulation.			*/
 	protected XYPlotter			consPlotter ;

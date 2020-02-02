@@ -301,7 +301,7 @@ implements OvenI, EmbeddingComponentAccessI{
 	}
 	
 	/**
-	 * running the SIL model for the fridge for 500 seconds.
+	 * running the SIL model for the Oven for 500 seconds.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 

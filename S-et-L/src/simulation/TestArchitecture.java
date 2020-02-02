@@ -55,8 +55,8 @@ import simulation.environment.wind.events.WaftEvent;
 import simulation.environment.wind.events.WindGustsEvent;
 import simulation.environment.wind.models.WindModel;
 import simulation.oven.events.OvenSwitchEvent;
-import simulation.oven.models.OvenConsumptionModel;
-import simulation.oven.models.OvenModel;
+import simulation.oven.models.OvenConsumption;
+import simulation.oven.models.OvenCoupledModel;
 import simulation.oven.models.OvenStateModel;
 import simulation.windTurbine.models.WindTurbineModel;
 public class TestArchitecture{
@@ -252,9 +252,9 @@ public class TestArchitecture{
 							OvenStateModel.URI,
 							TimeUnit.SECONDS,null,SimulationEngineCreationMode.ATOMIC_ENGINE));
 			
-			atomicModelDescriptors.put(OvenConsumptionModel.URI,
-					AtomicModelDescriptor.create(OvenConsumptionModel.class,
-							OvenConsumptionModel.URI,
+			atomicModelDescriptors.put(OvenConsumption.URI,
+					AtomicModelDescriptor.create(OvenConsumption.class,
+							OvenConsumption.URI,
 							TimeUnit.SECONDS,null,SimulationEngineCreationMode.ATOMIC_ENGINE));	
 			
 			atomicModelDescriptors.put(TicModel.URI+"-2",
@@ -265,7 +265,7 @@ public class TestArchitecture{
 			
 			Set<String> submodels2 = new HashSet<String>() ;
 			submodels2.add(OvenStateModel.URI);
-			submodels2.add(OvenConsumptionModel.URI);
+			submodels2.add(OvenConsumption.URI);
 			submodels2.add(TicModel.URI+"-2");
 			
 			Map<Class<? extends EventI>,EventSink[]> imported2 =
@@ -293,7 +293,7 @@ public class TestArchitecture{
 											TicEvent.class) ;
 					EventSink[] to21 =
 							new EventSink[] {
-								new EventSink(OvenConsumptionModel.URI,
+								new EventSink(OvenConsumption.URI,
 											  TicEvent.class)} ;
 					connections2.put(from21, to21) ;
 					
@@ -310,15 +310,15 @@ public class TestArchitecture{
 					new VariableSink[] {
 							new VariableSink("temperature",
 											 Double.class,
-											 OvenConsumptionModel.URI)} ;
+											 OvenConsumption.URI)} ;
 				
 				bindings2.put(source21, sinks21);
 				
 				coupledModelDescriptors.put(
-						OvenModel.URI,
+						OvenCoupledModel.URI,
 						new CoupledHIOA_Descriptor(
-								OvenModel.class,
-								OvenModel.URI,
+								OvenCoupledModel.class,
+								OvenCoupledModel.URI,
 								submodels2,
 								imported2,
 								null,
@@ -389,7 +389,7 @@ public class TestArchitecture{
 			submodels3.add(Electricity_ESModel.URI);
 			submodels3.add(HomeController.URI);
 			submodels3.add(UserModel.URI);
-			submodels3.add(OvenModel.URI);
+			submodels3.add(OvenCoupledModel.URI);
 			submodels3.add(CounterModel.URI);
 			submodels3.add(WindTurbineModel.URI);
 			submodels3.add(WindModel.URI);
@@ -407,7 +407,7 @@ public class TestArchitecture{
 									TVMILCoupledModel.URI,
 									EconomyEvent.class),
 							new EventSink(
-									OvenModel.URI,
+									OvenCoupledModel.URI,
 									EconomyEvent.class),
 							new EventSink(
 									FridgeCoupledModel.URI,
@@ -424,7 +424,7 @@ public class TestArchitecture{
 									TVMILCoupledModel.URI,
 									NoEconomyEvent.class),
 							new EventSink(
-									OvenModel.URI,
+									OvenCoupledModel.URI,
 									NoEconomyEvent.class),
 							new EventSink(
 									FridgeCoupledModel.URI,
@@ -489,7 +489,7 @@ public class TestArchitecture{
 									OvenSwitchEvent.class) ;
 			EventSink[] to38 =
 					new EventSink[] {
-						new EventSink(OvenModel.URI,
+						new EventSink(OvenCoupledModel.URI,
 									  OvenSwitchEvent.class)} ;
 			connections3.put(from38, to38) ;
 			
@@ -636,7 +636,7 @@ public class TestArchitecture{
 			
 			//Oven State Model
 			modelURI = OvenStateModel.URI;
-			simParams.put(modelURI + ":" + OvenStateModel.OVENSTATE_PLOTTING_PARAM_NAME,
+			simParams.put(modelURI + ":" + OvenStateModel.Oven_TEMP_PLOTTING_PARAM_NAME,
 					new PlotterDescription(
 							"Oven Model - State",
 							"Time (sec)",
@@ -648,8 +648,8 @@ public class TestArchitecture{
 							SimulationMain.getPlotterHeight()));
 			
 			//Oven cons Model
-			modelURI = OvenConsumptionModel.URI;
-			simParams.put(modelURI + ":" + OvenConsumptionModel.OVENCONS_PLOTTING_PARAM_NAME,
+			modelURI = OvenConsumption.URI;
+			simParams.put(modelURI + ":" + OvenConsumption.Oven_CONS_PLOTTING_PARAM_NAME,
 					new PlotterDescription(
 							"Oven Model - Consumption",
 							"Time (sec)",

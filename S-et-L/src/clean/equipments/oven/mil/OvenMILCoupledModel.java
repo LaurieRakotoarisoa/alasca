@@ -85,15 +85,6 @@ implements SGMILModelImplementationI{
 		
 		Map<Class<? extends EventI>,EventSink[]> imported =
 				new HashMap<Class<? extends EventI>,EventSink[]>() ;
-				
-//		imported.put(OpenDoor.class,
-//				new EventSink[] {
-//						new EventSink(FridgeStateMILModel.URI,
-//								OpenDoor.class)});
-//		imported.put(CloseDoor.class,
-//				new EventSink[] {
-//						new EventSink(FridgeStateMILModel.URI,
-//								CloseDoor.class)});
 		
 		imported.put(EconomyEvent.class,
 				new EventSink[] {
