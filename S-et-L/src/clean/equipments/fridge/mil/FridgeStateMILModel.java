@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import components.device.Fridge;
 import fr.sorbonne_u.components.cyphy.examples.hem.equipments.hairdryer.mil.models.SGMILModelImplementationI;
 import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentAccessI;
 import fr.sorbonne_u.devs_simulation.interfaces.SimulationReportI;
@@ -22,6 +23,7 @@ import simulation.Fridge.events.ActiveCompressor;
 import simulation.Fridge.events.CloseDoor;
 import simulation.Fridge.events.InactiveCompressor;
 import simulation.Fridge.events.OpenDoor;
+import utils.fridge.FridgeMode;
 
 @ModelExternalEvents(exported = {ActiveCompressor.class,
 							InactiveCompressor.class},
@@ -181,8 +183,9 @@ implements SGMILModelImplementationI{
 		ArrayList<EventI> current = this.getStoredEventAndReset();
 		assert current != null & current.size() == 1;
 		EventI e = current.get(0);
-		
+		this.logMessage("evnt "+e.getClass()) ;
 		e.executeOn(this);
+		this.logMessage("evnt "+e.getClass()+ " processed") ;
 		
 		this.sentEvent = true;
 	}
@@ -190,7 +193,6 @@ implements SGMILModelImplementationI{
 	@Override
 	public ArrayList<EventI> output() {
 		if(sentEvent) {
-			this.logMessage("emitting new compressor state event") ;
 			Time t = this.getCurrentStateTime().add(getNextTimeAdvance());
 			ArrayList<EventI> ret = new ArrayList<EventI>();
 			if(compressorActive) {				
@@ -297,7 +299,6 @@ implements SGMILModelImplementationI{
 	}
 	
 	public void openDoor() {
-		assert !this.doorOpened;
 		if(compressorActive) {
 			if(this.ecoMode) this.currentRate = -LOW_RATE*0.9;
 			else this.currentRate = -LOW_RATE;
@@ -306,24 +307,58 @@ implements SGMILModelImplementationI{
 			this.currentRate = +HIGH_RATE;
 		}
 		this.doorOpened = true;
-		this.logMessage("open door at "+getCurrentStateTime());
+		
+		try {
+			this.logMessage("open door at "+getCurrentStateTime());
+			this.logMessage(componentRef.toString());
+			componentRef.setEmbeddingComponentStateValue(Fridge.FRIDGE_STATE,convertFridgeState(doorOpened, compressorActive));
+			
+		} catch (Exception e) {
+			throw new RuntimeException();
+		}
 	}
 	
 	public void closeDoor() {
-		assert this.doorOpened;
 		if(this.compressorActive) {
 			if(this.ecoMode) this.currentRate = -LOW_RATE;
 			else this.currentRate = -DEFAULT_RATE;
 		}
 		else this.currentRate = +DEFAULT_RATE;
 		this.doorOpened = false;
-		this.logMessage("close door at "+getCurrentStateTime());
+		
+		try {
+			componentRef.setEmbeddingComponentStateValue(Fridge.FRIDGE_STATE, convertFridgeState(doorOpened, compressorActive));
+			this.logMessage("close door at "+getCurrentStateTime());
+		} catch (Exception e) {
+			throw new RuntimeException();
+		}
 	}
 	
 	public void setEcoMode(boolean mode) {
 		assert this.ecoMode != mode;
 		this.ecoMode = mode;
 		this.logMessage("Economy mode "+this.ecoMode+" at "+this.getCurrentStateTime());
+	}
+	
+	public boolean getStateDoor() {
+		return doorOpened;
+	}
+	
+	/**
+	 * convert the state of the fridge to a FridgeMode enum to set embedded component value
+	 * @param doorOpened state of the door
+	 * @param activeCompressor state of the compressor
+	 * @return
+	 */
+	private FridgeMode convertFridgeState(boolean doorOpened, boolean activeCompressor) {
+		if(doorOpened) {
+			if(compressorActive) return FridgeMode.On_Open;
+			else return FridgeMode.Off_Open;
+		}
+		else {
+			if(compressorActive) return FridgeMode.On_Close;
+			else return FridgeMode.Off_Close;
+		}
 	}
 	
 	

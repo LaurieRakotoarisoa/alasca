@@ -1,10 +1,21 @@
 package components.device;
 
+import java.util.HashMap;
+
+import clean.equipments.fridge.components.FridgeSimulatorPlugin;
+import clean.equipments.fridge.mil.FridgeConsumptionMILModel;
+import clean.equipments.fridge.mil.FridgeMILCoupledModel;
+import clean.equipments.fridge.mil.FridgeStateMILModel;
+import clean.equipments.fridge.sil.FridgeSILCoupledModel;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.OfferedInterfaces;
+import fr.sorbonne_u.components.cyphy.AbstractCyPhyComponent;
+import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentAccessI;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.components.ports.PortI;
+import fr.sorbonne_u.devs_simulation.architectures.Architecture;
+import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
 import interfaces.FridgeI;
 import ports.fridge.FridgeInboundPort;
 import utils.fridge.FridgeMode;
@@ -15,7 +26,8 @@ import utils.fridge.FridgeMode;
  *
  */
 @OfferedInterfaces (offered = FridgeI.class)
-public class Fridge extends AbstractComponent{
+public class Fridge extends AbstractCyPhyComponent
+implements EmbeddingComponentAccessI{
 	
 	/**
 	 * Current state of the Fridge
@@ -35,6 +47,14 @@ public class Fridge extends AbstractComponent{
 	 * true if economy mode is activated
 	 */
 	protected boolean ecoMode = false;
+	
+	public static final String TARG_TEMP = "target temperature";
+	public static final String ECO_MODE = "economy";
+	public static final String FRIDGE_STATE = "fridge state";
+	public static final String FRIDGE_CONS = "fridge consumption";
+	
+	/** the simulation plug-in holding the simulation models.				*/
+	protected FridgeSimulatorPlugin					asp ;
 	
 	/**
 	 * @param URI Component uri
@@ -85,10 +105,6 @@ public class Fridge extends AbstractComponent{
 	 * (On, off)
 	 */
 	public FridgeMode setModeService(FridgeMode state) {
-		if (state == FridgeMode.Off_Close) this.cons = 0;
-		else if (state == FridgeMode.Off_Open) this.cons = 0;
-		else if (state == FridgeMode.On_Open)this.cons = temperature*4;
-		else this.cons = temperature*2;
 		this.state = state;
 		this.logMessage("Modification state à "+ state);
 		return state;
@@ -100,6 +116,43 @@ public class Fridge extends AbstractComponent{
 		return mode;
 	}
 	
+	public FridgeMode openDoor() {
+		
+		if(state == FridgeMode.On_Close) state = FridgeMode.On_Open;
+		else {
+			assert state == FridgeMode.Off_Close;
+			state = FridgeMode.Off_Open;
+		}
+		return state;
+	}
+	
+	public FridgeMode closeDoor() {
+		
+		if(state == FridgeMode.On_Open) state = FridgeMode.On_Close;
+		else {
+			assert state == FridgeMode.Off_Open;
+			state = FridgeMode.Off_Close;
+		}
+		return state;
+	}
+	
+	public double updateCons(double cons) {
+		this.cons = cons;
+		this.logMessage("consumption updated "+this.cons);
+		return cons;
+	}
+	
+	/**
+	 * initialise the fridge component.
+	 *
+	 * @param simArchitectureURI		the URI of the simulation architecture to be created and run.
+	 * @throws Exception				<i>to do</i>.
+	 */
+	protected void		initialise(String simArchitectureURI) throws Exception
+	{
+		
+	}
+	
 	/**
 	 * @see fr.sorbonne_u.components.AbstractComponent#start()
 	 */
@@ -108,6 +161,14 @@ public class Fridge extends AbstractComponent{
 	{
 		super.start() ;
 		this.logMessage("starting Fridge component.") ;
+	}
+	
+	@Override
+	public void			execute() throws Exception
+	{
+		this.logMessage("execute");
+		silStandAloneSimulationRun();
+		
 	}
 	
 	@Override
@@ -128,6 +189,73 @@ public class Fridge extends AbstractComponent{
 			throw new ComponentShutdownException(e);
 		}
 		super.shutdown();
+	}
+
+	@Override
+	protected Architecture createLocalArchitecture(String architectureURI) throws Exception {
+		return FridgeSILCoupledModel.buildArchitecture();
+	}
+	
+	/**
+	 * @see fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentAccessI#getEmbeddingComponentStateValue(java.lang.String)
+	 */
+	@Override
+	public Object		getEmbeddingComponentStateValue(String name)
+	throws Exception
+	{
+		if(name == TARG_TEMP) return temperature;
+		else if(name == ECO_MODE) return ecoMode;
+		else if(name == FRIDGE_CONS) return cons;
+		else {assert name == FRIDGE_STATE; return state;}
+	}
+	
+	/**
+	 * @see fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentAccessI#getEmbeddingComponentStateValue(java.lang.String)
+	 */
+	@Override
+	public void		setEmbeddingComponentStateValue(String name,Object value)
+	throws Exception
+	{
+		if(name == TARG_TEMP) temperature = (Double) value;
+		else if(name == ECO_MODE) ecoMode = (Boolean) value;
+		else if(name == FRIDGE_CONS) updateCons((Double) value);
+		else {
+			setModeService(((FridgeMode) value));
+		}
+	}
+	
+	protected void startSimulation() {
+		this.runTask(
+				new AbstractComponent.AbstractTask() {
+					@Override
+					public void run() {
+						try {
+							((Fridge)this.getTaskOwner()).
+													silStandAloneSimulationRun() ;
+						} catch (Exception e) {
+							throw new RuntimeException(e) ;
+						}
+					}
+				}) ;
+	}
+	
+	protected void		silStandAloneSimulationRun() throws Exception
+	{
+		SimulationEngine se;
+		try {
+			Architecture localArchitecture = FridgeMILCoupledModel.buildArchitecture() ;
+			se = localArchitecture.constructSimulator() ;
+			se.setDebugLevel(0) ;
+			HashMap<String, Object> hm = new HashMap<String, Object>();
+			hm.put(FridgeStateMILModel.COMPONENT_HOLDER_REF_PARAM_NAME, this);
+			hm.put(FridgeConsumptionMILModel.COMPONENT_HOLDER_REF_PARAM_NAME, this);
+			se.setSimulationRunParameters(hm);
+			System.out.println(se.simulatorAsString()) ;
+			SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 10L ;
+			se.doStandAloneSimulation(0.0, 5000.0) ;
+		} catch (Exception e) {
+			throw new RuntimeException(e) ;
+		}
 	}
 
 }

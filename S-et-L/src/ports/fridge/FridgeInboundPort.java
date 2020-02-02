@@ -71,4 +71,16 @@ implements FridgeI{
 		
 	}
 
+	@Override
+	public void openDoor() throws Exception {
+		this.getOwner().handleRequestSync(owner -> ((Fridge)owner).openDoor());
+		
+	}
+
+	@Override
+	public void closeDoor() throws Exception {
+		this.getOwner().handleRequestSync(owner -> ((Fridge)owner).closeDoor());
+		
+	}
+
 }

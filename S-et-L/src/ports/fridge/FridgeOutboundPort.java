@@ -68,4 +68,18 @@ implements FridgeI{
 		
 	}
 
+
+	@Override
+	public void openDoor() throws Exception {
+		((FridgeI)this.connector).openDoor();
+		
+	}
+
+
+	@Override
+	public void closeDoor() throws Exception {
+		((FridgeI)this.connector).closeDoor();
+		
+	}
+
 }

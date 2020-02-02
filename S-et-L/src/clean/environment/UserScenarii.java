@@ -39,7 +39,7 @@ public class UserScenarii {
 		events.add(new CloseDoor(t.add(new Duration(2000.0, TimeUnit.SECONDS))));
 		t = new Time(4101.0, TimeUnit.SECONDS);
 		events.add(new OpenDoor(t));
-		events.add(new CloseDoor(t.add(new Duration(309.0, TimeUnit.SECONDS))));
+		events.add(new CloseDoor(t.add(new Duration(300.0, TimeUnit.SECONDS))));
 		return events;
 	}
 	

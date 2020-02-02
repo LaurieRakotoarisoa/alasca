@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import components.device.Fridge;
 import fr.sorbonne_u.components.cyphy.examples.hem.equipments.hairdryer.mil.models.SGMILModelImplementationI;
 import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentAccessI;
 import fr.sorbonne_u.devs_simulation.interfaces.SimulationReportI;
@@ -231,6 +232,13 @@ implements SGMILModelImplementationI{
 				SERIES,
 				this.getCurrentStateTime().getSimulatedTime(),
 				this.consumption) ;
+		
+		try {
+			componentRef.setEmbeddingComponentStateValue(Fridge.FRIDGE_CONS, this.consumption);
+			this.logMessage("close door at "+getCurrentStateTime());
+		} catch (Exception e) {
+			throw new RuntimeException();
+		}
 	}
 
 }

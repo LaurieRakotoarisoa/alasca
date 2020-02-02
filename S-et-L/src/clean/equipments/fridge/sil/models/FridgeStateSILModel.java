@@ -6,10 +6,11 @@ import java.util.concurrent.TimeUnit;
 
 import clean.equipments.fridge.components.FridgeComponent;
 import clean.equipments.fridge.mil.FridgeStateMILModel;
+import components.device.Fridge;
 import fr.sorbonne_u.components.cyphy.examples.hem.equipments.hairdryer.mil.models.SGMILModelImplementationI;
-import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentAccessI;
 import fr.sorbonne_u.devs_simulation.interfaces.SimulationReportI;
 import fr.sorbonne_u.devs_simulation.models.AtomicModel;
+import fr.sorbonne_u.devs_simulation.models.annotations.ModelExternalEvents;
 import fr.sorbonne_u.devs_simulation.models.events.EventI;
 import fr.sorbonne_u.devs_simulation.models.time.Duration;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
@@ -19,7 +20,10 @@ import fr.sorbonne_u.utils.PlotterDescription;
 import fr.sorbonne_u.utils.XYPlotter;
 import simulation.Fridge.events.ActiveCompressor;
 import simulation.Fridge.events.InactiveCompressor;
+import utils.fridge.FridgeMode;
 
+
+@ModelExternalEvents (exported = {InactiveCompressor.class,ActiveCompressor.class})
 public class FridgeStateSILModel 
 extends AtomicModel
 implements SGMILModelImplementationI{
@@ -91,12 +95,18 @@ implements SGMILModelImplementationI{
 	
 	/** reference on the object representing the component that holds the
 	 *  model; enables the model to access the state of this component.		*/
-	protected FridgeComponent componentRef ;
+	protected Fridge componentRef ;
 	
 	
 	// -------------------------------------------------------------------------
-	// HIOA model variables
+	// Methods
 	// -------------------------------------------------------------------------
+	
+
+	public Fridge getComponentRef()
+	{
+		return this.componentRef ;
+	}
 		
 	/**
 	 * @see fr.sorbonne_u.devs_simulation.models.Model#setSimulationRunParameters(java.util.Map)
@@ -109,7 +119,7 @@ implements SGMILModelImplementationI{
 		
 		// The reference to the embedding component
 		this.componentRef =
-			(FridgeComponent)
+			(Fridge)
 							simParams.get(FridgeStateMILModel.COMPONENT_HOLDER_REF_PARAM_NAME) ;
 	}
 	
@@ -154,10 +164,32 @@ implements SGMILModelImplementationI{
 	@Override
 	public void			userDefinedInternalTransition(Duration elapsedTime)
 	{
-		super.userDefinedInternalTransition(elapsedTime) ;
-		//Mode eco Door has changed ?
-		assert this.componentRef != null;
-		computeTemp();
+		try {
+			super.userDefinedInternalTransition(elapsedTime) ;
+			//Mode eco Door has changed ?
+			assert this.componentRef != null;
+			
+			//get the target temperature
+			double target = 
+					(Double)this.componentRef.getEmbeddingComponentStateValue(FridgeComponent.TARG_TEMP);
+			if(target != this.targetTemperature) setTargetTemperature(target);
+			assert target == this.targetTemperature;
+			
+			//get eco mode
+			boolean eco = 
+					(Boolean)this.componentRef.getEmbeddingComponentStateValue(FridgeComponent.ECO_MODE);
+			if(eco != this.ecoMode) setEcoMode(eco);
+			assert eco == ecoMode;
+			
+			//get fridge state
+			FridgeMode state = (FridgeMode)this.componentRef.getEmbeddingComponentStateValue(FridgeComponent.ECO_MODE);
+			updateState(state);
+			
+			
+			computeTemp();
+		}catch (Exception e) {
+			throw new RuntimeException();
+		}
 		
 	}
 	
@@ -167,14 +199,7 @@ implements SGMILModelImplementationI{
 	@Override
 	public void			userDefinedExternalTransition(Duration elapsedTime)
 	{
-		super.userDefinedExternalTransition(elapsedTime) ;
-		ArrayList<EventI> current = this.getStoredEventAndReset();
-		assert current != null & current.size() == 1;
-		EventI e = current.get(0);
-		
-		e.executeOn(this);
-		
-		this.sentEvent = true;
+		//No external events
 	}
 
 	@Override
@@ -313,7 +338,38 @@ implements SGMILModelImplementationI{
 	public void setEcoMode(boolean mode) {
 		assert this.ecoMode != mode;
 		this.ecoMode = mode;
+		this.sentEvent = true;
 		this.logMessage("Economy mode "+this.ecoMode+" at "+this.getCurrentStateTime());
+	}
+	
+	public double setTargetTemperature(double temperature) {
+		this.targetTemperature = temperature;
+		return this.targetTemperature;
+	}
+	
+	/** return true if door or state has changed **/
+	public void updateState(FridgeMode mode) {
+		boolean oldDoor = doorOpened;
+		boolean oldCompressorState = compressorActive;
+		switch (mode) {
+		case Off_Close: this.doorOpened = false; 
+						compressorActive = false;
+						break;
+		case Off_Open: this.doorOpened = true; 
+						compressorActive = false;
+						break;
+		case On_Close: this.doorOpened = false; 
+						compressorActive = true;
+						break;
+		case On_Open: this.doorOpened = true; 
+						compressorActive = true;
+						break;
+		default:
+			break;
+		}
+		
+		if(oldDoor != doorOpened || oldCompressorState != compressorActive) this.sentEvent = true;
+		else this.sentEvent = false;
 	}
 
 }

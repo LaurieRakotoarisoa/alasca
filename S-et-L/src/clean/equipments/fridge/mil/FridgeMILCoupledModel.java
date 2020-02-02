@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 import clean.environment.UserMILModel;
 import clean.equipments.controller.mil.models.ControllerMILModel;
+import clean.equipments.fridge.sil.models.UserFridgeSILModel;
 import clean.equipments.tv.mil.models.TVMILCoupledModel;
 import fr.sorbonne_u.components.cyphy.examples.hem.equipments.hairdryer.mil.models.SGMILModelImplementationI;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
@@ -92,14 +93,14 @@ implements SGMILModelImplementationI{
 		Map<Class<? extends EventI>,EventSink[]> imported =
 				new HashMap<Class<? extends EventI>,EventSink[]>() ;
 				
-		imported.put(OpenDoor.class,
-				new EventSink[] {
-						new EventSink(FridgeStateMILModel.URI,
-								OpenDoor.class)});
-		imported.put(CloseDoor.class,
-				new EventSink[] {
-						new EventSink(FridgeStateMILModel.URI,
-								CloseDoor.class)});
+//		imported.put(OpenDoor.class,
+//				new EventSink[] {
+//						new EventSink(FridgeStateMILModel.URI,
+//								OpenDoor.class)});
+//		imported.put(CloseDoor.class,
+//				new EventSink[] {
+//						new EventSink(FridgeStateMILModel.URI,
+//								CloseDoor.class)});
 		
 		imported.put(EconomyEvent.class,
 				new EventSink[] {
@@ -117,6 +118,7 @@ implements SGMILModelImplementationI{
 		Set<String> submodels = new HashSet<String>() ;
 		submodels.add(FridgeConsumptionMILModel.URI) ;
 		submodels.add(FridgeStateMILModel.URI) ;
+		submodels.add(UserMILModel.URI);
 		
 		
 		
@@ -134,6 +136,18 @@ implements SGMILModelImplementationI{
 		EventSink[] to2 = new EventSink[] {
 		new EventSink(FridgeConsumptionMILModel.URI, InactiveCompressor.class)} ;
 		connections.put(from2, to2) ;
+		
+		EventSource from3 =
+				new EventSource(UserMILModel.URI, OpenDoor.class) ;
+				EventSink[] to3 = new EventSink[] {
+				new EventSink(FridgeStateMILModel.URI, OpenDoor.class)} ;
+				connections.put(from3, to3) ;
+				
+		EventSource from4 =
+				new EventSource(UserMILModel.URI, CloseDoor.class) ;
+				EventSink[] to4 = new EventSink[] {
+				new EventSink(FridgeStateMILModel.URI, CloseDoor.class)} ;
+				connections.put(from4, to4) ;
 		
 		
 		
@@ -171,6 +185,15 @@ implements SGMILModelImplementationI{
 				AtomicModelDescriptor.create(
 						FridgeStateMILModel.class,
 						FridgeStateMILModel.URI,
+						TimeUnit.SECONDS,
+						null,
+						SimulationEngineCreationMode.ATOMIC_ENGINE)) ;
+		
+		atomicModelDescriptors.put(
+				UserMILModel.URI,
+				AtomicModelDescriptor.create(
+						UserMILModel.class,
+						UserMILModel.URI,
 						TimeUnit.SECONDS,
 						null,
 						SimulationEngineCreationMode.ATOMIC_ENGINE)) ;

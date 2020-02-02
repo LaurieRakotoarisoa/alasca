@@ -41,7 +41,7 @@ public interface FridgeI extends OfferedI, RequiredI{
 	public void turnOn( ) throws Exception;
 	
 	/**
-	 * set the temperature of the Fridge
+	 * set the target temperature of the Fridge
 	 * @throws Exception
 	 */
 	public void setTemperature(double temperature) throws Exception;
@@ -57,6 +57,19 @@ public interface FridgeI extends OfferedI, RequiredI{
 	 * @throws Exception
 	 */
 	public void deactivateEcoMode() throws Exception;
+	
+	/**
+	 * open the door of the fridge
+	 * @throws Exception
+	 */
+	public void openDoor() throws Exception;
+	
+	/**
+	 * close the door of the fridge
+	 * @throws Exception
+	 */
+	public void closeDoor() throws Exception;
+	
 	
 	
 }
