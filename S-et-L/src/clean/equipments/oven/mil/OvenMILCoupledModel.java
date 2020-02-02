@@ -55,6 +55,8 @@ implements SGMILModelImplementationI{
 	
 	public static final String	URI = OvenMILCoupledModel.class.getName() ;
 	
+	public static final String OvenSTATE_PLOTTING_PARAM_NAME = "Oven-state-plot";
+	
 	public static class	OvenModelReport
 	extends		AbstractSimulationReport
 	{
