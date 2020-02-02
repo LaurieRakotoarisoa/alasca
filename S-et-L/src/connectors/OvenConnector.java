@@ -35,6 +35,18 @@ implements OvenI{
 	public void setTemperature(int temperature) throws Exception {
 		((OvenI)this.offering).setTemperature(temperature);
 	}
+	
+	@Override
+	public void activateEcoMode() throws Exception {
+		((OvenI)this.offering).activateEcoMode();
+		
+	}
+
+	@Override
+	public void deactivateEcoMode() throws Exception {
+		((OvenI)this.offering).deactivateEcoMode();
+		
+	}
 
 	@Override
 	public int getCons() throws Exception {

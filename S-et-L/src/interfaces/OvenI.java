@@ -61,6 +61,18 @@ public interface OvenI extends OfferedI, RequiredI{
 	 */
 	public void setModeLight(OvenLightMode mode) throws Exception;
 	
+	/**
+	 * activate economy mode for the oven
+	 * @throws Exception
+	 */
+	public void activateEcoMode() throws Exception;
+	
+	/**
+	 * deactivate economy mode for the oven
+	 * @throws Exception
+	 */
+	public void deactivateEcoMode() throws Exception;
+	
 	
 	/**
 	 * Forbid cleaning oven with pyrolysis mode

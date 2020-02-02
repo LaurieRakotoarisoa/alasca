@@ -58,6 +58,18 @@ implements OvenI{
 		this.getOwner().handleRequestSync(owner -> ((Oven)owner).setTemperatur(temperature));
 		
 	}
+	
+	@Override
+	public void activateEcoMode() throws Exception {
+		this.getOwner().handleRequestSync(owner -> ((Oven)owner).setEcoMode(true));
+		
+	}
+
+	@Override
+	public void deactivateEcoMode() throws Exception {
+		this.getOwner().handleRequestSync(owner -> ((Oven)owner).setEcoMode(false));
+		
+	}
 
 	@Override
 	public void turnOn(int temperature) throws Exception {

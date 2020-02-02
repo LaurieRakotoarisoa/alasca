@@ -52,7 +52,19 @@ implements OvenI{
 	public void setTemperature(int temperature) throws Exception {
 		((OvenI)this.connector).setTemperature(temperature);
 	}
+	
+	@Override
+	public void activateEcoMode() throws Exception {
+		((OvenI)this.connector).activateEcoMode();
+		
+	}
 
+
+	@Override
+	public void deactivateEcoMode() throws Exception {
+		((OvenI)this.connector).deactivateEcoMode();
+		
+	}
 
 	@Override
 	public int getCons() throws Exception {
