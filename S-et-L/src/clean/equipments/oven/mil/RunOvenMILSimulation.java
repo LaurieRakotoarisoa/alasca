@@ -1,6 +1,5 @@
 package clean.equipments.oven.mil;
 
-import clean.equipments.fridge.mil.FridgeMILCoupledModel;
 import fr.sorbonne_u.components.cyphy.examples.hem.equipments.hairdryer.mil.models.SGMILModelImplementationI;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
@@ -11,7 +10,7 @@ public class RunOvenMILSimulation {
 	{
 		try {
 			Architecture localArchitecture =
-								FridgeMILCoupledModel.buildArchitecture();
+								OvenMILCoupledModel.buildArchitecture();
 			SimulationEngine se = localArchitecture.constructSimulator() ;
 			se.setDebugLevel(0) ;
 			System.out.println(se.simulatorAsString()) ;

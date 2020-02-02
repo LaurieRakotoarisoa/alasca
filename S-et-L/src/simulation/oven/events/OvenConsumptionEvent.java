@@ -55,4 +55,8 @@ extends Event{
 				"level = " + ((Reading)this.getEventInformation()).value
 												+ " watt";
 	}
+	
+	public double getConsumption() {
+		return ((Reading)this.getEventInformation()).value;
+	}
 }
